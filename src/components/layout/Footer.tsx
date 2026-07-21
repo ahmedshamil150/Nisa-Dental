@@ -51,13 +51,17 @@ export function Footer() {
           <span className="material-symbols-outlined fill">home</span>
           <span className="font-label-md text-[10px]">Home</span>
         </Link>
-        <Link href="/services" className="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-colors">
-          <span className="material-symbols-outlined">medical_services</span>
-          <span className="font-label-md text-[10px]">Services</span>
-        </Link>
         <Link href="/shop" className="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-colors">
           <span className="material-symbols-outlined">shopping_bag</span>
           <span className="font-label-md text-[10px]">Shop</span>
+        </Link>
+        <Link href="/cart" className="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">shopping_cart</span>
+          <span className="font-label-md text-[10px]">Cart</span>
+        </Link>
+        <Link href="/track" className="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-colors">
+          <span className="material-symbols-outlined">local_shipping</span>
+          <span className="font-label-md text-[10px]">Track</span>
         </Link>
         <Link href="/appointment" className="flex flex-col items-center justify-center text-on-surface-variant/70 hover:text-primary transition-colors">
           <span className="material-symbols-outlined">calendar_today</span>

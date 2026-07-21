@@ -98,6 +98,10 @@ body {
   background: var(--color-background);
   color: var(--color-on-background);
   font-family: Manrope, sans-serif;
+  padding-bottom: 72px;
+}
+@media (min-width: 768px) {
+  body { padding-bottom: 0; }
 }
 
 ::selection {

@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
+import { AddToCartButton } from "@/components/shop/AddToCartButton"
 
 async function getCategories() {
   const sb = getSupabase()
@@ -119,9 +120,7 @@ export default async function ShopPage({
                   </div>
                   <div className="mt-6 flex items-center justify-between">
                     <span className="font-headline-md text-headline-md text-primary">${product.sale_price || product.price}</span>
-                    <button className="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg hover:bg-primary/90 active:scale-95 transition-all flex items-center gap-2">
-                      Add to Cart <span className="material-symbols-outlined text-[18px]">add_shopping_cart</span>
-                    </button>
+                    <AddToCartButton product={product} />
                   </div>
                 </div>
               ))}

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
+import { AddToCartLargeButton } from "@/components/shop/AddToCartLargeButton"
 
 async function getProduct(slug: string) {
   const sb = getSupabase()
@@ -47,10 +48,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </span>
           </div>
 
-          <button className="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 mb-4">
-            <span className="material-symbols-outlined text-[20px]">add_shopping_cart</span>
-            Add to Cart
-          </button>
+          <AddToCartLargeButton product={product} />
           <Link href="/shop" className="block w-full border border-primary text-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/5 active:scale-95 transition-all text-center">
             Continue Shopping
           </Link>

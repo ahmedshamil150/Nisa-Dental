@@ -1,0 +1,110 @@
+"use client"
+
+import Link from "next/link"
+import { useCart } from "@/lib/cart-context"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+
+export default function CartPage() {
+  const { items, removeItem, updateQuantity, subtotal, itemCount } = useCart()
+  const [couponCode, setCouponCode] = useState("")
+  const [couponMsg, setCouponMsg] = useState("")
+  const router = useRouter()
+
+  const delivery = 5.99
+  const tax = subtotal * 0.08
+
+  return (
+    <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+      <h1 className="font-headline-lg text-headline-lg text-on-surface mb-8">Shopping Cart</h1>
+
+      {items.length === 0 ? (
+        <div className="text-center py-20 border-2 border-dashed border-outline-variant/30 rounded-xl">
+          <span className="material-symbols-outlined text-[64px] text-outline-variant">shopping_cart</span>
+          <p className="font-body-lg text-on-surface-variant mt-4 mb-8">Your cart is empty</p>
+          <Link href="/shop" className="bg-primary text-on-primary px-8 py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-all">
+            Browse Products
+          </Link>
+        </div>
+      ) : (
+        <div className="grid gap-12 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-4">
+            {items.map((item) => (
+              <div key={item.id} className="bg-surface p-6 rounded-xl border border-outline-variant/30 flex items-center gap-6">
+                <div className="w-20 h-20 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-outline-variant/50">inventory_2</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Link href={`/shop/${item.slug}`} className="font-headline-md text-headline-md text-on-surface hover:text-primary transition-colors">
+                    {item.name}
+                  </Link>
+                  <p className="font-headline-md text-headline-md text-primary mt-1">${item.price}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    className="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">remove</span>
+                  </button>
+                  <span className="font-label-md text-label-md w-8 text-center">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    className="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">add</span>
+                  </button>
+                </div>
+                <p className="font-headline-md text-headline-md text-on-surface w-24 text-right">${(item.price * item.quantity).toFixed(2)}</p>
+                <button onClick={() => removeItem(item.id)} className="text-on-surface-variant hover:text-error transition-colors">
+                  <span className="material-symbols-outlined">delete</span>
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-surface p-8 rounded-xl border border-outline-variant/30 h-fit">
+            <h2 className="font-headline-md text-headline-md text-on-surface mb-6">Order Summary</h2>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between"><span className="text-on-surface-variant">Subtotal</span><span className="font-medium">${subtotal.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-on-surface-variant">Delivery</span><span className="font-medium">${delivery.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-on-surface-variant">Tax (8%)</span><span className="font-medium">${tax.toFixed(2)}</span></div>
+              <div className="border-t pt-3 flex justify-between font-headline-md text-headline-md text-on-surface">
+                <span>Total</span><span>${(subtotal + delivery + tax).toFixed(2)}</span>
+              </div>
+            </div>
+
+            <hr className="my-6 border-outline-variant/30" />
+
+            <div className="mb-6">
+              <label className="font-label-md text-label-md text-on-surface block mb-2">Coupon Code</label>
+              <div className="flex gap-2">
+                <input
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="ENTER CODE"
+                  className="flex-1 rounded-lg border border-outline-variant bg-surface px-4 py-3 font-label-md text-label-md uppercase focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                />
+                <button className="bg-primary text-on-primary px-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-all">
+                  Apply
+                </button>
+              </div>
+              {couponMsg && <p className="text-caption mt-2 text-primary">{couponMsg}</p>}
+            </div>
+
+            <button
+              onClick={() => router.push("/checkout")}
+              className="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              Proceed to Checkout
+              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </button>
+            <Link href="/shop" className="block text-center text-primary font-label-md text-label-md mt-4 hover:underline">
+              Continue Shopping
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

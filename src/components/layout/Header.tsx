@@ -3,13 +3,25 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
+import { useCart } from "@/lib/cart-context"
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/shop", label: "Shop" },
+  { href: "/track", label: "Track Order" },
   { href: "/appointment", label: "Appointments" },
 ]
+
+function CartBadge() {
+  const { itemCount } = useCart()
+  if (itemCount === 0) return null
+  return (
+    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-error text-on-error text-[10px] font-bold flex items-center justify-center">
+      {itemCount > 9 ? "9+" : itemCount}
+    </span>
+  )
+}
 
 export function Header() {
   const pathname = usePathname()
@@ -52,8 +64,9 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <Link href="/shop" className="material-symbols-outlined text-primary hover:scale-110 transition-transform">
-              shopping_bag
+            <Link href="/cart" className="relative text-primary hover:scale-110 transition-transform">
+              <span className="material-symbols-outlined">shopping_cart</span>
+              <CartBadge />
             </Link>
             <Link href="/appointment" className="material-symbols-outlined text-primary hover:scale-110 transition-transform">
               calendar_month
@@ -79,11 +92,11 @@ export function Header() {
               )
             })}
             <Link
-              href="/appointment"
+              href="/cart"
               onClick={() => setMenuOpen(false)}
               className="block bg-primary text-on-primary text-center px-6 py-3 rounded-lg font-label-md text-label-md mt-4"
             >
-              Book Appointment
+              View Cart
             </Link>
           </div>
         )}
