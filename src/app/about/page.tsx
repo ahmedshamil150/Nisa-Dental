@@ -1,5 +1,12 @@
 import { getSupabase } from "@/lib/supabase"
 
+async function getServices() {
+  const sb = getSupabase()
+  if (!sb) return []
+  const { data } = await sb.from("services").select("*").eq("is_active", true).order("sort_order")
+  return (data || []) as any[]
+}
+
 async function getTeam() {
   const sb = getSupabase()
   if (!sb) return []
@@ -8,7 +15,7 @@ async function getTeam() {
 }
 
 export default async function AboutPage() {
-  const team = await getTeam()
+  const [services, team] = await Promise.all([getServices(), getTeam()])
 
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
@@ -38,8 +45,28 @@ export default async function AboutPage() {
         </div>
       </div>
 
+      {services.length > 0 && (
+        <section id="services" className="mb-20 scroll-mt-20">
+          <h2 className="font-headline-lg text-headline-lg text-on-surface text-center mb-12">Our Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((s: any) => (
+              <div key={s.id} className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 transition-all">
+                <span className="material-symbols-outlined text-primary text-4xl mb-4">clinical_notes</span>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{s.name}</h3>
+                {s.short_description && <p className="text-on-surface-variant mb-4">{s.short_description}</p>}
+                {s.description && <p className="text-caption text-on-surface-variant mb-4 line-clamp-2">{s.description}</p>}
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-outline-variant/20">
+                  {s.price && <span className="font-headline-md text-headline-md text-primary">PKR {s.price}</span>}
+                  {s.duration_minutes && <span className="text-caption text-on-surface-variant">~{s.duration_minutes} min</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {team.length > 0 && (
-        <>
+        <section id="team" className="scroll-mt-20">
           <h2 className="font-headline-lg text-headline-lg text-on-surface text-center mb-12">Meet Our Team</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((m: any) => (
@@ -59,7 +86,7 @@ export default async function AboutPage() {
               </div>
             ))}
           </div>
-        </>
+        </section>
       )}
     </div>
   )

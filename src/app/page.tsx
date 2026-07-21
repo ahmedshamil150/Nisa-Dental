@@ -1,19 +1,22 @@
 import Link from "next/link"
+import { getSupabase } from "@/lib/supabase"
 
-const services = [
-  { name: "General Dentistry", short_description: "Comprehensive oral exams, deep cleanings, and preventative care tailored to your needs.", slug: "general-dentistry" },
-  { name: "Orthodontics", short_description: "Align your smile with modern solutions from invisible aligners to precision braces.", slug: "orthodontics" },
-  { name: "Teeth Whitening", short_description: "Professional grade brightening treatments that deliver immediate, safe results.", slug: "whitening" },
-  { name: "Pediatric Care", short_description: "Gentle, fun dental visits designed specifically for our youngest patients.", slug: "pediatric" },
-]
+async function getServices() {
+  const sb = getSupabase()
+  if (!sb) return []
+  const { data } = await sb.from("services").select("*").eq("is_active", true).order("sort_order")
+  return (data || []) as any[]
+}
 
-const testimonials = [
-  { id: 1, rating: 5, content: "The best dental experience I've ever had. The staff is professional, the clinic is spotless, and the technology is state-of-the-art.", patient_name: "Eleanor Shellstrop", patient_title: "Patient for 3 years" },
-  { id: 2, rating: 5, content: "I was terrified of dentists until I visited Nisa. The team was incredibly gentle and explained everything clearly.", patient_name: "Sarah Johnson", patient_title: "Patient for 1 year" },
-  { id: 3, rating: 5, content: "My Invisalign transformation was seamless. Monthly checkups were quick and efficient. Highly recommend NISA!", patient_name: "Michael Chen", patient_title: "Patient for 5 years" },
-]
+async function getTestimonials() {
+  const sb = getSupabase()
+  if (!sb) return []
+  const { data } = await sb.from("testimonials").select("*").eq("is_approved", true).order("created_at", { ascending: false })
+  return (data || []) as any[]
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [services, testimonials] = await Promise.all([getServices(), getTestimonials()])
 
   return (
     <>
@@ -44,7 +47,7 @@ export default function HomePage() {
               Book Appointment
             </Link>
             <Link
-              href="/services"
+              href="/about#services"
               className="border border-primary text-primary px-8 py-4 rounded-lg font-label-md text-label-md hover:bg-primary/5 transition-all active:scale-95 text-center"
             >
               View Our Services
@@ -60,77 +63,75 @@ export default function HomePage() {
           <div className="w-16 h-1 bg-primary mx-auto rounded-full" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter max-w-container-max mx-auto">
-          {/* Main Service Card */}
           {services.length > 0 && (
-            <div className="md:col-span-8 bg-surface-container-low p-8 md:p-10 rounded-xl border border-outline-variant/30 flex flex-col md:flex-row gap-8 items-center overflow-hidden group transition-all duration-500 hover:shadow-sm">
-              <div className="flex-1">
-                <span className="material-symbols-outlined text-primary text-4xl mb-4">clinical_notes</span>
-                <h3 className="font-headline-md text-headline-md mb-3 text-on-surface">{services[0]?.name || "General Dentistry"}</h3>
-                <p className="text-on-surface-variant mb-6">{services[0]?.short_description || "Comprehensive oral exams, deep cleanings, and preventative care tailored to your specific needs."}</p>
-                <ul className="space-y-2 mb-8">
-                  <li className="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
-                    <span className="material-symbols-outlined text-primary text-[18px]">check_circle</span> Routine Check-ups
-                  </li>
-                  <li className="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
-                    <span className="material-symbols-outlined text-primary text-[18px]">check_circle</span> Professional Cleaning
-                  </li>
-                </ul>
-                <Link href="/services" className="text-primary font-bold flex items-center gap-2 group-hover:gap-4 transition-all">
-                  Learn More <span className="material-symbols-outlined">arrow_forward</span>
-                </Link>
+            <>
+              <div className="md:col-span-8 bg-surface-container-low p-8 md:p-10 rounded-xl border border-outline-variant/30 flex flex-col md:flex-row gap-8 items-center overflow-hidden group transition-all duration-500 hover:shadow-sm">
+                <div className="flex-1">
+                  <span className="material-symbols-outlined text-primary text-4xl mb-4">clinical_notes</span>
+                  <h3 className="font-headline-md text-headline-md mb-3 text-on-surface">{services[0]?.name}</h3>
+                  <p className="text-on-surface-variant mb-6">{services[0]?.short_description}</p>
+                  <ul className="space-y-2 mb-8">
+                    <li className="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+                      <span className="material-symbols-outlined text-primary text-[18px]">check_circle</span> Routine Check-ups
+                    </li>
+                    <li className="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+                      <span className="material-symbols-outlined text-primary text-[18px]">check_circle</span> Professional Cleaning
+                    </li>
+                  </ul>
+                  <Link href="/about#services" className="text-primary font-bold flex items-center gap-2 group-hover:gap-4 transition-all">
+                    Learn More <span className="material-symbols-outlined">arrow_forward</span>
+                  </Link>
+                </div>
+                <div className="w-full md:w-1/2 aspect-square rounded-lg overflow-hidden border border-outline-variant/20 bg-primary-fixed-dim/20 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[80px] text-primary/30">clinical_notes</span>
+                </div>
               </div>
-              <div className="w-full md:w-1/2 aspect-square rounded-lg overflow-hidden border border-outline-variant/20 bg-primary-fixed-dim/20 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[80px] text-primary/30">clinical_notes</span>
+
+              <div className="md:col-span-4 bg-primary text-on-primary p-8 rounded-xl border border-primary-container flex flex-col justify-between transition-all duration-500 hover:shadow-xl">
+                <div>
+                  <span className="material-symbols-outlined text-on-primary text-4xl mb-4">dentistry</span>
+                  <h3 className="font-headline-md text-headline-md mb-3">Orthodontics</h3>
+                  <p className="text-primary-fixed opacity-90">Align your smile with modern solutions from invisible aligners to precision braces.</p>
+                </div>
+                <div className="mt-8">
+                  <div className="bg-primary-container/20 p-4 rounded-lg border border-primary-fixed/20 mb-6">
+                    <p className="font-label-md text-label-md italic">&ldquo;Life changing results.&rdquo;</p>
+                  </div>
+                  <Link
+                    href="/appointment"
+                    className="block w-full bg-surface text-primary py-3 rounded-lg font-label-md text-label-md hover:bg-surface-dim transition-colors text-center"
+                  >
+                    Book Consultant
+                  </Link>
+                </div>
               </div>
-            </div>
+
+              <div className="md:col-span-6 bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 transition-all">
+                <div className="mb-6 rounded-lg overflow-hidden h-48 bg-cover bg-center border border-outline-variant/10 bg-primary-fixed-dim/20 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[60px] text-primary/30">brightness_high</span>
+                </div>
+                <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">Teeth Whitening</h3>
+                <p className="text-on-surface-variant mb-6">Professional grade brightening treatments that deliver immediate, safe, and stunning results.</p>
+                <div className="flex gap-2">
+                  <span className="bg-secondary-container px-3 py-1 rounded-full text-[12px] font-bold text-on-secondary-container uppercase tracking-wider">Most Popular</span>
+                </div>
+              </div>
+
+              <div className="md:col-span-6 bg-tertiary-container text-on-tertiary-container p-8 rounded-xl border border-tertiary flex items-center justify-between overflow-hidden relative">
+                <div className="z-10 relative">
+                  <h3 className="font-headline-md text-headline-md mb-2">Pediatric Care</h3>
+                  <p className="opacity-80 max-w-xs mb-4">Gentle, fun, and educational dental visits designed specifically for our youngest patients.</p>
+                  <Link
+                    href="/about#services"
+                    className="inline-block bg-tertiary text-on-tertiary px-6 py-2 rounded-lg font-label-md text-label-md hover:bg-tertiary/90 transition-all"
+                  >
+                    Explore
+                  </Link>
+                </div>
+                <span className="material-symbols-outlined text-[120px] absolute -right-4 -bottom-4 opacity-10 rotate-12">child_care</span>
+              </div>
+            </>
           )}
-
-          {/* Orthodontics Card */}
-          <div className="md:col-span-4 bg-primary text-on-primary p-8 rounded-xl border border-primary-container flex flex-col justify-between transition-all duration-500 hover:shadow-xl">
-            <div>
-              <span className="material-symbols-outlined text-on-primary text-4xl mb-4">dentistry</span>
-              <h3 className="font-headline-md text-headline-md mb-3">Orthodontics</h3>
-              <p className="text-primary-fixed opacity-90">Align your smile with modern solutions from invisible aligners to precision braces.</p>
-            </div>
-            <div className="mt-8">
-              <div className="bg-primary-container/20 p-4 rounded-lg border border-primary-fixed/20 mb-6">
-                <p className="font-label-md text-label-md italic">&ldquo;Life changing results.&rdquo;</p>
-              </div>
-              <Link
-                href="/appointment"
-                className="block w-full bg-surface text-primary py-3 rounded-lg font-label-md text-label-md hover:bg-surface-dim transition-colors text-center"
-              >
-                Book Consultant
-              </Link>
-            </div>
-          </div>
-
-          {/* Teeth Whitening */}
-          <div className="md:col-span-6 bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 transition-all">
-            <div className="mb-6 rounded-lg overflow-hidden h-48 bg-cover bg-center border border-outline-variant/10 bg-primary-fixed-dim/20 flex items-center justify-center">
-              <span className="material-symbols-outlined text-[60px] text-primary/30">brightness_high</span>
-            </div>
-            <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">Teeth Whitening</h3>
-            <p className="text-on-surface-variant mb-6">Professional grade brightening treatments that deliver immediate, safe, and stunning results.</p>
-            <div className="flex gap-2">
-              <span className="bg-secondary-container px-3 py-1 rounded-full text-[12px] font-bold text-on-secondary-container uppercase tracking-wider">Most Popular</span>
-            </div>
-          </div>
-
-          {/* Pediatric Care */}
-          <div className="md:col-span-6 bg-tertiary-container text-on-tertiary-container p-8 rounded-xl border border-tertiary flex items-center justify-between overflow-hidden relative">
-            <div className="z-10 relative">
-              <h3 className="font-headline-md text-headline-md mb-2">Pediatric Care</h3>
-              <p className="opacity-80 max-w-xs mb-4">Gentle, fun, and educational dental visits designed specifically for our youngest patients.</p>
-              <Link
-                href="/services"
-                className="inline-block bg-tertiary text-on-tertiary px-6 py-2 rounded-lg font-label-md text-label-md hover:bg-tertiary/90 transition-all"
-              >
-                Explore
-              </Link>
-            </div>
-            <span className="material-symbols-outlined text-[120px] absolute -right-4 -bottom-4 opacity-10 rotate-12">child_care</span>
-          </div>
         </div>
       </section>
 
@@ -193,79 +194,39 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="px-margin-mobile md:px-margin-desktop py-section-gap overflow-hidden">
-        <div className="max-w-container-max mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div className="max-w-md">
-              <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Patient Stories</h2>
-              <p className="text-on-surface-variant">Don&apos;t just take our word for it—hear from the thousands of patients who have trusted us with their smiles.</p>
+      {testimonials.length > 0 && (
+        <section className="px-margin-mobile md:px-margin-desktop py-section-gap overflow-hidden">
+          <div className="max-w-container-max mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+              <div className="max-w-md">
+                <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Patient Stories</h2>
+                <p className="text-on-surface-variant">Don&apos;t just take our word for it—hear from the thousands of patients who have trusted us with their smiles.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {testimonials.map((t: any) => (
+                <div key={t.id} className="bg-surface p-8 rounded-xl border border-outline-variant/30 shadow-sm relative group hover:-translate-y-2 transition-transform duration-300">
+                  <div className="flex text-primary mb-4">
+                    {Array.from({ length: t.rating }).map((_, i) => (
+                      <span key={i} className="material-symbols-outlined fill" style={{ fontSize: "20px" }}>star</span>
+                    ))}
+                  </div>
+                  <p className="text-on-surface italic mb-8 font-body-lg">&ldquo;{t.content}&rdquo;</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center font-bold text-primary">
+                      {t.patient_name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-label-md text-label-md text-on-surface">{t.patient_name}</div>
+                      {t.patient_title && <div className="text-caption text-on-surface-variant">{t.patient_title}</div>}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.length > 0 ? testimonials.map((t: any) => (
-              <div key={t.id} className="bg-surface p-8 rounded-xl border border-outline-variant/30 shadow-sm relative group hover:-translate-y-2 transition-transform duration-300">
-                <div className="flex text-primary mb-4">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <span key={i} className="material-symbols-outlined fill" style={{ fontSize: "20px" }}>star</span>
-                  ))}
-                </div>
-                <p className="text-on-surface italic mb-8 font-body-lg">&ldquo;{t.content}&rdquo;</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center font-bold text-primary">
-                    {t.patient_name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="font-label-md text-label-md text-on-surface">{t.patient_name}</div>
-                    <div className="text-caption text-on-surface-variant">{t.patient_title || "Patient"}</div>
-                  </div>
-                </div>
-              </div>
-            )) : (
-              <>
-                <div className="bg-surface p-8 rounded-xl border border-outline-variant/30 shadow-sm">
-                  <div className="flex text-primary mb-4">
-                    {[1,2,3,4,5].map(i => <span key={i} className="material-symbols-outlined fill" style={{fontSize:"20px"}}>star</span>)}
-                  </div>
-                  <p className="text-on-surface italic mb-8 font-body-lg">&ldquo;The best dental experience I&apos;ve ever had. The staff is professional, the clinic is spotless, and the technology is state-of-the-art.&rdquo;</p>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-secondary-container" />
-                    <div>
-                      <div className="font-label-md text-label-md text-on-surface">Happy Patient</div>
-                      <div className="text-caption text-on-surface-variant">Patient for 3 years</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-surface p-8 rounded-xl border border-outline-variant/30 shadow-sm">
-                  <div className="flex text-primary mb-4">
-                    {[1,2,3,4,5].map(i => <span key={i} className="material-symbols-outlined fill" style={{fontSize:"20px"}}>star</span>)}
-                  </div>
-                  <p className="text-on-surface italic mb-8 font-body-lg">&ldquo;I was terrified of dentists until I visited Nisa. The team was incredibly gentle and explained everything clearly.&rdquo;</p>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary-container" />
-                    <div>
-                      <div className="font-label-md text-label-md text-on-surface">Sarah Johnson</div>
-                      <div className="text-caption text-on-surface-variant">Patient for 1 year</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-surface p-8 rounded-xl border border-outline-variant/30 shadow-sm">
-                  <div className="flex text-primary mb-4">
-                    {[1,2,3,4,5].map(i => <span key={i} className="material-symbols-outlined fill" style={{fontSize:"20px"}}>star</span>)}
-                  </div>
-                  <p className="text-on-surface italic mb-8 font-body-lg">&ldquo;My Invisalign transformation was seamless. Monthly checkups were quick and efficient. Highly recommend NISA!&rdquo;</p>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-tertiary-container" />
-                    <div>
-                      <div className="font-label-md text-label-md text-on-surface">Michael Chen</div>
-                      <div className="text-caption text-on-surface-variant">Patient for 5 years</div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="px-margin-mobile md:px-margin-desktop py-section-gap">

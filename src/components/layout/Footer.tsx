@@ -16,10 +16,10 @@ export function Footer() {
           <div>
             <h4 className="font-label-md text-label-md text-primary mb-6">SERVICES</h4>
             <ul className="space-y-4">
-              <li><Link href="/services" className="text-on-surface-variant/80 hover:text-primary transition-colors">General Dentistry</Link></li>
-              <li><Link href="/services" className="text-on-surface-variant/80 hover:text-primary transition-colors">Cosmetic Dental</Link></li>
-              <li><Link href="/services" className="text-on-surface-variant/80 hover:text-primary transition-colors">Orthodontics</Link></li>
-              <li><Link href="/services" className="text-on-surface-variant/80 hover:text-primary transition-colors">Pediatric Care</Link></li>
+              <li><Link href="/about#services" className="text-on-surface-variant/80 hover:text-primary transition-colors">General Dentistry</Link></li>
+              <li><Link href="/about#services" className="text-on-surface-variant/80 hover:text-primary transition-colors">Cosmetic Dental</Link></li>
+              <li><Link href="/about#services" className="text-on-surface-variant/80 hover:text-primary transition-colors">Orthodontics</Link></li>
+              <li><Link href="/about#services" className="text-on-surface-variant/80 hover:text-primary transition-colors">Pediatric Care</Link></li>
             </ul>
           </div>
           <div>
