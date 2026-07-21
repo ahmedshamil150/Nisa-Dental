@@ -58,7 +58,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   .totals .final td { font-size: 18px; font-weight: bold; color: #3f625f; padding-top: 12px; border-top: 2px solid #3f625f; }
   .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e1e3e3; text-align: center; color: #717977; font-size: 12px; }
   .badge { display: inline-block; background: #d2e7e2; color: #0d1f1c; padding: 2px 10px; border-radius: 4px; font-size: 11px; text-transform: uppercase; }
+  .no-print { margin-bottom: 20px; text-align: center; }
+  .no-print button { background: #3f625f; color: #fff; border: none; padding: 10px 24px; border-radius: 6px; font-size: 14px; cursor: pointer; }
+  .no-print button:hover { background: #2d4a47; }
+  @media print { .no-print { display: none; } }
 </style></head><body>
+  <div class="no-print">
+    <button onclick="window.print()">Save as PDF</button>
+    <p style="color:#717977;font-size:12px;margin-top:6px;">Click above, then choose "Save as PDF" as the destination.</p>
+  </div>
   <div class="meta">
     <div>
       <h1>NISA DENTAL</h1>
@@ -101,7 +109,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   return new NextResponse(html, {
     headers: {
       "Content-Type": "text/html",
-      "Content-Disposition": `attachment; filename="invoice-${inv.invoice_number}.html"`,
+      "Content-Disposition": `inline; filename="invoice-${inv.invoice_number}.html"`,
     },
   })
 }
