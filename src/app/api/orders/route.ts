@@ -6,22 +6,31 @@ export async function GET(req: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
+
   const { searchParams } = new URL(req.url)
-  const id = searchParams.get("id") || searchParams.get("order_number")
+  const id = searchParams.get("id")
 
   if (!id) {
-    return NextResponse.json({ error: "Order ID or number required" }, { status: 400 })
+    return NextResponse.json({ error: "Order ID required" }, { status: 400 })
   }
 
-  const { data: order } = await supabase
-    .from("orders")
-    .select("*, order_items(*), invoices(*)")
-    .or(`id.eq.${id},order_number.eq.${id}`)
-    .single()
+  // Try UUID lookup first
+  let query = supabase.from("orders").select("*, order_items(*), invoices(*)")
+
+  if (id.startsWith("NISA-")) {
+    query = query.ilike("notes", `%Order#${id}%`)
+  } else {
+    query = query.eq("id", id)
+  }
+
+  const { data: order } = await query.limit(1).maybeSingle()
 
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 })
   }
 
-  return NextResponse.json(order)
+  const shortId = order.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
+  const order_number = "NISA-" + shortId
+
+  return NextResponse.json({ ...order, order_number })
 }

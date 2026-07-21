@@ -23,7 +23,7 @@ export async function POST(req: Request) {
 
     const supabase = getSupabase()
     let discount = 0
-    let appliedCouponId: string | null = null
+    let appliedCouponCode: string | null = null
 
     if (coupon_code) {
       const { data: coupon, error: couponErr } = await supabase
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Coupon has expired" }, { status: 400 })
       }
 
-      if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
+      if (coupon.max_uses && coupon.used_count >= coupon.max_uses) {
         return NextResponse.json({ error: "Coupon usage limit reached" }, { status: 400 })
       }
 
@@ -50,41 +50,35 @@ export async function POST(req: Request) {
         : coupon.discount_value
 
       if (discount > subtotal) discount = subtotal
-      appliedCouponId = coupon.id
+      appliedCouponCode = coupon.code
     }
 
     const total = subtotal + delivery + tax - discount
 
-    let order_number: string
-    try {
-      const { data: on } = await supabase.rpc("generate_order_number")
-      order_number = on || "NISA-" + Date.now().toString(36).slice(-4).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase()
-    } catch {
-      order_number = "NISA-" + Date.now().toString(36).slice(-4).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase()
-    }
+    const order_number = "NISA-" + Date.now().toString(36).slice(-4).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase()
 
     const { data: order, error: orderErr } = await supabase
       .from("orders")
       .insert({
         customer_name,
         customer_email,
-        customer_phone,
+        customer_phone: customer_phone || null,
         shipping_address,
-        coupon_id: appliedCouponId,
+        billing_address: shipping_address,
         subtotal,
-        delivery_charge: delivery,
         tax,
-        discount,
+        shipping_cost: delivery,
         total,
-        status: "pending",
-        order_number,
+        order_status: "pending",
+        payment_status: "pending",
+        notes: `Order#${order_number}${appliedCouponCode ? ` | Coupon: ${appliedCouponCode} (-$${discount.toFixed(2)})` : ""}`,
       })
       .select()
       .single()
 
     if (orderErr) {
-      console.error("Order insert error:", orderErr)
-      return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
+      console.error("Order insert error:", JSON.stringify(orderErr))
+      return NextResponse.json({ error: "Failed to create order", detail: orderErr.message }, { status: 500 })
     }
 
     const orderItems = items.map((item: any) => ({
@@ -93,6 +87,7 @@ export async function POST(req: Request) {
       product_name: item.product_name,
       quantity: item.quantity,
       unit_price: item.unit_price,
+      total_price: item.unit_price * item.quantity,
     }))
 
     const { error: itemsErr } = await supabase.from("order_items").insert(orderItems)
@@ -102,23 +97,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Failed to save order items" }, { status: 500 })
     }
 
-    if (appliedCouponId) {
-      await supabase.rpc("increment_coupon_usage", { coupon_id: appliedCouponId })
+    if (appliedCouponCode) {
+      const { data: coupon } = await supabase.from("coupons").select("used_count").eq("code", appliedCouponCode).single()
+      if (coupon) {
+        await supabase.from("coupons").update({ used_count: (coupon.used_count || 0) + 1 }).eq("code", appliedCouponCode)
+      }
     }
 
-    let invoiceNumber = "INV-" + order_number
     const { data: invoice, error: invErr } = await supabase
       .from("invoices")
       .insert({
         order_id: order.id,
-        invoice_number: invoiceNumber,
-        customer_name,
-        customer_email,
-        billing_address: shipping_address,
+        invoice_number: "INV-" + order_number,
         subtotal,
+        tax_rate: 8.00,
+        tax_amount: tax,
         delivery_charge: delivery,
-        tax,
-        discount,
+        discount_amount: discount,
+        coupon_code: appliedCouponCode,
         total,
         status: "unpaid",
       })
@@ -127,12 +123,14 @@ export async function POST(req: Request) {
 
     if (invErr) {
       console.error("Invoice insert error:", invErr)
+      return NextResponse.json({ order_id: order.id, order_number, invoice_error: invErr.message })
     }
 
     await supabase.from("revenue_log").insert({
-      order_id: order.id,
+      invoice_id: invoice.id,
       amount: total,
       source: "online_sale",
+      description: `Order ${order_number}`,
     })
 
     return NextResponse.json({ order_id: order.id, order_number })
