@@ -104,7 +104,7 @@ export function Header() {
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
           <button onClick={() => setIconsOpen(!iconsOpen)}
-            className="bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-2 py-1.5 shadow-sm flex items-center gap-1">
+            className="bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-1.5 py-2 shadow-sm flex flex-col items-center gap-0.5">
             <span className="material-symbols-outlined text-on-primary text-[18px]">shopping_cart</span>
             <span className="material-symbols-outlined text-on-primary text-[18px]">calendar_month</span>
             <span className="material-symbols-outlined text-on-primary text-[18px]">local_shipping</span>
