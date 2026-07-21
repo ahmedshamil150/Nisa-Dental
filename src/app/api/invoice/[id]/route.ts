@@ -6,7 +6,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const sb = getSupabase()
   if (!sb) return NextResponse.json({ error: "No DB" }, { status: 500 })
 
-  const { data: invoice } = await sb.from("invoices").select("*, order:orders(*)").eq("id", id).single()
+  const { data: invoice } = await sb.from("invoices").select("*, order:orders(*, order_items(*))").eq("id", id).single()
   if (!invoice) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   const inv = invoice as any
