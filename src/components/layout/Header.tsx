@@ -98,7 +98,7 @@ export function Header() {
         {/* Logo + text capsule */}
         <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-3 h-9 shadow-sm mx-auto self-start mt-0.5">
           <img src="/logo.png" alt="" className="h-7 w-7 rounded-full" />
-          <span className="font-headline-md text-[14px] font-semibold text-on-primary tracking-tight">NISA</span>
+          <span className={`font-headline-md text-[14px] font-semibold text-on-primary tracking-tight transition-all duration-300 ease-out ${iconsOpen ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-[60px]"}`}>NISA</span>
         </Link>
 
         {/* Icon capsule with 3 icons */}
