@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
+import { TestimonialsCarousel } from "@/components/ui/TestimonialsCarousel"
 
 async function getServices() {
   const sb = getSupabase()
@@ -193,40 +194,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      {testimonials.length > 0 && (
-        <section className="px-margin-mobile md:px-margin-desktop py-section-gap overflow-hidden">
-          <div className="max-w-container-max mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-              <div className="max-w-md">
-                <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Patient Stories</h2>
-                <p className="text-on-surface-variant">Don&apos;t just take our word for it—hear from the thousands of patients who have trusted us with their smiles.</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map((t: any) => (
-                <div key={t.id} className="bg-surface p-8 rounded-xl border border-outline-variant/30 shadow-sm relative group hover:-translate-y-2 transition-transform duration-300">
-                  <div className="flex text-primary mb-4">
-                    {Array.from({ length: t.rating }).map((_, i) => (
-                      <span key={i} className="material-symbols-outlined fill" style={{ fontSize: "20px" }}>star</span>
-                    ))}
-                  </div>
-                  <p className="text-on-surface italic mb-8 font-body-lg">&ldquo;{t.content}&rdquo;</p>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center font-bold text-primary">
-                      {t.patient_name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="font-label-md text-label-md text-on-surface">{t.patient_name}</div>
-                      {t.patient_title && <div className="text-caption text-on-surface-variant">{t.patient_title}</div>}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      <TestimonialsCarousel testimonials={testimonials} />
 
       {/* CTA Section */}
       <section className="px-margin-mobile md:px-margin-desktop py-section-gap">
