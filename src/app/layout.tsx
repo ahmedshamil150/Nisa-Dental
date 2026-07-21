@@ -5,6 +5,10 @@ import { LayoutWrapper } from "@/components/layout/LayoutWrapper"
 export const metadata: Metadata = {
   title: "Nisa Dental & Surgical - Advanced Dental Care & Surgical Supplies",
   description: "Professional dental services and premium surgical products. Book your appointment today.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

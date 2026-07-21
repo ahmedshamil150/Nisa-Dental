@@ -7,10 +7,10 @@ import { useCart } from "@/lib/cart-context"
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
   { href: "/shop", label: "Shop" },
   { href: "/track", label: "Track Order" },
-  { href: "/appointment", label: "Appointments" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ]
 
 function CartBadge() {
@@ -35,8 +35,11 @@ export function Header() {
             <button className="material-symbols-outlined md:hidden text-primary" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? "close" : "menu"}
             </button>
-            <Link href="/" className="font-headline-md text-headline-md font-semibold text-primary tracking-tight">
-              NISA DENTAL
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/logo.png" alt="Nisa Dental" className="h-8 w-auto" />
+              <span className="font-headline-md text-headline-md font-semibold text-primary tracking-tight">
+                NISA DENTAL
+              </span>
             </Link>
           </div>
 
@@ -55,21 +58,18 @@ export function Header() {
                 </Link>
               )
             })}
-            <Link
-              href="/appointment"
-              className="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all"
-            >
-              Book Appointment
-            </Link>
           </nav>
 
           <div className="flex items-center gap-4">
+            <Link
+              href="/appointment"
+              className="hidden md:inline-flex bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all"
+            >
+              Appointment
+            </Link>
             <Link href="/cart" className="relative text-primary hover:scale-110 transition-transform">
               <span className="material-symbols-outlined">shopping_cart</span>
               <CartBadge />
-            </Link>
-            <Link href="/appointment" className="material-symbols-outlined text-primary hover:scale-110 transition-transform">
-              calendar_month
             </Link>
           </div>
         </div>
@@ -92,9 +92,16 @@ export function Header() {
               )
             })}
             <Link
-              href="/cart"
+              href="/appointment"
               onClick={() => setMenuOpen(false)}
               className="block bg-primary text-on-primary text-center px-6 py-3 rounded-lg font-label-md text-label-md mt-4"
+            >
+              Book Appointment
+            </Link>
+            <Link
+              href="/cart"
+              onClick={() => setMenuOpen(false)}
+              className="block border border-outline-variant text-center px-6 py-3 rounded-lg font-label-md text-label-md mt-2"
             >
               View Cart
             </Link>
