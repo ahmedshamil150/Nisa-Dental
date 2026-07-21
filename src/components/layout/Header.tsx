@@ -103,31 +103,24 @@ export function Header() {
 
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
-          <button onClick={() => setIconsOpen(!iconsOpen)}
-            className="bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-1.5 py-1.5 shadow-sm flex flex-col items-center gap-0.5">
-            <span className="material-symbols-outlined text-on-primary text-[18px]">shopping_cart</span>
-            <span className="material-symbols-outlined text-on-primary text-[18px]">calendar_month</span>
-            <span className="material-symbols-outlined text-on-primary text-[18px]">local_shipping</span>
-          </button>
-          {iconsOpen && (
-            <div className="absolute top-full right-0 mt-2 bg-surface shadow-xl rounded-2xl border border-outline-variant/30 p-2 min-w-[140px]">
-              <Link href="/cart" onClick={() => setIconsOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-surface-container transition-colors text-on-surface font-label-md text-label-md">
-                <span className="material-symbols-outlined text-primary text-[20px]">shopping_cart</span>
-                Cart
-              </Link>
-              <Link href="/appointment" onClick={() => setIconsOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-surface-container transition-colors text-on-surface font-label-md text-label-md">
-                <span className="material-symbols-outlined text-primary text-[20px]">calendar_month</span>
-                Appointment
-              </Link>
-              <Link href="/track" onClick={() => setIconsOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-surface-container transition-colors text-on-surface font-label-md text-label-md">
-                <span className="material-symbols-outlined text-primary text-[20px]">local_shipping</span>
-                Track Order
-              </Link>
-            </div>
-          )}
+          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full shadow-sm flex flex-col items-center transition-all duration-200 ${iconsOpen ? "px-3 py-2 gap-2" : "px-1.5 py-1.5 gap-0.5"}`}>
+            <Link href="/cart" className="flex items-center gap-2 text-on-primary hover:opacity-80 transition-opacity">
+              <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
+              {iconsOpen && <span className="font-label-md text-[12px] whitespace-nowrap">Cart</span>}
+            </Link>
+            <Link href="/appointment" className="flex items-center gap-2 text-on-primary hover:opacity-80 transition-opacity">
+              <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+              {iconsOpen && <span className="font-label-md text-[12px] whitespace-nowrap">Appointment</span>}
+            </Link>
+            <Link href="/track" className="flex items-center gap-2 text-on-primary hover:opacity-80 transition-opacity">
+              <span className="material-symbols-outlined text-[18px]">local_shipping</span>
+              {iconsOpen && <span className="font-label-md text-[12px] whitespace-nowrap">Track</span>}
+            </Link>
+            <button onClick={() => setIconsOpen(!iconsOpen)}
+              className="text-on-primary/70 hover:text-on-primary transition-colors">
+              <span className="material-symbols-outlined text-[16px]">{iconsOpen ? "expand_less" : "expand_more"}</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -138,7 +131,7 @@ export function Header() {
       {menuOpen && (
         <div className="fixed inset-0 z-[100] md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMenuOpen(false)} />
-          <div className="absolute top-0 right-0 h-full w-72 max-w-[85vw] bg-surface shadow-2xl flex flex-col">
+          <div className="absolute top-0 left-0 h-full w-72 max-w-[85vw] bg-surface shadow-2xl flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant/30">
               <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
                 <img src="/logo.png" alt="Nisa Dental" className="h-8 w-8 rounded-full" />
