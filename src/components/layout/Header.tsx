@@ -91,12 +91,12 @@ export function Header() {
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 px-margin-mobile py-2 flex items-center gap-2 pointer-events-none">
         {/* Hamburger */}
         <button onClick={() => setMenuOpen(true)}
-          className="pointer-events-auto h-9 w-9 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0">
+          className="pointer-events-auto h-9 w-9 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0 self-start mt-0.5">
           <span className="material-symbols-outlined text-[20px]">menu</span>
         </button>
 
         {/* Logo + text capsule */}
-        <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-3 h-9 shadow-sm mx-auto">
+        <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-3 h-9 shadow-sm mx-auto self-start mt-0.5">
           <img src="/logo.png" alt="" className="h-5 w-5 rounded-full ring-2 ring-white/30" />
           <span className="font-headline-md text-[13px] font-semibold text-on-primary tracking-tight">NISA</span>
         </Link>
@@ -104,7 +104,7 @@ export function Header() {
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
           <button onClick={() => setIconsOpen(!iconsOpen)}
-            className="bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-1.5 h-9 shadow-sm flex flex-col items-center justify-center gap-px">
+            className="bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-1.5 py-1.5 shadow-sm flex flex-col items-center gap-0.5">
             <span className="material-symbols-outlined text-on-primary text-[18px]">shopping_cart</span>
             <span className="material-symbols-outlined text-on-primary text-[18px]">calendar_month</span>
             <span className="material-symbols-outlined text-on-primary text-[18px]">local_shipping</span>
