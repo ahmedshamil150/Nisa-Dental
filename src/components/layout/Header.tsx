@@ -103,22 +103,22 @@ export function Header() {
 
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
-          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-2xl shadow-sm flex flex-col items-center transition-all duration-300 ease-out overflow-hidden ${iconsOpen ? "px-4 py-3 gap-3" : "px-2 py-2 gap-1.5"}`}>
-            <Link href="/cart" className="flex items-center justify-center gap-3 text-on-primary hover:opacity-80 transition-opacity w-full">
+          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-2xl shadow-sm flex flex-col items-stretch transition-all duration-300 ease-out overflow-hidden ${iconsOpen ? "px-4 py-3 gap-3" : "px-2 py-2 gap-1.5"}`}>
+            <Link href="/cart" className="flex items-center justify-end gap-2 text-on-primary hover:opacity-80 transition-opacity">
+              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[100px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Cart</span>
               <span className="material-symbols-outlined text-[20px] shrink-0">shopping_cart</span>
-              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Cart</span>
             </Link>
-            <Link href="/appointment" className="flex items-center justify-center gap-3 text-on-primary hover:opacity-80 transition-opacity w-full">
+            <Link href="/appointment" className="flex items-center justify-end gap-2 text-on-primary hover:opacity-80 transition-opacity">
+              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[100px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Appointment</span>
               <span className="material-symbols-outlined text-[20px] shrink-0">calendar_month</span>
-              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Appointment</span>
             </Link>
-            <Link href="/track" className="flex items-center justify-center gap-3 text-on-primary hover:opacity-80 transition-opacity w-full">
+            <Link href="/track" className="flex items-center justify-end gap-2 text-on-primary hover:opacity-80 transition-opacity">
+              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[100px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Track</span>
               <span className="material-symbols-outlined text-[20px] shrink-0">local_shipping</span>
-              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Track</span>
             </Link>
             <button onClick={() => setIconsOpen(!iconsOpen)}
               className="flex items-center justify-center text-on-primary/70 hover:text-on-primary transition-colors pt-0.5">
-              <span className="material-symbols-outlined text-[18px] transition-transform duration-300 ease-out" style={{ transform: iconsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
+              <span className="material-symbols-outlined text-[18px]">{iconsOpen ? "chevron_right" : "chevron_left"}</span>
             </button>
           </div>
         </div>
