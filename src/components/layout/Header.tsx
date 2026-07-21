@@ -88,18 +88,26 @@ export function Header() {
       </header>
 
       {/* --- Mobile Header --- */}
-      <header className="md:hidden fixed top-0 left-0 right-0 z-50 px-margin-mobile py-2 flex items-center justify-end gap-2 pointer-events-none">
-        {/* Logo capsule */}
-        <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-full px-3 py-1.5 shadow-sm mr-auto">
+      <header className="md:hidden fixed top-0 left-0 right-0 z-50 px-margin-mobile py-2 flex items-center gap-2 pointer-events-none">
+        {/* Hamburger */}
+        <button onClick={() => setMenuOpen(true)}
+          className="pointer-events-auto w-10 h-10 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0">
+          <span className="material-symbols-outlined text-[22px]">menu</span>
+        </button>
+
+        {/* Logo + text capsule */}
+        <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-full px-3 py-1.5 shadow-sm mx-auto">
           <img src="/logo.png" alt="" className="h-6 w-6 rounded-full" />
           <span className="font-headline-md text-[14px] font-semibold text-primary tracking-tight">NISA</span>
         </Link>
 
-        {/* Icon capsule */}
-        <div className="pointer-events-auto relative">
+        {/* Icon capsule with 3 icons */}
+        <div className="pointer-events-auto relative shrink-0">
           <button onClick={() => setIconsOpen(!iconsOpen)}
-            className="bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-full p-2 shadow-sm text-primary">
-            <span className="material-symbols-outlined text-[20px]">{iconsOpen ? "close" : "more_vert"}</span>
+            className="bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-full px-2 py-1.5 shadow-sm flex items-center gap-1">
+            <span className="material-symbols-outlined text-primary text-[18px]">shopping_cart</span>
+            <span className="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
+            <span className="material-symbols-outlined text-primary text-[18px]">local_shipping</span>
           </button>
           {iconsOpen && (
             <div className="absolute top-full right-0 mt-2 bg-surface shadow-xl rounded-2xl border border-outline-variant/30 p-2 min-w-[140px]">
@@ -121,12 +129,6 @@ export function Header() {
             </div>
           )}
         </div>
-
-        {/* Hamburger */}
-        <button onClick={() => setMenuOpen(true)}
-          className="pointer-events-auto w-10 h-10 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform">
-          <span className="material-symbols-outlined text-[22px]">menu</span>
-        </button>
       </header>
 
       {/* Spacer for mobile */}
