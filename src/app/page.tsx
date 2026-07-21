@@ -1,22 +1,19 @@
 import Link from "next/link"
-import { getSupabase } from "@/lib/supabase"
 
-async function getServices() {
-  const sb = getSupabase()
-  if (!sb) return []
-  const { data } = await sb.from("services").select("*").eq("is_active", true).order("sort_order").limit(4)
-  return (data || []) as any[]
-}
+const services = [
+  { name: "General Dentistry", short_description: "Comprehensive oral exams, deep cleanings, and preventative care tailored to your needs.", slug: "general-dentistry" },
+  { name: "Orthodontics", short_description: "Align your smile with modern solutions from invisible aligners to precision braces.", slug: "orthodontics" },
+  { name: "Teeth Whitening", short_description: "Professional grade brightening treatments that deliver immediate, safe results.", slug: "whitening" },
+  { name: "Pediatric Care", short_description: "Gentle, fun dental visits designed specifically for our youngest patients.", slug: "pediatric" },
+]
 
-async function getTestimonials() {
-  const sb = getSupabase()
-  if (!sb) return []
-  const { data } = await sb.from("testimonials").select("*").eq("is_approved", true).eq("is_featured", true).limit(3)
-  return (data || []) as any[]
-}
+const testimonials = [
+  { id: 1, rating: 5, content: "The best dental experience I've ever had. The staff is professional, the clinic is spotless, and the technology is state-of-the-art.", patient_name: "Eleanor Shellstrop", patient_title: "Patient for 3 years" },
+  { id: 2, rating: 5, content: "I was terrified of dentists until I visited Nisa. The team was incredibly gentle and explained everything clearly.", patient_name: "Sarah Johnson", patient_title: "Patient for 1 year" },
+  { id: 3, rating: 5, content: "My Invisalign transformation was seamless. Monthly checkups were quick and efficient. Highly recommend NISA!", patient_name: "Michael Chen", patient_title: "Patient for 5 years" },
+]
 
-export default async function HomePage() {
-  const [services, testimonials] = await Promise.all([getServices(), getTestimonials()])
+export default function HomePage() {
 
   return (
     <>

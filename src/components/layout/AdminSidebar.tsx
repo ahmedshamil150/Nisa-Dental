@@ -14,7 +14,6 @@ interface SidebarLink {
 
 const sidebarLinks: SidebarLink[] = [
   { href: "/admin", label: "Dashboard", icon: "dashboard" },
-  { href: "/admin/services", label: "Services", icon: "clinical_notes" },
   { href: "/admin/products", label: "Products", icon: "inventory_2" },
   { href: "/admin/categories", label: "Categories", icon: "category" },
   { href: "/admin/coupons", label: "Coupons", icon: "sell" },
@@ -22,7 +21,6 @@ const sidebarLinks: SidebarLink[] = [
   { href: "/admin/invoices", label: "Invoices", icon: "receipt_long" },
   { href: "/admin/appointments", label: "Appointments", icon: "calendar_today" },
   { href: "/admin/testimonials", label: "Testimonials", icon: "star" },
-  { href: "/admin/team", label: "Team", icon: "group" },
   { href: "/admin/messages", label: "Messages", icon: "mail" },
   { href: "/admin/settings", label: "Settings", icon: "settings" },
 ]
