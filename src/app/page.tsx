@@ -21,7 +21,7 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden px-margin-mobile md:px-margin-desktop py-section-gap">
+      <section className="relative min-h-[80vh] md:min-h-[90vh] flex items-center overflow-hidden px-margin-mobile md:px-margin-desktop pb-section-gap pt-0 md:pt-section-gap">
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full bg-cover bg-center" style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1600&q=80')"
@@ -29,26 +29,26 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent" />
         </div>
         <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 bg-secondary-container/50 px-4 py-1.5 rounded-full mb-6">
-            <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
-            <span className="font-label-md text-label-md text-on-secondary-container">PREMIUM DENTAL CARE</span>
+          <div className="inline-flex items-center gap-2 bg-secondary-container/50 px-3 md:px-4 py-1 rounded-full mb-4 md:mb-6">
+            <span className="material-symbols-outlined text-primary text-[14px] md:text-[18px]">verified</span>
+            <span className="font-label-md text-[10px] md:text-label-md text-on-secondary-container">PREMIUM DENTAL CARE</span>
           </div>
-          <h1 className="font-headline-xl text-headline-xl text-on-surface mb-6 leading-tight">
+          <h1 className="font-headline-xl text-[28px] md:text-headline-xl text-on-surface mb-4 md:mb-6 leading-tight">
             Exceptional Care for your <span className="text-primary italic font-medium">Perfect Smile</span>
           </h1>
-          <p className="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-lg">
+          <p className="font-body-lg text-[14px] md:text-body-lg text-on-surface-variant mb-6 md:mb-10 max-w-lg">
             Experience a new standard of dental healthcare where advanced technology meets compassionate, gentle treatment in a serene environment.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
             <Link
               href="/appointment"
-              className="bg-primary text-on-primary px-8 py-4 rounded-lg font-label-md text-label-md hover:shadow-lg transition-all active:scale-95 text-center"
+              className="bg-primary text-on-primary px-6 md:px-8 py-3 md:py-4 rounded-lg font-label-md text-[13px] md:text-label-md hover:shadow-lg transition-all active:scale-95 text-center"
             >
               Book Appointment
             </Link>
             <Link
               href="/about#services"
-              className="border border-primary text-primary px-8 py-4 rounded-lg font-label-md text-label-md hover:bg-primary/5 transition-all active:scale-95 text-center"
+              className="border border-primary text-primary px-6 md:px-8 py-3 md:py-4 rounded-lg font-label-md text-[13px] md:text-label-md hover:bg-primary/5 transition-all active:scale-95 text-center"
             >
               View Our Services
             </Link>
