@@ -7,6 +7,8 @@ export interface CartItem {
   name: string
   price: number
   quantity: number
+  weight: number
+  stock_quantity: number
   image?: string
   slug: string
 }
@@ -19,6 +21,7 @@ interface CartContextType {
   clearCart: () => void
   itemCount: number
   subtotal: number
+  totalWeight: number
 }
 
 const CartContext = createContext<CartContextType | null>(null)
@@ -40,8 +43,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addItem = useCallback((product: Omit<CartItem, "quantity">) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.id === product.id)
+      const qty = existing ? existing.quantity + 1 : 1
+      if (qty > product.stock_quantity) return prev
       if (existing) {
-        return prev.map((i) => (i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i))
+        return prev.map((i) => (i.id === product.id ? { ...i, quantity: qty } : i))
       }
       return [...prev, { ...product, quantity: 1 }]
     })
@@ -53,16 +58,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const updateQuantity = useCallback((id: string, quantity: number) => {
     if (quantity < 1) return
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity } : i)))
+    setItems((prev) => {
+      const item = prev.find((i) => i.id === id)
+      if (!item || quantity > item.stock_quantity) return prev
+      return prev.map((i) => (i.id === id ? { ...i, quantity } : i))
+    })
   }, [])
 
   const clearCart = useCallback(() => setItems([]), [])
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const totalWeight = items.reduce((sum, i) => sum + (i.weight || 0) * i.quantity, 0)
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, itemCount, subtotal }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, itemCount, subtotal, totalWeight }}>
       {children}
     </CartContext.Provider>
   )

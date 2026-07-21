@@ -15,6 +15,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const product = await getProduct(id)
   if (!product) notFound()
 
+  const discount = product.discount_percent || 0
+  const salePrice = discount > 0 ? Math.round(product.price * (100 - discount) / 100) : null
+
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-12">
       <Link href="/shop" className="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface-variant hover:text-primary mb-8">
@@ -23,8 +26,24 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       </Link>
 
       <div className="grid gap-12 md:grid-cols-2">
-        <div className="aspect-square rounded-xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-center">
-          <span className="material-symbols-outlined text-[120px] text-outline-variant/40">inventory_2</span>
+        <div className="space-y-4">
+          <div className="aspect-square rounded-xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-center relative overflow-hidden">
+            {product.image_url ? (
+              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="material-symbols-outlined text-[120px] text-outline-variant/40">inventory_2</span>
+            )}
+            {discount > 0 && (
+              <span className="absolute top-4 right-4 bg-red-500 text-white font-label-md text-sm px-3 py-1 rounded">
+                -{discount}%
+              </span>
+            )}
+          </div>
+          {product.image_urls?.[1] && (
+            <div className="aspect-video rounded-xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-center overflow-hidden">
+              <img src={product.image_urls[1]} alt="" className="w-full h-full object-cover" />
+            </div>
+          )}
         </div>
 
         <div>
@@ -32,8 +51,14 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">{product.name}</h1>
 
           <div className="flex items-baseline gap-3 mb-6">
-            <span className="font-headline-xl text-headline-xl text-primary">${product.sale_price || product.price}</span>
-            {product.sale_price && <span className="text-headline-md text-on-surface-variant line-through">${product.price}</span>}
+            {salePrice ? (
+              <>
+                <span className="font-headline-xl text-headline-xl text-primary">PKR {salePrice}</span>
+                <span className="text-headline-md text-on-surface-variant line-through">PKR {product.price}</span>
+              </>
+            ) : (
+              <span className="font-headline-xl text-headline-xl text-primary">PKR {product.price}</span>
+            )}
           </div>
 
           <p className="font-body-md text-body-md text-on-surface-variant mb-6">{product.description}</p>
@@ -48,7 +73,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             </span>
           </div>
 
-          <AddToCartLargeButton product={product} />
+          {product.stock_quantity > 0 && <AddToCartLargeButton product={product} />}
           <Link href="/shop" className="block w-full border border-primary text-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/5 active:scale-95 transition-all text-center">
             Continue Shopping
           </Link>

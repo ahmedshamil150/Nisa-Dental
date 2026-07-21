@@ -6,13 +6,13 @@ import Link from "next/link"
 import { useCart } from "@/lib/cart-context"
 
 export default function CheckoutPage() {
-  const { items, subtotal, clearCart } = useCart()
+  const { items, subtotal, totalWeight, clearCart } = useCart()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const delivery = 5.99
-  const tax = subtotal * 0.08
+  const ratePerKg = 150
+  const delivery = Math.round(totalWeight * ratePerKg * 100) / 100
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -39,7 +39,7 @@ export default function CheckoutPage() {
       })),
       subtotal,
       delivery,
-      tax,
+      total_weight: totalWeight,
     }
 
     try {
@@ -57,9 +57,10 @@ export default function CheckoutPage() {
       }
 
       clearCart()
-      router.push(`/order-confirmation/${result.order_id}`)
-    } catch {
-      setError("Something went wrong")
+      router.push(`/track/${result.order_number}`)
+    } catch (err) {
+      console.error("Checkout error:", err)
+      setError("Something went wrong. Check the console for details.")
       setLoading(false)
     }
   }
@@ -100,19 +101,19 @@ export default function CheckoutPage() {
                 </div>
                 <div className="sm:col-span-2">
                   <label className="font-label-md text-label-md text-on-surface block mb-1">Address *</label>
-                  <input name="address" required className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="123 Main Street" />
+                  <input name="address" required className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="House 123, Street 4" />
                 </div>
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-1">City *</label>
-                  <input name="city" required className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="New York" />
+                  <input name="city" required className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Karachi" />
                 </div>
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-1">State *</label>
-                  <input name="state" required className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="NY" />
+                  <input name="state" required className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Sindh" />
                 </div>
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-1">ZIP Code *</label>
-                  <input name="zip" required className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="10001" />
+                  <input name="zip" required className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="74000" />
                 </div>
                 <div>
                   <label className="font-label-md text-label-md text-on-surface block mb-1">Coupon Code</label>
@@ -129,17 +130,16 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
                     <span className="text-on-surface-variant truncate mr-4">{item.name} x{item.quantity}</span>
-                    <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-medium">PKR {item.price * item.quantity}</span>
                   </div>
                 ))}
               </div>
               <hr className="my-4 border-outline-variant/30" />
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between"><span className="text-on-surface-variant">Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-on-surface-variant">Delivery</span><span>${delivery.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-on-surface-variant">Tax (8%)</span><span>${tax.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span className="text-on-surface-variant">Subtotal</span><span>PKR {subtotal}</span></div>
+                <div className="flex justify-between"><span className="text-on-surface-variant">Delivery ({totalWeight.toFixed(2)}kg × PKR {ratePerKg}/kg)</span><span>PKR {delivery}</span></div>
                 <div className="border-t pt-3 flex justify-between font-headline-md text-headline-md text-on-surface">
-                  <span>Total</span><span>${(subtotal + delivery + tax).toFixed(2)}</span>
+                  <span>Total</span><span>PKR {subtotal + delivery}</span>
                 </div>
               </div>
 
@@ -160,7 +160,7 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <span className="material-symbols-outlined text-[20px]">lock</span>
-                    Place Order — ${(subtotal + delivery + tax).toFixed(2)}
+                    Place Order — PKR {subtotal + delivery}
                   </>
                 )}
               </button>

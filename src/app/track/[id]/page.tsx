@@ -6,10 +6,11 @@ import { useEffect, useState } from "react"
 
 const STATUS_STEPS = [
   { key: "pending", label: "Order Placed", icon: "receipt_long", desc: "Your order has been received" },
-  { key: "processing", label: "Processing", icon: "manufacturing", desc: "Your order is being prepared" },
+  { key: "confirmed", label: "Confirmed", icon: "fact_check", desc: "Your order has been confirmed" },
   { key: "shipped", label: "Shipped", icon: "local_shipping", desc: "Your order is on the way" },
   { key: "delivered", label: "Delivered", icon: "check_circle", desc: "Package delivered successfully" },
   { key: "cancelled", label: "Cancelled", icon: "cancel", desc: "Order was cancelled" },
+  { key: "requested_return", label: "Return Requested", icon: "assignment_return", desc: "Return has been requested" },
 ]
 
 export default function TrackOrderPage() {
@@ -17,7 +18,7 @@ export default function TrackOrderPage() {
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+    useEffect(() => {
     if (!params.id) return
     fetch(`/api/orders?id=${params.id}`)
       .then((r) => r.json())
@@ -25,6 +26,30 @@ export default function TrackOrderPage() {
       .catch(console.error)
       .finally(() => setLoading(false))
   }, [params.id])
+
+  const handleCancel = async () => {
+    if (!confirm("Are you sure you want to cancel this order?")) return
+    const res = await fetch("/api/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: params.id, order_status: "cancelled" }),
+    })
+    if (res.ok) {
+      setOrder((prev: any) => ({ ...prev, status: "cancelled" }))
+    }
+  }
+
+  const handleReturn = async () => {
+    if (!confirm("Request a return for this order?")) return
+    const res = await fetch("/api/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: params.id, order_status: "requested_return" }),
+    })
+    if (res.ok) {
+      setOrder((prev: any) => ({ ...prev, status: "requested_return" }))
+    }
+  }
 
   if (loading) {
     return (
@@ -45,7 +70,14 @@ export default function TrackOrderPage() {
   }
 
   const isCancelled = order.status === "cancelled"
+  const isReturnRequested = order.status === "requested_return"
   const currentIdx = STATUS_STEPS.findIndex((s) => s.key === order.status)
+
+  const activeSteps = isCancelled
+    ? STATUS_STEPS.filter((s) => s.key === "cancelled")
+    : isReturnRequested
+      ? STATUS_STEPS.filter((s) => ["pending", "confirmed", "requested_return"].includes(s.key))
+      : STATUS_STEPS.slice(0, 4)
 
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap max-w-2xl">
@@ -58,7 +90,7 @@ export default function TrackOrderPage() {
         <div className="flex items-center justify-between mb-2">
           <h2 className="font-headline-md text-headline-md text-on-surface">Status</h2>
           <span className={`px-4 py-1.5 rounded-full font-label-sm text-label-sm ${
-            isCancelled ? "bg-error-container text-on-error-container" : "bg-primary/10 text-primary"
+            isCancelled || isReturnRequested ? "bg-error-container text-on-error-container" : "bg-primary/10 text-primary"
           }`}>
             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
           </span>
@@ -68,8 +100,8 @@ export default function TrackOrderPage() {
           <div className="absolute left-[19px] top-0 bottom-0 w-0.5 bg-outline-variant/30" />
 
           <div className="space-y-8">
-            {(isCancelled ? STATUS_STEPS.filter((s) => s.key === "cancelled") : STATUS_STEPS.slice(0, 4)).map((step, idx) => {
-              const isCompleted = !isCancelled && idx <= currentIdx
+            {activeSteps.map((step, idx) => {
+              const isCompleted = !isCancelled && !isReturnRequested && idx <= currentIdx
               const isCurrent = !isCancelled && idx === currentIdx
 
               return (
@@ -77,7 +109,7 @@ export default function TrackOrderPage() {
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 relative z-10 transition-all ${
                     isCompleted
                       ? "bg-primary text-on-primary"
-                      : isCancelled && step.key === "cancelled"
+                      : (isCancelled && step.key === "cancelled") || (isReturnRequested && step.key === "requested_return")
                         ? "bg-error-container text-on-error-container"
                         : "bg-surface-container-low text-outline-variant"
                   }`}>
@@ -88,10 +120,26 @@ export default function TrackOrderPage() {
                       isCurrent ? "text-primary font-bold" : isCompleted ? "text-on-surface" : "text-outline-variant"
                     }`}>{step.label}</p>
                     <p className={`font-body-md ${isCompleted ? "text-on-surface-variant" : "text-outline-variant"}`}>
-                      {isCancelled && step.key === "cancelled" ? "Order was cancelled" : step.desc}
+                      {isCancelled && step.key === "cancelled" ? "Order was cancelled" : isReturnRequested && step.key === "requested_return" ? "Return requested by customer" : step.desc}
                     </p>
-                    {isCurrent && (
+                    {isCurrent && order.status === "pending" && (
                       <div className="mt-3 flex gap-3">
+                        <button onClick={handleCancel} className="bg-error text-on-error px-4 py-2 rounded-lg font-label-sm text-label-sm hover:bg-error/90 transition-all inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[16px]">cancel</span>
+                          Cancel Order
+                        </button>
+                      </div>
+                    )}
+                    {isCurrent && order.status === "confirmed" && (
+                      <div className="mt-3 flex gap-3">
+                        <button onClick={handleReturn} className="bg-error text-on-error px-4 py-2 rounded-lg font-label-sm text-label-sm hover:bg-error/90 transition-all inline-flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[16px]">assignment_return</span>
+                          Request Return
+                        </button>
+                      </div>
+                    )}
+                    {(isCurrent || order.status !== "pending") && (
+                      <div className="mt-3">
                         <Link
                           href={order.invoices?.[0]?.id ? `/api/invoice/${order.invoices[0].id}` : "#"}
                           className="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-sm text-label-sm hover:bg-primary/90 transition-all inline-flex items-center gap-1"
@@ -115,20 +163,19 @@ export default function TrackOrderPage() {
           {order.order_items?.map((item: any) => (
             <div key={item.id} className="flex justify-between text-sm">
               <span className="text-on-surface-variant">{item.product_name} x{item.quantity}</span>
-              <span className="font-medium">${(item.unit_price * item.quantity).toFixed(2)}</span>
+              <span className="font-medium">PKR {item.unit_price * item.quantity}</span>
             </div>
           ))}
         </div>
         <hr className="my-4 border-outline-variant/30" />
         <div className="space-y-2 text-sm">
-          <div className="flex justify-between"><span className="text-on-surface-variant">Subtotal</span><span>${order.subtotal?.toFixed(2)}</span></div>
-          <div className="flex justify-between"><span className="text-on-surface-variant">Delivery</span><span>${order.delivery_charge?.toFixed(2)}</span></div>
-          <div className="flex justify-between"><span className="text-on-surface-variant">Tax</span><span>${order.tax?.toFixed(2)}</span></div>
+          <div className="flex justify-between"><span className="text-on-surface-variant">Subtotal</span><span>PKR {order.subtotal}</span></div>
+          <div className="flex justify-between"><span className="text-on-surface-variant">Delivery</span><span>PKR {order.delivery_charge}</span></div>
           {order.discount > 0 && (
-            <div className="flex justify-between text-primary"><span>Discount</span><span>-${order.discount?.toFixed(2)}</span></div>
+            <div className="flex justify-between text-primary"><span>Discount</span><span>-PKR {order.discount}</span></div>
           )}
           <div className="border-t pt-2 flex justify-between font-headline-md text-headline-md text-on-surface">
-            <span>Total</span><span>${order.total?.toFixed(2)}</span>
+            <span>Total</span><span>PKR {order.total}</span>
           </div>
         </div>
       </div>

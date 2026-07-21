@@ -1,80 +1,253 @@
-import { getSupabase } from "@/lib/supabase"
-import { Card, CardContent } from "@/components/ui/Card"
-import { Button } from "@/components/ui/Button"
-import { Badge } from "@/components/ui/Badge"
-import { Plus, Pencil, Trash2 } from "lucide-react"
-import Link from "next/link"
+"use client"
 
-async function getProducts() {
-  const sb = getSupabase()
-  if (!sb) return []
-  const { data } = await sb.from("products").select("*, category:product_categories(*)").order("created_at", { ascending: false })
-  return (data || []) as any[]
+import { useEffect, useState } from "react"
+import { getSupabase } from "@/lib/supabase"
+
+interface Product {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  short_description: string | null
+  price: number
+  discount_percent: number
+  weight: number
+  stock_quantity: number
+  image_url: string | null
+  image_urls: string[]
+  category_id: string | null
+  category?: { name: string }
+  is_active: boolean
+  is_featured: boolean
 }
 
-export default async function AdminProductsPage() {
-  const products = await getProducts()
+export default function AdminProductsPage() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [editing, setEditing] = useState<Product | null>(null)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({
+    name: "", slug: "", description: "", short_description: "",
+    price: "", discount_percent: "0", weight: "0", stock_quantity: "0",
+    category_id: "", image_url: "", image_url_2: "",
+    is_featured: false, is_active: true,
+  })
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  async function loadData() {
+    const sb = getSupabase()
+    if (!sb) return
+    const [p, c] = await Promise.all([
+      sb.from("products").select("*, category:product_categories(*)").order("created_at", { ascending: false }),
+      sb.from("product_categories").select("*").order("sort_order"),
+    ])
+    setProducts((p.data || []) as any)
+    setCategories((c.data || []) as any)
+  }
+
+  function openNew() {
+    setEditing(null)
+    setForm({ name: "", slug: "", description: "", short_description: "", price: "", discount_percent: "0", weight: "0", stock_quantity: "0", category_id: "", image_url: "", image_url_2: "", is_featured: false, is_active: true })
+    setShowForm(true)
+  }
+
+  function openEdit(p: Product) {
+    setEditing(p)
+    const urls = p.image_urls || []
+    setForm({
+      name: p.name, slug: p.slug, description: p.description || "", short_description: p.short_description || "",
+      price: String(p.price), discount_percent: String(p.discount_percent || 0),
+      weight: String(p.weight || 0), stock_quantity: String(p.stock_quantity),
+      category_id: p.category_id || "", image_url: urls[0] || p.image_url || "",
+      image_url_2: urls[1] || "", is_featured: p.is_featured, is_active: p.is_active,
+    })
+    setShowForm(true)
+  }
+
+  async function save() {
+    const sb = getSupabase()
+    if (!sb) return
+    const price = parseFloat(form.price)
+    const discount = parseInt(form.discount_percent) || 0
+    const salePrice = discount > 0 ? price * (100 - discount) / 100 : null
+    const image_urls = [form.image_url, form.image_url_2].filter(Boolean)
+    const data = {
+      name: form.name,
+      slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-"),
+      description: form.description || null,
+      short_description: form.short_description || null,
+      price,
+      discount_percent: discount,
+      sale_price: salePrice,
+      weight: parseFloat(form.weight) || 0,
+      stock_quantity: parseInt(form.stock_quantity) || 0,
+      category_id: form.category_id || null,
+      image_url: form.image_url || null,
+      image_urls,
+      is_featured: form.is_featured,
+      is_active: form.is_active,
+    }
+
+    if (editing) {
+      await (sb.from("products") as any).update(data).eq("id", editing.id)
+    } else {
+      await (sb.from("products") as any).insert(data)
+    }
+    setShowForm(false)
+    loadData()
+  }
+
+  async function toggleActive(p: Product) {
+    const sb = getSupabase()
+    if (!sb) return
+    await (sb.from("products") as any).update({ is_active: !p.is_active }).eq("id", p.id)
+    loadData()
+  }
+
+  const displayPrice = (p: Product) => {
+    if (p.discount_percent > 0) {
+      const sale = p.price * (100 - p.discount_percent) / 100
+      return <><span className="line-through text-on-surface-variant mr-2">PKR {p.price}</span><span className="text-primary font-bold">PKR {sale.toFixed(0)}</span></>
+    }
+    return <span>PKR {p.price}</span>
+  }
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-        <Link href="/api/admin/products/new">
-          <Button>
-            <Plus className="h-4 w-4" /> Add Product
-          </Button>
-        </Link>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface">Products</h1>
+        <button onClick={openNew} className="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary/90 flex items-center gap-2">
+          <span className="material-symbols-outlined text-[18px]">add</span>Add Product
+        </button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-gray-50 text-left text-xs uppercase text-gray-500">
-              <tr>
-                <th className="px-6 py-3 font-medium">Name</th>
-                <th className="px-6 py-3 font-medium">Category</th>
-                <th className="px-6 py-3 font-medium">Price</th>
-                <th className="px-6 py-3 font-medium">Stock</th>
-                <th className="px-6 py-3 font-medium">SKU</th>
-                <th className="px-6 py-3 font-medium">Featured</th>
-                <th className="px-6 py-3 font-medium">Status</th>
-                <th className="px-6 py-3 font-medium">Actions</th>
+      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
+            <tr>
+              <th className="px-6 py-3 font-medium">Name</th>
+              <th className="px-6 py-3 font-medium">Category</th>
+              <th className="px-6 py-3 font-medium">Price</th>
+              <th className="px-6 py-3 font-medium">Discount</th>
+              <th className="px-6 py-3 font-medium">Stock</th>
+              <th className="px-6 py-3 font-medium">Weight</th>
+              <th className="px-6 py-3 font-medium">Active</th>
+              <th className="px-6 py-3 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {products.length === 0 ? (
+              <tr><td colSpan={8} className="px-6 py-12 text-center text-on-surface-variant">No products yet</td></tr>
+            ) : products.map((p: any) => (
+              <tr key={p.id} className="hover:bg-surface-container-low">
+                <td className="px-6 py-4 font-medium text-on-surface">{p.name}</td>
+                <td className="px-6 py-4 text-on-surface-variant">{p.category?.name || "-"}</td>
+                <td className="px-6 py-4">{displayPrice(p)}</td>
+                <td className="px-6 py-4">{p.discount_percent > 0 ? `${p.discount_percent}%` : "-"}</td>
+                <td className="px-6 py-4"><span className={`${p.stock_quantity > 0 ? "text-green-700" : "text-red-600"}`}>{p.stock_quantity}</span></td>
+                <td className="px-6 py-4">{p.weight > 0 ? `${p.weight} kg` : "-"}</td>
+                <td className="px-6 py-4">
+                  <button onClick={() => toggleActive(p)} className={`px-3 py-1 rounded-full text-xs font-medium ${p.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                    {p.is_active ? "Active" : "Inactive"}
+                  </button>
+                </td>
+                <td className="px-6 py-4">
+                  <button onClick={() => openEdit(p)} className="text-primary hover:underline font-label-md text-label-md">Edit</button>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y">
-              {products.map((p: any) => (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-900">{p.name}</td>
-                  <td className="px-6 py-4 text-gray-500">{p.category?.name || "-"}</td>
-                  <td className="px-6 py-4">${p.sale_price || p.price}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant={p.stock_quantity > 0 ? "success" : "danger"}>
-                      {p.stock_quantity}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 text-gray-500">{p.sku || "-"}</td>
-                  <td className="px-6 py-4">{p.is_featured ? <Badge variant="success">Yes</Badge> : "No"}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant={p.is_active ? "success" : "danger"}>
-                      {p.is_active ? "Active" : "Inactive"}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {showForm && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>
+          <div className="bg-surface rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6" onClick={(e) => e.stopPropagation()}>
+            <h2 className="font-headline-md text-headline-md text-on-surface mb-6">{editing ? "Edit" : "Add"} Product</h2>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Name *</label>
+                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, "-") })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Slug</label>
+                  <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Category</label>
+                  <select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none">
+                    <option value="">No category</option>
+                    {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Price (PKR) *</label>
+                  <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div>
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Discount %</label>
+                  <input type="number" min="0" max="100" value={form.discount_percent} onChange={(e) => setForm({ ...form, discount_percent: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div>
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Weight (kg)</label>
+                  <input type="number" step="0.01" value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div>
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Stock Qty</label>
+                  <input type="number" value={form.stock_quantity} onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Short Description</label>
+                  <input value={form.short_description} onChange={(e) => setForm({ ...form, short_description: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Description</label>
+                  <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Image URL 1</label>
+                  <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div className="col-span-2">
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Image URL 2</label>
+                  <input value={form.image_url_2} onChange={(e) => setForm({ ...form, image_url_2: e.target.value })}
+                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                </div>
+                <div className="flex items-center gap-6">
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" checked={form.is_featured} onChange={(e) => setForm({ ...form, is_featured: e.target.checked })}
+                      className="w-4 h-4 accent-primary" />
+                    <span className="font-label-md text-label-md">Featured</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
+                      className="w-4 h-4 accent-primary" />
+                    <span className="font-label-md text-label-md">Active</span>
+                  </label>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-4 border-t">
+                <button onClick={save} className="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-primary/90">Save</button>
+                <button onClick={() => setShowForm(false)} className="border border-outline-variant px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-surface-container">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

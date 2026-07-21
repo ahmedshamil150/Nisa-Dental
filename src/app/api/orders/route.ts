@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
-export async function GET(req: Request) {
-  const supabase = createClient(
+function getSupabase() {
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
+}
 
+function toOrderNumber(id: string) {
+  return "NISA-" + id.replace(/-/g, "").slice(0, 8).toUpperCase()
+}
+
+export async function GET(req: Request) {
+  const supabase = getSupabase()
   const { searchParams } = new URL(req.url)
   const id = searchParams.get("id")
 
@@ -17,7 +24,8 @@ export async function GET(req: Request) {
   let query = supabase.from("orders").select("*, order_items(*), invoices(*)")
 
   if (id.startsWith("NISA-")) {
-    query = query.ilike("notes", `%Order#${id}%`)
+    const seq = id.replace("NISA-", "")
+    query = query.ilike("notes", `%Order#NISA-${seq}%`)
   } else {
     query = query.eq("id", id)
   }
@@ -28,14 +36,42 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 })
   }
 
-  const shortId = order.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
-  const order_number = "NISA-" + shortId
-
   return NextResponse.json({
     ...order,
-    order_number,
+    order_number: toOrderNumber(order.id),
     status: order.order_status,
     delivery_charge: order.shipping_cost,
-    discount: 0,
   })
+}
+
+export async function PATCH(req: Request) {
+  const body = await req.json()
+  const { id, order_status } = body
+
+  if (!id || !order_status) {
+    return NextResponse.json({ error: "id and order_status required" }, { status: 400 })
+  }
+
+  const supabase = getSupabase()
+
+  let query = supabase.from("orders").select("id, order_status")
+  if (id.startsWith("NISA-")) {
+    const seq = id.replace("NISA-", "")
+    query = query.ilike("notes", `%Order#NISA-${seq}%`)
+  } else {
+    query = query.eq("id", id)
+  }
+
+  const { data: order } = await query.limit(1).maybeSingle()
+  if (!order) {
+    return NextResponse.json({ error: "Order not found" }, { status: 404 })
+  }
+
+  const { error } = await (supabase.from("orders") as any).update({ order_status }).eq("id", order.id)
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true })
 }

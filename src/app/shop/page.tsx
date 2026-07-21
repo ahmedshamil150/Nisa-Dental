@@ -13,29 +13,30 @@ async function getProducts(searchParams: { category?: string; search?: string })
   const sb = getSupabase()
   if (!sb) return []
   let query = sb.from("products").select("*, category:product_categories(*)").eq("is_active", true)
-
   if (searchParams.category) {
     query = query.eq("category:product_categories.slug", searchParams.category)
   }
   if (searchParams.search) {
     query = query.ilike("name", `%${searchParams.search}%`)
   }
-
   const { data } = await query.order("created_at", { ascending: false })
   return (data || []) as any[]
 }
 
-export default async function ShopPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ category?: string; search?: string }>
-}) {
+function calcPrice(product: any) {
+  if (product.discount_percent > 0) {
+    const sale = product.price * (100 - product.discount_percent) / 100
+    return { original: product.price, sale: Math.round(sale), percent: product.discount_percent }
+  }
+  return { original: product.price, sale: null, percent: 0 }
+}
+
+export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string; search?: string }> }) {
   const params = await searchParams
   const [categories, products] = await Promise.all([getCategories(), getProducts(params)])
 
   return (
     <>
-      {/* Hero Section */}
       <section className="relative h-[353px] flex items-center overflow-hidden bg-primary-container">
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full opacity-40 bg-cover bg-center" style={{
@@ -50,15 +51,13 @@ export default async function ShopPage({
         </div>
       </section>
 
-      {/* Shop Container */}
       <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-12 flex flex-col md:flex-row gap-gutter">
-        {/* Filter Sidebar */}
         <aside className="w-full md:w-64 flex-shrink-0 space-y-8">
           <div>
             <h3 className="font-label-md text-label-md text-primary uppercase tracking-widest mb-6">Categories</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/shop" className="flex items-center gap-3 cursor-pointer group">
+                <Link href="/shop" className={`flex items-center gap-3 group ${!params.category ? "font-bold text-primary" : ""}`}>
                   <span className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${!params.category ? 'bg-primary border-primary' : 'border-outline-variant'}`}>
                     {!params.category && <span className="w-2 h-2 rounded-sm bg-white" />}
                   </span>
@@ -67,7 +66,7 @@ export default async function ShopPage({
               </li>
               {categories.map((cat: any) => (
                 <li key={cat.id}>
-                  <Link href={`/shop?category=${cat.slug}`} className="flex items-center gap-3 cursor-pointer group">
+                  <Link href={`/shop?category=${cat.slug}`} className={`flex items-center gap-3 group ${params.category === cat.slug ? "font-bold text-primary" : ""}`}>
                     <span className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${params.category === cat.slug ? 'bg-primary border-primary' : 'border-outline-variant'}`}>
                       {params.category === cat.slug && <span className="w-2 h-2 rounded-sm bg-white" />}
                     </span>
@@ -86,7 +85,6 @@ export default async function ShopPage({
           </div>
         </aside>
 
-        {/* Product Grid */}
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-8 border-b border-outline-variant/30 pb-4">
             <span className="font-body-md text-on-surface-variant">Showing {products.length} products</span>
@@ -99,35 +97,58 @@ export default async function ShopPage({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {products.map((product: any) => (
-                <div key={product.id} className="group relative bg-white border border-outline-variant/30 p-6 flex flex-col transition-all hover:shadow-lg hover:shadow-primary/5">
-                  <Link href={`/shop/${product.slug}`}>
-                    <div className="relative aspect-square mb-6 overflow-hidden bg-surface flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[60px] text-outline-variant/50">inventory_2</span>
-                    </div>
-                  </Link>
-                  {product.is_featured && (
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-primary text-white font-label-md text-[10px] px-2 py-1 uppercase tracking-tighter">Bestseller</span>
-                    </div>
-                  )}
-                  <div className="flex-grow">
+              {products.map((product: any) => {
+                const price = calcPrice(product)
+                return (
+                  <div key={product.id} className="group relative bg-white border border-outline-variant/30 p-6 flex flex-col transition-all hover:shadow-lg hover:shadow-primary/5">
                     <Link href={`/shop/${product.slug}`}>
-                      <h3 className="font-headline-md text-headline-md text-on-surface mb-1">{product.name}</h3>
+                      <div className="relative aspect-square mb-6 overflow-hidden bg-surface flex items-center justify-center">
+                        {product.image_url ? (
+                          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="material-symbols-outlined text-[60px] text-outline-variant/50">inventory_2</span>
+                        )}
+                        {product.image_urls?.[1] && (
+                          <img src={product.image_urls[1]} alt="" className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        )}
+                      </div>
                     </Link>
-                    <p className="text-caption font-caption text-on-surface-variant mb-4 uppercase tracking-widest">{product.category?.name || "Product"}</p>
-                    <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">{product.short_description}</p>
+                    <div className="absolute top-4 right-4 flex flex-col gap-1">
+                      {price.percent > 0 && (
+                        <span className="bg-red-500 text-white font-label-md text-[10px] px-2 py-1 uppercase tracking-tighter rounded">
+                          -{price.percent}%
+                        </span>
+                      )}
+                      {product.is_featured && !price.percent && (
+                        <span className="bg-primary text-white font-label-md text-[10px] px-2 py-1 uppercase tracking-tighter">Bestseller</span>
+                      )}
+                    </div>
+                    <div className="flex-grow">
+                      <Link href={`/shop/${product.slug}`}>
+                        <h3 className="font-headline-md text-headline-md text-on-surface mb-1">{product.name}</h3>
+                      </Link>
+                      <p className="text-caption font-caption text-on-surface-variant mb-4 uppercase tracking-widest">{product.category?.name || "Product"}</p>
+                      <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">{product.short_description}</p>
+                    </div>
+                    <div className="mt-6 flex items-center justify-between">
+                      <div>
+                        {price.sale ? (
+                          <>
+                            <span className="font-headline-md text-headline-md text-primary">PKR {price.sale}</span>
+                            <span className="font-body-md text-body-md text-on-surface-variant line-through ml-2">PKR {price.original}</span>
+                          </>
+                        ) : (
+                          <span className="font-headline-md text-headline-md text-primary">PKR {product.price}</span>
+                        )}
+                      </div>
+                      <AddToCartButton product={product} />
+                    </div>
                   </div>
-                  <div className="mt-6 flex items-center justify-between">
-                    <span className="font-headline-md text-headline-md text-primary">${product.sale_price || product.price}</span>
-                    <AddToCartButton product={product} />
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
 
-          {/* Pagination */}
           {products.length > 0 && (
             <div className="mt-16 flex justify-center items-center gap-4">
               <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors disabled:opacity-30" disabled>

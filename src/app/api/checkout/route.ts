@@ -8,10 +8,14 @@ function getSupabase() {
   )
 }
 
+function getSetting(settings: any[], key: string, fallback: string) {
+  return settings.find((s: any) => s.key === key)?.value || fallback
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { customer_name, customer_email, customer_phone, shipping_address, coupon_code, items, subtotal, delivery, tax } = body
+    const { customer_name, customer_email, customer_phone, shipping_address, coupon_code, items, subtotal, delivery, total_weight } = body
 
     if (!customer_name || !customer_email || !shipping_address) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -22,6 +26,36 @@ export async function POST(req: Request) {
     }
 
     const supabase = getSupabase()
+
+    // Validate stock for each item
+    for (const item of items) {
+      const { data: product } = await supabase
+        .from("products")
+        .select("stock_quantity, name")
+        .eq("id", item.product_id)
+        .single()
+
+      if (!product) {
+        return NextResponse.json({ error: `Product "${item.product_name}" not found` }, { status: 400 })
+      }
+
+      if (product.stock_quantity < item.quantity) {
+        return NextResponse.json({
+          error: `Insufficient stock for "${product.name}". Available: ${product.stock_quantity}, requested: ${item.quantity}`
+        }, { status: 400 })
+      }
+    }
+
+    // Fetch settings for delivery rate calculation
+    const { data: siteSettings } = await supabase.from("site_settings").select("*")
+    const settings = siteSettings || []
+    const ratePerKg = parseInt(getSetting(settings, "delivery_rate_per_kg", "150"))
+    const taxRate = parseFloat(getSetting(settings, "tax_rate", "0"))
+
+    // Compute delivery from weight if not already computed
+    const computedDelivery = delivery || (total_weight ? Math.round(total_weight * ratePerKg * 100) / 100 : 0)
+    const tax = Math.round(subtotal * (taxRate / 100) * 100) / 100
+
     let discount = 0
     let appliedCouponCode: string | null = null
 
@@ -45,6 +79,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Coupon usage limit reached" }, { status: 400 })
       }
 
+      if (coupon.min_order_amount && subtotal < coupon.min_order_amount) {
+        return NextResponse.json({ error: `Minimum order PKR ${coupon.min_order_amount} for this coupon` }, { status: 400 })
+      }
+
       discount = coupon.discount_type === "percentage"
         ? subtotal * (coupon.discount_value / 100)
         : coupon.discount_value
@@ -53,8 +91,7 @@ export async function POST(req: Request) {
       appliedCouponCode = coupon.code
     }
 
-    const total = subtotal + delivery + tax - discount
-
+    const total = subtotal + computedDelivery + tax - discount
     const order_number = "NISA-" + Date.now().toString(36).slice(-4).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase()
 
     const { data: order, error: orderErr } = await supabase
@@ -67,18 +104,27 @@ export async function POST(req: Request) {
         billing_address: shipping_address,
         subtotal,
         tax,
-        shipping_cost: delivery,
+        shipping_cost: computedDelivery,
         total,
         order_status: "pending",
         payment_status: "pending",
-        notes: `Order#${order_number}${appliedCouponCode ? ` | Coupon: ${appliedCouponCode} (-$${discount.toFixed(2)})` : ""}`,
+        notes: `Order#${order_number}${appliedCouponCode ? ` | Coupon: ${appliedCouponCode} (-PKR ${discount.toFixed(0)})` : ""}${total_weight ? ` | Weight: ${total_weight}kg` : ""}`,
       })
       .select()
       .single()
 
     if (orderErr) {
       console.error("Order insert error:", JSON.stringify(orderErr))
-      return NextResponse.json({ error: "Failed to create order", detail: orderErr.message }, { status: 500 })
+      return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
+    }
+
+    // Deduct stock (best-effort, don't block order if RPC fails)
+    try {
+      for (const item of items) {
+        await supabase.rpc("decrement_stock", { pid: item.product_id, qty: item.quantity })
+      }
+    } catch (stockErr) {
+      console.error("Stock deduction error (non-fatal):", stockErr)
     }
 
     const orderItems = items.map((item: any) => ({
@@ -110,9 +156,9 @@ export async function POST(req: Request) {
         order_id: order.id,
         invoice_number: "INV-" + order_number,
         subtotal,
-        tax_rate: 8.00,
+        tax_rate: taxRate,
         tax_amount: tax,
-        delivery_charge: delivery,
+        delivery_charge: computedDelivery,
         discount_amount: discount,
         coupon_code: appliedCouponCode,
         total,
@@ -123,19 +169,21 @@ export async function POST(req: Request) {
 
     if (invErr) {
       console.error("Invoice insert error:", invErr)
-      return NextResponse.json({ order_id: order.id, order_number, invoice_error: invErr.message })
+    } else {
+      await supabase.from("revenue_log").insert({
+        invoice_id: invoice.id,
+        amount: total,
+        source: "online_sale",
+        description: `Order ${order_number}`,
+      })
     }
 
-    await supabase.from("revenue_log").insert({
-      invoice_id: invoice.id,
-      amount: total,
-      source: "online_sale",
-      description: `Order ${order_number}`,
-    })
+    const shortId = order.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
 
-    return NextResponse.json({ order_id: order.id, order_number })
+    return NextResponse.json({ order_id: order.id, order_number: order_number })
   } catch (err) {
     console.error("Checkout error:", err)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    const msg = err instanceof Error ? err.message : "Internal server error"
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

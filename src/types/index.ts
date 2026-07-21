@@ -60,6 +60,8 @@ export interface Product {
   specifications: Record<string, any>
   price: number
   sale_price: number | null
+  discount_percent: number
+  weight: number
   stock_quantity: number
   sku: string | null
   image_url: string | null

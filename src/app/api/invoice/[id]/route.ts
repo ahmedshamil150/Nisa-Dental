@@ -1,33 +1,48 @@
 import { NextResponse } from "next/server"
-import { getSupabase } from "@/lib/supabase"
+import { createClient } from "@supabase/supabase-js"
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const sb = getSupabase()
-  if (!sb) return NextResponse.json({ error: "No DB" }, { status: 500 })
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
-  const { data: invoice } = await sb.from("invoices").select("*, order:orders(*, order_items(*))").eq("id", id).single()
-  if (!invoice) return NextResponse.json({ error: "Not found" }, { status: 404 })
+  let invoice: any
+
+  // Try as invoice ID first, then as order ID
+  const { data: byInv } = await supabase.from("invoices").select("*, order:orders(*, order_items(*))").eq("id", id).maybeSingle()
+  if (byInv) {
+    invoice = byInv
+  } else {
+    const { data: byOrd } = await supabase.from("invoices").select("*, order:orders(*, order_items(*))").eq("order_id", id).maybeSingle()
+    if (byOrd) invoice = byOrd
+  }
+
+  if (!invoice) return NextResponse.json({ error: "Invoice not found" }, { status: 404 })
 
   const inv = invoice as any
   const order = inv.order || {}
+  const items = (order.order_items || []) as any[]
 
-  const items = (order.items || []) as any[]
   const rows: string[][] = [
     ["Item", "Qty", "Unit Price", "Total"],
     ...items.map((item: any) => [
       item.product_name || "Product",
       String(item.quantity),
-      `$${item.unit_price}`,
-      `$${item.total_price}`,
+      `PKR ${item.unit_price}`,
+      `PKR ${item.total_price}`,
     ]),
   ]
 
   const subtotal = inv.subtotal || order.subtotal || 0
-  const delivery = inv.delivery_charge || 0
-  const tax = inv.tax_amount || 0
+  const delivery = inv.delivery_charge || order.shipping_cost || 0
+  const tax = inv.tax_amount || order.tax || 0
   const discount = inv.discount_amount || 0
   const total = inv.total || order.total || 0
+
+  const shortId = order.id?.toString().replace(/-/g, "").slice(0, 8).toUpperCase() || ""
+  const orderNumber = "NISA-" + shortId
 
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Invoice ${inv.invoice_number}</title>
@@ -53,12 +68,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       <p style="font-size:24px;font-weight:bold;color:#3f625f;">${inv.invoice_number}</p>
       <p style="color:#717977;">${new Date(inv.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })}</p>
       <span class="badge">${inv.status}</span>
+      <p style="color:#717977;margin-top:4px;">Order: ${orderNumber}</p>
     </div>
   </div>
 
   <div style="margin-bottom:30px;">
     <p style="font-weight:600;margin-bottom:4px;">Bill To:</p>
     <p style="color:#717977;">${order.customer_name || 'N/A'}<br/>${order.customer_email || ''}</p>
+    ${order.shipping_address ? `<p style="color:#717977;">${order.shipping_address.line1 || ''}<br/>${order.shipping_address.city || ''}, ${order.shipping_address.state || ''} ${order.shipping_address.zip || ''}</p>` : ''}
   </div>
 
   <table>
@@ -67,12 +84,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   </table>
 
   <table class="totals">
-    <tr><td>Subtotal</td><td style="text-align:right;">$${subtotal}</td></tr>
-    <tr><td>Delivery</td><td style="text-align:right;">$${delivery}</td></tr>
-    <tr><td>Tax (${inv.tax_rate || 0}%)</td><td style="text-align:right;">$${tax}</td></tr>
-    ${discount > 0 ? `<tr><td>Discount</td><td style="text-align:right;color:#ba1a1a;">-$${discount}</td></tr>` : ''}
+    <tr><td>Subtotal</td><td style="text-align:right;">PKR ${subtotal}</td></tr>
+    <tr><td>Delivery</td><td style="text-align:right;">PKR ${delivery}</td></tr>
+    <tr><td>Tax (${inv.tax_rate || 0}%)</td><td style="text-align:right;">PKR ${tax}</td></tr>
+    ${discount > 0 ? `<tr><td>Discount</td><td style="text-align:right;color:#ba1a1a;">-PKR ${discount}</td></tr>` : ''}
     ${inv.coupon_code ? `<tr><td>Coupon</td><td style="text-align:right;">${inv.coupon_code}</td></tr>` : ''}
-    <tr class="final"><td>Total</td><td style="text-align:right;">$${total}</td></tr>
+    <tr class="final"><td>Total</td><td style="text-align:right;">PKR ${total}</td></tr>
   </table>
 
   <div class="footer">

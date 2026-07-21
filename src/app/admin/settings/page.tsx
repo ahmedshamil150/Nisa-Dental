@@ -1,20 +1,39 @@
-import { getSupabase } from "@/lib/supabase"
+"use client"
+
+import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/Card"
 
-export const dynamic = "force-dynamic"
+export default function AdminSettingsPage() {
+  const [settings, setSettings] = useState<any[]>([])
+  const [deliveryRate, setDeliveryRate] = useState("150")
+  const [taxRate, setTaxRate] = useState("0")
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState("")
 
-async function getSettings() {
-  const sb = getSupabase()
-  if (!sb) return []
-  const { data } = await sb.from("site_settings").select("*").order("key")
-  return (data || []) as any[]
-}
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        setSettings(data)
+        const dr = data.find((s: any) => s.key === "delivery_rate_per_kg")
+        if (dr) setDeliveryRate(dr.value)
+        const tr = data.find((s: any) => s.key === "tax_rate")
+        if (tr) setTaxRate(tr.value)
+      })
+      .catch(console.error)
+  }, [])
 
-export default async function AdminSettingsPage() {
-  const settings = await getSettings()
-
-  const deliveryCharge = settings.find((s: any) => s.key === "delivery_charge")?.value || "5.99"
-  const taxRate = settings.find((s: any) => s.key === "tax_rate")?.value || "8.00"
+  const save = async (key: string, value: string) => {
+    setSaving(true)
+    await fetch("/api/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key, value }),
+    })
+    setSaving(false)
+    setMsg("Saved!")
+    setTimeout(() => setMsg(""), 2000)
+  }
 
   return (
     <div>
@@ -29,18 +48,23 @@ export default async function AdminSettingsPage() {
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="font-label-md text-label-md text-on-surface block mb-1">Delivery Charge ($)</label>
-                <input type="number" step="0.01" defaultValue={deliveryCharge}
+                <label className="font-label-md text-label-md text-on-surface block mb-1">Delivery Rate (PKR per kg)</label>
+                <input type="number" step="1" value={deliveryRate}
+                  onChange={(e) => setDeliveryRate(e.target.value)}
                   className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
               </div>
               <div>
                 <label className="font-label-md text-label-md text-on-surface block mb-1">Tax Rate (%)</label>
-                <input type="number" step="0.01" defaultValue={taxRate}
+                <input type="number" step="0.01" value={taxRate}
+                  onChange={(e) => setTaxRate(e.target.value)}
                   className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
               </div>
-              <button className="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all">
-                Save Changes
+              <button onClick={() => { save("delivery_rate_per_kg", deliveryRate); save("tax_rate", taxRate) }}
+                disabled={saving}
+                className="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50">
+                {saving ? "Saving..." : "Save Changes"}
               </button>
+              {msg && <p className="text-primary font-label-md text-label-md">{msg}</p>}
             </div>
           </CardContent>
         </Card>

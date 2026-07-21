@@ -6,13 +6,13 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, subtotal, itemCount } = useCart()
+  const { items, removeItem, updateQuantity, subtotal, totalWeight, itemCount } = useCart()
   const [couponCode, setCouponCode] = useState("")
   const [couponMsg, setCouponMsg] = useState("")
   const router = useRouter()
 
-  const delivery = 5.99
-  const tax = subtotal * 0.08
+  const ratePerKg = 150
+  const delivery = Math.round(totalWeight * ratePerKg * 100) / 100
 
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
@@ -38,7 +38,7 @@ export default function CartPage() {
                   <Link href={`/shop/${item.slug}`} className="font-headline-md text-headline-md text-on-surface hover:text-primary transition-colors">
                     {item.name}
                   </Link>
-                  <p className="font-headline-md text-headline-md text-primary mt-1">${item.price}</p>
+                  <p className="font-headline-md text-headline-md text-primary mt-1">PKR {item.price}</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
@@ -55,7 +55,7 @@ export default function CartPage() {
                     <span className="material-symbols-outlined text-[18px]">add</span>
                   </button>
                 </div>
-                <p className="font-headline-md text-headline-md text-on-surface w-24 text-right">${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="font-headline-md text-headline-md text-on-surface w-24 text-right">PKR {item.price * item.quantity}</p>
                 <button onClick={() => removeItem(item.id)} className="text-on-surface-variant hover:text-error transition-colors">
                   <span className="material-symbols-outlined">delete</span>
                 </button>
@@ -65,14 +65,11 @@ export default function CartPage() {
 
           <div className="bg-surface p-8 rounded-xl border border-outline-variant/30 h-fit">
             <h2 className="font-headline-md text-headline-md text-on-surface mb-6">Order Summary</h2>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between"><span className="text-on-surface-variant">Subtotal</span><span className="font-medium">${subtotal.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span className="text-on-surface-variant">Delivery</span><span className="font-medium">${delivery.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span className="text-on-surface-variant">Tax (8%)</span><span className="font-medium">${tax.toFixed(2)}</span></div>
-              <div className="border-t pt-3 flex justify-between font-headline-md text-headline-md text-on-surface">
-                <span>Total</span><span>${(subtotal + delivery + tax).toFixed(2)}</span>
+      <div className="space-y-3 text-sm">
+                <div className="flex justify-between"><span className="text-on-surface-variant">Subtotal</span><span className="font-medium">PKR {subtotal}</span></div>
+                <div className="flex justify-between"><span className="text-on-surface-variant">Delivery ({totalWeight.toFixed(2)}kg × PKR {ratePerKg}/kg)</span><span className="font-medium">PKR {delivery}</span></div>
+                <div className="flex justify-between"><span className="text-on-surface-variant">Total</span><span className="font-headline-md text-headline-md text-primary">PKR {subtotal + delivery}</span></div>
               </div>
-            </div>
 
             <hr className="my-6 border-outline-variant/30" />
 
