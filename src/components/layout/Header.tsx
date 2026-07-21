@@ -103,22 +103,28 @@ export function Header() {
 
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
-          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full shadow-sm flex flex-col items-center transition-all duration-200 ${iconsOpen ? "px-3 py-2 gap-2" : "px-1.5 py-1.5 gap-0.5"}`}>
-            <Link href="/cart" className="flex items-center gap-2 text-on-primary hover:opacity-80 transition-opacity">
-              <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
-              {iconsOpen && <span className="font-label-md text-[12px] whitespace-nowrap">Cart</span>}
-            </Link>
-            <Link href="/appointment" className="flex items-center gap-2 text-on-primary hover:opacity-80 transition-opacity">
-              <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-              {iconsOpen && <span className="font-label-md text-[12px] whitespace-nowrap">Appointment</span>}
-            </Link>
-            <Link href="/track" className="flex items-center gap-2 text-on-primary hover:opacity-80 transition-opacity">
-              <span className="material-symbols-outlined text-[18px]">local_shipping</span>
-              {iconsOpen && <span className="font-label-md text-[12px] whitespace-nowrap">Track</span>}
-            </Link>
+          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-2xl shadow-sm flex flex-col items-stretch transition-all duration-300 ease-out overflow-hidden ${iconsOpen ? "px-4 py-3 gap-3" : "px-2 py-2 gap-1.5"}`}>
+            <div className="flex items-center justify-start min-w-0">
+              <Link href="/cart" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity">
+                <span className="material-symbols-outlined text-[20px] shrink-0">shopping_cart</span>
+                <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Cart</span>
+              </Link>
+            </div>
+            <div className="flex items-center justify-start min-w-0">
+              <Link href="/appointment" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity">
+                <span className="material-symbols-outlined text-[20px] shrink-0">calendar_month</span>
+                <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Appointment</span>
+              </Link>
+            </div>
+            <div className="flex items-center justify-start min-w-0">
+              <Link href="/track" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity">
+                <span className="material-symbols-outlined text-[20px] shrink-0">local_shipping</span>
+                <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0 overflow-hidden"}`}>Track</span>
+              </Link>
+            </div>
             <button onClick={() => setIconsOpen(!iconsOpen)}
-              className="text-on-primary/70 hover:text-on-primary transition-colors">
-              <span className="material-symbols-outlined text-[16px]">{iconsOpen ? "expand_less" : "expand_more"}</span>
+              className="flex items-center justify-center text-on-primary/70 hover:text-on-primary transition-colors pt-0.5">
+              <span className="material-symbols-outlined text-[18px] transition-transform duration-300 ease-out" style={{ transform: iconsOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>expand_more</span>
             </button>
           </div>
         </div>
@@ -131,7 +137,7 @@ export function Header() {
       {menuOpen && (
         <div className="fixed inset-0 z-[100] md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMenuOpen(false)} />
-          <div className="absolute top-0 left-0 h-full w-72 max-w-[85vw] bg-surface shadow-2xl flex flex-col">
+          <div className="absolute top-0 left-0 h-full w-72 max-w-[85vw] bg-surface shadow-2xl flex flex-col animate-slide-in-left">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant/30">
               <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
                 <img src="/logo.png" alt="Nisa Dental" className="h-8 w-8 rounded-full" />
