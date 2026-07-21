@@ -96,18 +96,18 @@ export function Header() {
         </button>
 
         {/* Logo + text capsule */}
-        <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-full px-3 py-1.5 shadow-sm mx-auto">
-          <img src="/logo.png" alt="" className="h-6 w-6 rounded-full" />
-          <span className="font-headline-md text-[14px] font-semibold text-primary tracking-tight">NISA</span>
+        <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-3 py-1.5 shadow-sm mx-auto">
+          <img src="/logo.png" alt="" className="h-6 w-6 rounded-full ring-2 ring-white/30" />
+          <span className="font-headline-md text-[14px] font-semibold text-on-primary tracking-tight">NISA</span>
         </Link>
 
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
           <button onClick={() => setIconsOpen(!iconsOpen)}
-            className="bg-surface/90 backdrop-blur-md border border-outline-variant/30 rounded-full px-2 py-1.5 shadow-sm flex items-center gap-1">
-            <span className="material-symbols-outlined text-primary text-[18px]">shopping_cart</span>
-            <span className="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
-            <span className="material-symbols-outlined text-primary text-[18px]">local_shipping</span>
+            className="bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-2 py-1.5 shadow-sm flex items-center gap-1">
+            <span className="material-symbols-outlined text-on-primary text-[18px]">shopping_cart</span>
+            <span className="material-symbols-outlined text-on-primary text-[18px]">calendar_month</span>
+            <span className="material-symbols-outlined text-on-primary text-[18px]">local_shipping</span>
           </button>
           {iconsOpen && (
             <div className="absolute top-full right-0 mt-2 bg-surface shadow-xl rounded-2xl border border-outline-variant/30 p-2 min-w-[140px]">
