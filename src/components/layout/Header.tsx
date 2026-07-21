@@ -37,7 +37,7 @@ export function Header() {
       <header className="hidden md:block bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm sticky top-0 z-50">
         <div className="flex justify-between items-center w-full px-margin-desktop h-16">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Nisa Dental" className="h-8 w-auto rounded-full" />
+            <img src="/logo.png" alt="Nisa Dental" className="h-10 w-auto rounded-full" />
             <span className="font-headline-md text-headline-md font-semibold text-primary tracking-tight">
               NISA DENTAL
             </span>
@@ -97,8 +97,8 @@ export function Header() {
 
         {/* Logo + text capsule */}
         <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-3 h-9 shadow-sm mx-auto self-start mt-0.5">
-          <img src="/logo.png" alt="" className="h-5 w-5 rounded-full ring-2 ring-white/30" />
-          <span className="font-headline-md text-[13px] font-semibold text-on-primary tracking-tight">NISA</span>
+          <img src="/logo.png" alt="" className="h-7 w-7 rounded-full" />
+          <span className="font-headline-md text-[14px] font-semibold text-on-primary tracking-tight">NISA</span>
         </Link>
 
         {/* Icon capsule with 3 icons */}
@@ -134,7 +134,7 @@ export function Header() {
           <div className="absolute top-0 left-0 h-full w-72 max-w-[85vw] bg-surface shadow-2xl flex flex-col animate-slide-in-left">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant/30">
               <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
-                <img src="/logo.png" alt="Nisa Dental" className="h-8 w-8 rounded-full" />
+                <img src="/logo.png" alt="Nisa Dental" className="h-10 w-10 rounded-full" />
                 <span className="font-headline-md text-headline-md font-semibold text-primary">NISA DENTAL</span>
               </Link>
               <button onClick={() => setMenuOpen(false)} className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
