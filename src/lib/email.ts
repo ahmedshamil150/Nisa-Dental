@@ -132,3 +132,53 @@ export async function sendOrderStatusUpdate(order: any, orderNumber: string, old
     console.error("Failed to send status update email:", e)
   }
 }
+
+export async function sendAppointmentConfirmation(appointment: any) {
+  const transport = getTransport()
+  if (!transport) return
+
+  const adminEmail = process.env.NOTIFICATION_EMAIL || process.env.SMTP_USER
+
+  const html = `
+<!DOCTYPE html>
+<html><body style="font-family:Arial,sans-serif;color:#191c1c;max-width:600px;margin:auto;padding:20px;">
+  <div style="border-bottom:2px solid #3f625f;padding-bottom:16px;margin-bottom:24px;">
+    <h1 style="color:#3f625f;font-size:24px;margin:0;">NISA DENTAL</h1>
+    <p style="color:#717977;margin:4px 0 0;">Appointment Request</p>
+  </div>
+  <p style="font-size:16px;">Hi <strong>${appointment.patient_name}</strong>,</p>
+  <p>Your appointment request has been received!</p>
+  <p><strong>Date:</strong> ${new Date(appointment.appointment_date).toLocaleDateString()}<br/>
+  <strong>Time:</strong> ${appointment.appointment_time?.slice(0, 5)}</p>
+  <p style="color:#717977;">We will review your request and confirm your appointment within 24 hours. You will receive a confirmation email once it's approved.</p>
+  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #e1e3e3;text-align:center;color:#717977;font-size:12px;">
+    <p>NISA DENTAL CLINIC — Premium Oral Healthcare</p>
+  </div>
+</body></html>`
+
+  if (appointment.patient_email) {
+    try {
+      await transport.sendMail({
+        from: `"Nisa Dental" <${process.env.SMTP_USER}>`,
+        to: appointment.patient_email,
+        subject: "Appointment Request Received — Nisa Dental",
+        html,
+      })
+    } catch (e) {
+      console.error("Failed to send appointment email to customer:", e)
+    }
+  }
+
+  if (adminEmail) {
+    try {
+      await transport.sendMail({
+        from: `"Nisa Dental" <${process.env.SMTP_USER}>`,
+        to: adminEmail,
+        subject: `New Appointment — ${appointment.patient_name}`,
+        html: html.replace("Appointment Request", "New Appointment Request"),
+      })
+    } catch (e) {
+      console.error("Failed to send appointment email to admin:", e)
+    }
+  }
+}

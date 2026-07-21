@@ -1,16 +1,33 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
 import { Card } from "@/components/ui/Card"
 
 function AppointmentForm() {
-  const searchParams = useSearchParams()
-  const submitted = searchParams.get("success") === "true"
-  const error = searchParams.get("error") === "true" ? "Something went wrong. Please try again."
-    : searchParams.get("error") === "missing-fields" ? "Please fill in all required fields."
-    : ""
+  const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+
+    const fd = new FormData(e.currentTarget)
+    try {
+      const res = await fetch("/api/appointment", { method: "POST", body: fd })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setSubmitted(true)
+      } else {
+        setError(data.error === "missing-fields" ? "Please fill in all required fields." : "Something went wrong. Please try again.")
+      }
+    } catch {
+      setError("Something went wrong. Please try again.")
+    }
+    setLoading(false)
+  }
 
   if (submitted) {
     return (
@@ -19,9 +36,12 @@ function AppointmentForm() {
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
             <span className="material-symbols-outlined text-[48px] text-primary">check_circle</span>
           </div>
-          <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">Appointment Requested!</h1>
-          <p className="font-body-lg text-on-surface-variant mb-8">
-            We&apos;ll review your request and confirm within 24 hours. Check your email for updates.
+          <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">Thank You!</h1>
+          <p className="font-body-lg text-on-surface-variant mb-4">
+            Your appointment request has been submitted successfully.
+          </p>
+          <p className="font-body-md text-on-surface-variant mb-8">
+            You will shortly receive a confirmation email with your appointment details.
           </p>
           <Link href="/" className="bg-primary text-on-primary px-8 py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 inline-flex items-center gap-2">
             Back to Home
@@ -48,7 +68,7 @@ function AppointmentForm() {
         )}
 
         <Card className="p-8">
-          <form action="/api/appointment" method="POST" className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label htmlFor="patient_name" className="font-label-md text-label-md text-on-surface block mb-1">Full Name *</label>
@@ -100,9 +120,10 @@ function AppointmentForm() {
                 placeholder="Any special requests..." />
             </div>
 
-            <button type="submit" className="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2">
+            <button type="submit" disabled={loading}
+              className="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50">
               <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-              Book Appointment
+              {loading ? "Submitting..." : "Book Appointment"}
             </button>
           </form>
         </Card>
