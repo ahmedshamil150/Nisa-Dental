@@ -12,6 +12,10 @@ function getSetting(settings: any[], key: string, fallback: string) {
   return settings.find((s: any) => s.key === key)?.value || fallback
 }
 
+function toOrderNumber(id: string) {
+  return "NISA-" + id.replace(/-/g, "").slice(0, 8).toUpperCase()
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
@@ -92,7 +96,6 @@ export async function POST(req: Request) {
     }
 
     const total = subtotal + computedDelivery + tax - discount
-    const order_number = "NISA-" + Date.now().toString(36).slice(-4).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase()
 
     const { data: order, error: orderErr } = await supabase
       .from("orders")
@@ -108,7 +111,7 @@ export async function POST(req: Request) {
         total,
         order_status: "pending",
         payment_status: "pending",
-        notes: `Order#${order_number}${appliedCouponCode ? ` | Coupon: ${appliedCouponCode} (-PKR ${discount.toFixed(0)})` : ""}${total_weight ? ` | Weight: ${total_weight}kg` : ""}`,
+        notes: "",
       })
       .select()
       .single()
@@ -117,6 +120,13 @@ export async function POST(req: Request) {
       console.error("Order insert error:", JSON.stringify(orderErr))
       return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
     }
+
+    const order_number = toOrderNumber(order.id)
+
+    // Update notes with order number
+    await supabase.from("orders").update({
+      notes: `Order#${order_number}${appliedCouponCode ? ` | Coupon: ${appliedCouponCode} (-PKR ${discount.toFixed(0)})` : ""}${total_weight ? ` | Weight: ${total_weight}kg` : ""}`,
+    }).eq("id", order.id)
 
     // Deduct stock (best-effort, don't block order if RPC fails)
     try {
@@ -178,9 +188,7 @@ export async function POST(req: Request) {
       })
     }
 
-    const shortId = order.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
-
-    return NextResponse.json({ order_id: order.id, order_number: order_number })
+    return NextResponse.json({ order_id: order.id, order_number })
   } catch (err) {
     console.error("Checkout error:", err)
     const msg = err instanceof Error ? err.message : "Internal server error"
