@@ -26,12 +26,31 @@ export default function AdminProductsPage() {
   const [categories, setCategories] = useState<any[]>([])
   const [editing, setEditing] = useState<Product | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [form, setForm] = useState({
     name: "", slug: "", description: "", short_description: "",
     price: "", discount_percent: "0", weight: "0", stock_quantity: "0",
     category_id: "", image_url: "", image_url_2: "",
     is_featured: false, is_active: true,
   })
+
+  async function uploadFile(file: File, field: "image_url" | "image_url_2") {
+    setUploading(true)
+    const fd = new FormData()
+    fd.append("file", file)
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: fd })
+      const data = await res.json()
+      if (res.ok) {
+        setForm((prev) => ({ ...prev, [field]: data.url }))
+      } else {
+        alert("Upload failed: " + (data.error || "Unknown error"))
+      }
+    } catch {
+      alert("Upload failed")
+    }
+    setUploading(false)
+  }
 
   useEffect(() => {
     loadData()
@@ -218,14 +237,29 @@ export default function AdminProductsPage() {
                     className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
                 </div>
                 <div className="col-span-2">
-                  <label className="font-label-md text-label-md text-on-surface block mb-1">Image URL 1</label>
-                  <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Image 1</label>
+                  <div className="flex items-start gap-3">
+                    <div className="flex-grow">
+                      <input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadFile(f, "image_url") }}
+                        className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md file:mr-3 file:bg-primary file:text-on-primary file:border-0 file:px-3 file:py-1 file:rounded file:font-label-md" />
+                      <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                        className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-xs mt-2 focus:border-primary outline-none" placeholder="Or paste URL..." />
+                    </div>
+                    {form.image_url && <img src={form.image_url} alt="" className="w-20 h-20 rounded-lg object-cover border border-outline-variant/30 shrink-0" />}
+                  </div>
                 </div>
                 <div className="col-span-2">
-                  <label className="font-label-md text-label-md text-on-surface block mb-1">Image URL 2</label>
-                  <input value={form.image_url_2} onChange={(e) => setForm({ ...form, image_url_2: e.target.value })}
-                    className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary outline-none" />
+                  <label className="font-label-md text-label-md text-on-surface block mb-1">Image 2</label>
+                  <div className="flex items-start gap-3">
+                    <div className="flex-grow">
+                      <input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadFile(f, "image_url_2") }}
+                        className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md file:mr-3 file:bg-primary file:text-on-primary file:border-0 file:px-3 file:py-1 file:rounded file:font-label-md" />
+                      <input value={form.image_url_2} onChange={(e) => setForm({ ...form, image_url_2: e.target.value })}
+                        className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-xs mt-2 focus:border-primary outline-none" placeholder="Or paste URL..." />
+                    </div>
+                    {form.image_url_2 && <img src={form.image_url_2} alt="" className="w-20 h-20 rounded-lg object-cover border border-outline-variant/30 shrink-0" />}
+                  </div>
+                  {uploading && <p className="text-caption text-primary mt-1">Uploading...</p>}
                 </div>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2">
