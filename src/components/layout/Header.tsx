@@ -88,7 +88,7 @@ export function Header() {
       </header>
 
       {/* --- Mobile Header --- */}
-      <header className="md:hidden fixed top-0 left-0 right-0 z-50 px-margin-mobile py-2 flex items-center gap-2 pointer-events-none bg-gradient-to-b from-surface via-surface to-transparent pb-4">
+      <header className="md:hidden fixed top-0 left-0 right-0 z-50 px-margin-mobile py-2 flex items-center gap-2 pointer-events-none">
         {/* Hamburger */}
         <button onClick={() => setMenuOpen(true)}
           className="pointer-events-auto h-9 w-9 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0 self-start mt-0.5">
