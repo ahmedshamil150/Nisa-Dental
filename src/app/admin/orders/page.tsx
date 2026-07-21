@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 
 const STATUS_COLORS: Record<string, string> = {
@@ -12,10 +12,15 @@ const STATUS_COLORS: Record<string, string> = {
   requested_return: "bg-orange-100 text-orange-800",
 }
 
+const ORDER_STATUSES = ["", "pending", "confirmed", "shipped", "delivered", "cancelled", "requested_return"]
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [selected, setSelected] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+
+  const [filterStatus, setFilterStatus] = useState("")
+  const [search, setSearch] = useState("")
 
   useEffect(() => { loadOrders() }, [])
 
@@ -27,6 +32,27 @@ export default function AdminOrdersPage() {
     setOrders((data || []) as any)
     setLoading(false)
   }
+
+  const showOrderNumber = (o: any) => {
+    const shortId = o.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
+    return "NISA-" + shortId
+  }
+
+  const filtered = useMemo(() => {
+    let list = [...orders]
+    if (filterStatus) {
+      list = list.filter((o) => o.order_status === filterStatus)
+    }
+    if (search) {
+      const q = search.toLowerCase()
+      list = list.filter((o) =>
+        o.customer_name.toLowerCase().includes(q) ||
+        o.customer_email.toLowerCase().includes(q) ||
+        showOrderNumber(o).toLowerCase().includes(q)
+      )
+    }
+    return list
+  }, [orders, filterStatus, search])
 
   async function updateStatus(id: string, order_status: string) {
     const sb = getSupabase()
@@ -44,20 +70,39 @@ export default function AdminOrdersPage() {
       }
     }
     await (sb.from("orders") as any).update(update).eq("id", id)
-    await loadOrders()
-    if (selected?.id === id) {
-      setSelected({ ...selected, order_status })
-    }
   }
 
-  const showOrderNumber = (o: any) => {
-    const shortId = o.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
-    return "NISA-" + shortId
+  async function removeOrder(id: string) {
+    if (!confirm("Delete this order?")) return
+    const sb = getSupabase()
+    if (!sb) return
+    await sb.from("orders").delete().eq("id", id)
+    await loadOrders()
+    if (selected?.id === id) {
+      setSelected(null)
+    }
   }
 
   return (
     <div>
       <h1 className="font-headline-lg text-headline-lg text-on-surface mb-6">Orders</h1>
+
+      <div className="flex flex-wrap gap-3 mb-6 items-center">
+        <input
+          placeholder="Search name, email, order #..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none w-60"
+        />
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
+          <option value="">All Statuses</option>
+          {ORDER_STATUSES.filter(Boolean).map((s) => (
+            <option key={s} value={s}>{s.replace("_", " ")}</option>
+          ))}
+        </select>
+        <span className="text-xs text-on-surface-variant">{filtered.length} of {orders.length}</span>
+      </div>
 
       <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
         <table className="w-full text-sm">
@@ -77,9 +122,9 @@ export default function AdminOrdersPage() {
           <tbody className="divide-y">
             {loading ? (
               <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">Loading...</td></tr>
-            ) : orders.length === 0 ? (
-              <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">No orders yet</td></tr>
-            ) : orders.map((o: any) => (
+            ) : filtered.length === 0 ? (
+              <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">No orders match filters</td></tr>
+            ) : filtered.map((o: any) => (
               <tr key={o.id} className="hover:bg-surface-container-low">
                 <td className="px-6 py-4 font-bold text-on-surface">{showOrderNumber(o)}</td>
                 <td className="px-6 py-4 font-medium text-on-surface">{o.customer_name}</td>
@@ -98,7 +143,10 @@ export default function AdminOrdersPage() {
                 </td>
                 <td className="px-6 py-4 text-on-surface-variant">{new Date(o.created_at).toLocaleDateString()}</td>
                 <td className="px-6 py-4">
-                  <button onClick={() => setSelected(o)} className="text-primary hover:underline font-label-md text-label-md">View</button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setSelected(o)} className="text-primary hover:underline font-label-md text-label-md">View</button>
+                    <button onClick={() => removeOrder(o.id)} className="text-red-600 hover:underline font-label-md text-label-md">Delete</button>
+                  </div>
                 </td>
               </tr>
             ))}

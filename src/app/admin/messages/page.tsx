@@ -1,68 +1,100 @@
+"use client"
+
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
-import { Card, CardContent } from "@/components/ui/Card"
-import { Badge } from "@/components/ui/Badge"
-import { Button } from "@/components/ui/Button"
-import { Mail } from "lucide-react"
 
-async function getMessages() {
-  const sb = getSupabase()
-  if (!sb) return []
-  const { data } = await sb.from("contacts").select("*").order("created_at", { ascending: false })
-  return (data || []) as any[]
-}
+export default function AdminMessagesPage() {
+  const [messages, setMessages] = useState<any[]>([])
+  const [filterRead, setFilterRead] = useState("")
 
-export default async function AdminMessagesPage() {
-  const messages = await getMessages()
+  useEffect(() => { loadMessages() }, [])
+
+  async function loadMessages() {
+    const sb = getSupabase()
+    if (!sb) return
+    const { data } = await sb.from("contacts").select("*").order("created_at", { ascending: false })
+    setMessages((data || []) as any[])
+  }
+
+  const filtered = useMemo(() => {
+    if (filterRead === "read") return messages.filter((m) => m.is_read)
+    if (filterRead === "unread") return messages.filter((m) => !m.is_read)
+    return messages
+  }, [messages, filterRead])
+
+  async function markRead(id: string) {
+    const sb = getSupabase()
+    if (!sb) return
+    await (sb.from("contacts") as any).update({ is_read: true }).eq("id", id)
+    loadMessages()
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Delete this message?")) return
+    const sb = getSupabase()
+    if (!sb) return
+    await sb.from("contacts").delete().eq("id", id)
+    loadMessages()
+  }
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface">Messages</h1>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-gray-50 text-left text-xs uppercase text-gray-500">
-              <tr>
-                <th className="px-6 py-3 font-medium">From</th>
-                <th className="px-6 py-3 font-medium">Subject</th>
-                <th className="px-6 py-3 font-medium">Message</th>
-                <th className="px-6 py-3 font-medium">Status</th>
-                <th className="px-6 py-3 font-medium">Date</th>
-                <th className="px-6 py-3 font-medium">Actions</th>
+      <div className="flex flex-wrap gap-3 mb-6 items-center">
+        <select value={filterRead} onChange={(e) => setFilterRead(e.target.value)}
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
+          <option value="">All Messages</option>
+          <option value="unread">Unread</option>
+          <option value="read">Read</option>
+        </select>
+        <span className="text-xs text-on-surface-variant">{filtered.length} of {messages.length}</span>
+      </div>
+
+      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
+            <tr>
+              <th className="px-6 py-3 font-medium">From</th>
+              <th className="px-6 py-3 font-medium">Subject</th>
+              <th className="px-6 py-3 font-medium">Message</th>
+              <th className="px-6 py-3 font-medium">Status</th>
+              <th className="px-6 py-3 font-medium">Date</th>
+              <th className="px-6 py-3 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {filtered.length === 0 ? (
+              <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No messages match filters</td></tr>
+            ) : filtered.map((m: any) => (
+              <tr key={m.id} className="hover:bg-surface-container-low">
+                <td className="px-6 py-4">
+                  <p className="font-medium text-on-surface">{m.name}</p>
+                  <p className="text-xs text-on-surface-variant">{m.email}{m.phone ? ` | ${m.phone}` : ""}</p>
+                </td>
+                <td className="px-6 py-4 text-on-surface-variant">{m.subject || "No subject"}</td>
+                <td className="max-w-xs truncate px-6 py-4 text-on-surface-variant">{m.message}</td>
+                <td className="px-6 py-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${m.is_read ? "bg-gray-100 text-gray-800" : "bg-yellow-100 text-yellow-800"}`}>
+                    {m.is_read ? "Read" : "New"}
+                  </span>
+                </td>
+                <td className="px-6 py-4 text-on-surface-variant">{new Date(m.created_at).toLocaleDateString()}</td>
+                <td className="px-6 py-4">
+                  <div className="flex gap-2">
+                    {!m.is_read && (
+                      <button onClick={() => markRead(m.id)} className="text-primary hover:underline font-label-md text-label-md">Mark Read</button>
+                    )}
+                    <button onClick={() => remove(m.id)} className="text-red-600 hover:underline font-label-md text-label-md">Delete</button>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y">
-              {messages.map((m: any) => (
-                <tr key={m.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div>
-                      <p className="font-medium text-gray-900">{m.name}</p>
-                      <p className="text-xs text-gray-500">{m.email}</p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">{m.subject || "No subject"}</td>
-                  <td className="max-w-xs truncate px-6 py-4 text-gray-500">{m.message}</td>
-                  <td className="px-6 py-4">
-                    <Badge variant={m.is_read ? "default" : "warning"}>
-                      {m.is_read ? "Read" : "New"}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 text-gray-500">
-                    {new Date(m.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <Button variant="outline" size="sm">
-                      <Mail className="h-4 w-4" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

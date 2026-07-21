@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 
 interface Product {
@@ -34,6 +34,13 @@ export default function AdminProductsPage() {
     is_featured: false, is_active: true,
   })
 
+  const [filterCat, setFilterCat] = useState("")
+  const [filterDiscounted, setFilterDiscounted] = useState(false)
+  const [filterFeatured, setFilterFeatured] = useState(false)
+  const [filterInStock, setFilterInStock] = useState(false)
+  const [sortPrice, setSortPrice] = useState("")
+  const [search, setSearch] = useState("")
+
   async function uploadFile(file: File, field: "image_url" | "image_url_2") {
     setUploading(true)
     const fd = new FormData()
@@ -66,6 +73,32 @@ export default function AdminProductsPage() {
     setProducts((p.data || []) as any)
     setCategories((c.data || []) as any)
   }
+
+  const filtered = useMemo(() => {
+    let list = [...products]
+    if (search) {
+      const q = search.toLowerCase()
+      list = list.filter((p) => p.name.toLowerCase().includes(q))
+    }
+    if (filterCat) {
+      list = list.filter((p) => p.category_id === filterCat)
+    }
+    if (filterDiscounted) {
+      list = list.filter((p) => p.discount_percent > 0)
+    }
+    if (filterFeatured) {
+      list = list.filter((p) => p.is_featured)
+    }
+    if (filterInStock) {
+      list = list.filter((p) => p.stock_quantity > 0)
+    }
+    if (sortPrice === "low") {
+      list.sort((a, b) => a.price - b.price)
+    } else if (sortPrice === "high") {
+      list.sort((a, b) => b.price - a.price)
+    }
+    return list
+  }, [products, search, filterCat, filterDiscounted, filterFeatured, filterInStock, sortPrice])
 
   function openNew() {
     setEditing(null)
@@ -126,6 +159,14 @@ export default function AdminProductsPage() {
     loadData()
   }
 
+  async function remove(id: string) {
+    if (!confirm("Delete this product?")) return
+    const sb = getSupabase()
+    if (!sb) return
+    await sb.from("products").delete().eq("id", id)
+    loadData()
+  }
+
   const displayPrice = (p: Product) => {
     if (p.discount_percent > 0) {
       const sale = p.price * (100 - p.discount_percent) / 100
@@ -143,6 +184,39 @@ export default function AdminProductsPage() {
         </button>
       </div>
 
+      <div className="flex flex-wrap gap-3 mb-6 items-center">
+        <input
+          placeholder="Search name..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none w-48"
+        />
+        <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
+          <option value="">All Categories</option>
+          {categories.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+        <label className="flex items-center gap-1.5 text-sm">
+          <input type="checkbox" checked={filterDiscounted} onChange={(e) => setFilterDiscounted(e.target.checked)} className="accent-primary" />
+          Discounted
+        </label>
+        <label className="flex items-center gap-1.5 text-sm">
+          <input type="checkbox" checked={filterFeatured} onChange={(e) => setFilterFeatured(e.target.checked)} className="accent-primary" />
+          Featured
+        </label>
+        <label className="flex items-center gap-1.5 text-sm">
+          <input type="checkbox" checked={filterInStock} onChange={(e) => setFilterInStock(e.target.checked)} className="accent-primary" />
+          In Stock
+        </label>
+        <select value={sortPrice} onChange={(e) => setSortPrice(e.target.value)}
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
+          <option value="">Default sort</option>
+          <option value="low">Price: Low to High</option>
+          <option value="high">Price: High to Low</option>
+        </select>
+        <span className="text-xs text-on-surface-variant">{filtered.length} of {products.length}</span>
+      </div>
+
       <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
@@ -158,9 +232,9 @@ export default function AdminProductsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {products.length === 0 ? (
-              <tr><td colSpan={8} className="px-6 py-12 text-center text-on-surface-variant">No products yet</td></tr>
-            ) : products.map((p: any) => (
+            {filtered.length === 0 ? (
+              <tr><td colSpan={8} className="px-6 py-12 text-center text-on-surface-variant">No products match filters</td></tr>
+            ) : filtered.map((p: any) => (
               <tr key={p.id} className="hover:bg-surface-container-low">
                 <td className="px-6 py-4 font-medium text-on-surface">{p.name}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{p.category?.name || "-"}</td>
@@ -174,7 +248,10 @@ export default function AdminProductsPage() {
                   </button>
                 </td>
                 <td className="px-6 py-4">
-                  <button onClick={() => openEdit(p)} className="text-primary hover:underline font-label-md text-label-md">Edit</button>
+                  <div className="flex gap-2">
+                    <button onClick={() => openEdit(p)} className="text-primary hover:underline font-label-md text-label-md">Edit</button>
+                    <button onClick={() => remove(p.id)} className="text-red-600 hover:underline font-label-md text-label-md">Delete</button>
+                  </div>
                 </td>
               </tr>
             ))}

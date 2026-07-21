@@ -1,17 +1,34 @@
+"use client"
+
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
-import { Card, CardContent } from "@/components/ui/Card"
-import { Badge } from "@/components/ui/Badge"
 import Link from "next/link"
 
-async function getInvoices() {
-  const sb = getSupabase()
-  if (!sb) return []
-  const { data } = await sb.from("invoices").select("*, order:orders(*)").order("created_at", { ascending: false })
-  return (data || []) as any[]
-}
+export default function AdminInvoicesPage() {
+  const [invoices, setInvoices] = useState<any[]>([])
+  const [filterStatus, setFilterStatus] = useState("")
 
-export default async function AdminInvoicesPage() {
-  const invoices = await getInvoices()
+  useEffect(() => { loadInvoices() }, [])
+
+  async function loadInvoices() {
+    const sb = getSupabase()
+    if (!sb) return
+    const { data } = await sb.from("invoices").select("*, order:orders(*)").order("created_at", { ascending: false })
+    setInvoices((data || []) as any[])
+  }
+
+  const filtered = useMemo(() => {
+    if (!filterStatus) return invoices
+    return invoices.filter((inv) => inv.status === filterStatus)
+  }, [invoices, filterStatus])
+
+  async function remove(id: string) {
+    if (!confirm("Delete this invoice?")) return
+    const sb = getSupabase()
+    if (!sb) return
+    await sb.from("invoices").delete().eq("id", id)
+    loadInvoices()
+  }
 
   return (
     <div>
@@ -19,50 +36,56 @@ export default async function AdminInvoicesPage() {
         <h1 className="font-headline-lg text-headline-lg text-on-surface">Invoices</h1>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
-              <tr>
-                <th className="px-6 py-3 font-medium">Invoice #</th>
-                <th className="px-6 py-3 font-medium">Customer</th>
-                <th className="px-6 py-3 font-medium">Total</th>
-                <th className="px-6 py-3 font-medium">Tax</th>
-                <th className="px-6 py-3 font-medium">Delivery</th>
-                <th className="px-6 py-3 font-medium">Coupon</th>
-                <th className="px-6 py-3 font-medium">Status</th>
-                <th className="px-6 py-3 font-medium">Date</th>
-                <th className="px-6 py-3 font-medium">PDF</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {invoices.length === 0 ? (
-                <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">No invoices yet</td></tr>
-              ) : invoices.map((inv: any) => (
-                <tr key={inv.id} className="hover:bg-surface-container-low">
-                  <td className="px-6 py-4 font-medium text-on-surface">{inv.invoice_number}</td>
-                  <td className="px-6 py-4 text-on-surface-variant">{inv.order?.customer_name || 'N/A'}</td>
-                  <td className="px-6 py-4 font-bold text-on-surface">${inv.total}</td>
-                  <td className="px-6 py-4">${inv.tax_amount}</td>
-                  <td className="px-6 py-4">${inv.delivery_charge}</td>
-                  <td className="px-6 py-4">{inv.coupon_code || '-'}</td>
-                  <td className="px-6 py-4"><Badge variant={inv.status === 'paid' ? 'success' : 'warning'}>{inv.status}</Badge></td>
-                  <td className="px-6 py-4 text-on-surface-variant">{new Date(inv.created_at).toLocaleDateString()}</td>
-                  <td className="px-6 py-4">
-                    <Link
-                      href={`/api/invoice/${inv.id}`}
-                      className="text-primary hover:underline font-label-md text-label-md flex items-center gap-1"
-                    >
+      <div className="flex flex-wrap gap-3 mb-6 items-center">
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
+          <option value="">All Statuses</option>
+          <option value="paid">Paid</option>
+          <option value="unpaid">Unpaid</option>
+        </select>
+        <span className="text-xs text-on-surface-variant">{filtered.length} of {invoices.length}</span>
+      </div>
+
+      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
+            <tr>
+              <th className="px-6 py-3 font-medium">Invoice #</th>
+              <th className="px-6 py-3 font-medium">Customer</th>
+              <th className="px-6 py-3 font-medium">Total</th>
+              <th className="px-6 py-3 font-medium">Status</th>
+              <th className="px-6 py-3 font-medium">Date</th>
+              <th className="px-6 py-3 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {filtered.length === 0 ? (
+              <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No invoices match filters</td></tr>
+            ) : filtered.map((inv: any) => (
+              <tr key={inv.id} className="hover:bg-surface-container-low">
+                <td className="px-6 py-4 font-medium text-on-surface">{inv.invoice_number}</td>
+                <td className="px-6 py-4 text-on-surface-variant">{inv.order?.customer_name || "N/A"}</td>
+                <td className="px-6 py-4 font-bold">PKR {inv.total}</td>
+                <td className="px-6 py-4">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${inv.status === "paid" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
+                    {inv.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 text-on-surface-variant">{new Date(inv.created_at).toLocaleDateString()}</td>
+                <td className="px-6 py-4">
+                  <div className="flex gap-2">
+                    <Link href={`/api/invoice/${inv.id}`} className="text-primary hover:underline font-label-md text-label-md flex items-center gap-1">
                       <span className="material-symbols-outlined text-[16px]">download</span>
                       PDF
                     </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+                    <button onClick={() => remove(inv.id)} className="text-red-600 hover:underline font-label-md text-label-md">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

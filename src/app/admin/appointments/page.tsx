@@ -1,10 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+
+const STATUSES = ["", "pending", "confirmed", "completed", "cancelled"]
 
 export default function AdminAppointmentsPage() {
   const [appointments, setAppointments] = useState<any[]>([])
+  const [filterStatus, setFilterStatus] = useState("")
 
   useEffect(() => { loadAppointments() }, [])
 
@@ -15,6 +18,11 @@ export default function AdminAppointmentsPage() {
     setAppointments((data || []) as any[])
   }
 
+  const filtered = useMemo(() => {
+    if (!filterStatus) return appointments
+    return appointments.filter((a) => a.status === filterStatus)
+  }, [appointments, filterStatus])
+
   async function updateStatus(id: string, status: string) {
     const sb = getSupabase()
     if (!sb) return
@@ -22,10 +30,29 @@ export default function AdminAppointmentsPage() {
     loadAppointments()
   }
 
+  async function remove(id: string) {
+    if (!confirm("Delete this appointment?")) return
+    const sb = getSupabase()
+    if (!sb) return
+    await sb.from("appointments").delete().eq("id", id)
+    loadAppointments()
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-headline-lg text-headline-lg text-on-surface">Appointments</h1>
+      </div>
+
+      <div className="flex flex-wrap gap-3 mb-6 items-center">
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
+          <option value="">All Statuses</option>
+          {STATUSES.filter(Boolean).map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+        <span className="text-xs text-on-surface-variant">{filtered.length} of {appointments.length}</span>
       </div>
 
       <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
@@ -42,9 +69,9 @@ export default function AdminAppointmentsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {appointments.length === 0 ? (
-              <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No appointments yet</td></tr>
-            ) : appointments.map((a: any) => (
+            {filtered.length === 0 ? (
+              <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No appointments match filters</td></tr>
+            ) : filtered.map((a: any) => (
               <tr key={a.id} className="hover:bg-surface-container-low">
                 <td className="px-6 py-4 font-medium text-on-surface">{a.patient_name}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{a.service?.name || "General"}</td>
@@ -65,16 +92,19 @@ export default function AdminAppointmentsPage() {
                   {a.patient_phone && <p>{a.patient_phone}</p>}
                 </td>
                 <td className="px-6 py-4">
-                  <select
-                    value={a.status}
-                    onChange={(e) => updateStatus(a.id, e.target.value)}
-                    className="rounded-lg border border-outline-variant bg-surface px-3 py-1.5 text-xs font-label-md focus:border-primary outline-none"
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
+                  <div className="flex gap-2 items-center">
+                    <select
+                      value={a.status}
+                      onChange={(e) => updateStatus(a.id, e.target.value)}
+                      className="rounded-lg border border-outline-variant bg-surface px-3 py-1.5 text-xs font-label-md focus:border-primary outline-none"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    <button onClick={() => remove(a.id)} className="text-red-600 hover:underline font-label-md text-label-md text-xs">Delete</button>
+                  </div>
                 </td>
               </tr>
             ))}
