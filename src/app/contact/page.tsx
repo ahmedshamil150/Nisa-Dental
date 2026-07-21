@@ -1,158 +1,85 @@
 import { Card } from "@/components/ui/Card"
-import { Phone, Mail, MapPin, Clock } from "lucide-react"
 
 export default function ContactPage() {
   return (
-    <div className="py-12">
-      <div className="container mx-auto px-4">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Contact Us</h1>
-          <p className="mt-3 text-gray-600">
-            Get in touch with us for appointments, inquiries, or feedback
-          </p>
-        </div>
+    <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+      <div className="max-w-3xl mx-auto text-center mb-16">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">Contact Us</h1>
+        <div className="w-16 h-1 bg-primary mx-auto rounded-full mb-6" />
+        <p className="font-body-lg text-body-lg text-on-surface-variant">Get in touch for appointments, inquiries, or feedback</p>
+      </div>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Contact Form */}
-          <Card className="p-6">
-            <h2 className="mb-6 text-xl font-semibold text-gray-900">Send Us a Message</h2>
-            <form
-              action="/api/contact"
-              method="POST"
-              className="space-y-4"
-            >
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    required
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-                    placeholder="Your name"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    required
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-                    placeholder="your@email.com"
-                  />
-                </div>
+      <div className="grid gap-12 md:grid-cols-2">
+        <Card className="p-8">
+          <h2 className="font-headline-md text-headline-md text-on-surface mb-6">Send Us a Message</h2>
+          <form action="/api/contact" method="POST" className="space-y-5">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="name" className="font-label-md text-label-md text-on-surface block mb-1">Name *</label>
+                <input type="text" name="name" id="name" required
+                  className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                  placeholder="Your name" />
               </div>
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  id="phone"
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-                  placeholder="(555) 123-4567"
-                />
+                <label htmlFor="email" className="font-label-md text-label-md text-on-surface block mb-1">Email *</label>
+                <input type="email" name="email" id="email" required
+                  className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                  placeholder="your@email.com" />
               </div>
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  name="subject"
-                  id="subject"
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-                  placeholder="How can we help?"
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-                  Message *
-                </label>
-                <textarea
-                  name="message"
-                  id="message"
-                  required
-                  rows={5}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
-                  placeholder="Tell us more about your inquiry..."
-                />
-              </div>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-teal-700"
-              >
-                Send Message
-              </button>
-            </form>
+            </div>
+            <div>
+              <label htmlFor="phone" className="font-label-md text-label-md text-on-surface block mb-1">Phone</label>
+              <input type="tel" name="phone" id="phone"
+                className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                placeholder="(555) 123-4567" />
+            </div>
+            <div>
+              <label htmlFor="subject" className="font-label-md text-label-md text-on-surface block mb-1">Subject</label>
+              <input type="text" name="subject" id="subject"
+                className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                placeholder="How can we help?" />
+            </div>
+            <div>
+              <label htmlFor="message" className="font-label-md text-label-md text-on-surface block mb-1">Message *</label>
+              <textarea name="message" id="message" required rows={5}
+                className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                placeholder="Tell us more..." />
+            </div>
+            <button type="submit" className="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all">
+              Send Message
+            </button>
+          </form>
+        </Card>
+
+        <div className="space-y-6">
+          <Card className="p-6 flex items-start gap-4">
+            <span className="material-symbols-outlined text-primary">location_on</span>
+            <div>
+              <h3 className="font-headline-md text-headline-md text-on-surface">Address</h3>
+              <p className="text-on-surface-variant">123 Care Street, Suite 500<br />Healthcare City, HC 12345</p>
+            </div>
           </Card>
-
-          {/* Contact Info */}
-          <div className="space-y-6">
-            <Card className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
-                  <MapPin className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Address</h3>
-                  <p className="mt-1 text-sm text-gray-600">
-                    123 Medical Center Drive<br />
-                    Suite 100<br />
-                    New York, NY 10001
-                  </p>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Phone</h3>
-                  <p className="mt-1 text-sm text-gray-600">+1 (555) 123-4567</p>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Email</h3>
-                  <p className="mt-1 text-sm text-gray-600">info@nisadental.com</p>
-                </div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
-                  <Clock className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Clinic Hours</h3>
-                  <div className="mt-1 space-y-1 text-sm text-gray-600">
-                    <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                    <p>Saturday: 10:00 AM - 2:00 PM</p>
-                    <p>Sunday: Closed</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
+          <Card className="p-6 flex items-start gap-4">
+            <span className="material-symbols-outlined text-primary">call</span>
+            <div>
+              <h3 className="font-headline-md text-headline-md text-on-surface">Phone</h3>
+              <p className="text-on-surface-variant">+1 234 567 890</p>
+            </div>
+          </Card>
+          <Card className="p-6 flex items-start gap-4">
+            <span className="material-symbols-outlined text-primary">mail</span>
+            <div>
+              <h3 className="font-headline-md text-headline-md text-on-surface">Email</h3>
+              <p className="text-on-surface-variant">info@nisadental.com</p>
+            </div>
+          </Card>
+          <Card className="p-6 flex items-start gap-4">
+            <span className="material-symbols-outlined text-primary">schedule</span>
+            <div>
+              <h3 className="font-headline-md text-headline-md text-on-surface">Hours</h3>
+              <p className="text-on-surface-variant">Mon-Fri: 9AM - 6PM<br />Sat: 10AM - 2PM</p>
+            </div>
+          </Card>
         </div>
       </div>
     </div>

@@ -165,3 +165,44 @@ export interface CartItem {
   created_at: string
   product?: Product
 }
+
+export interface Coupon {
+  id: string
+  code: string
+  description: string | null
+  discount_type: 'percentage' | 'fixed'
+  discount_value: number
+  min_order_amount: number
+  max_uses: number | null
+  used_count: number
+  is_active: boolean
+  expires_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Invoice {
+  id: string
+  order_id: string
+  invoice_number: string
+  subtotal: number
+  tax_rate: number
+  tax_amount: number
+  delivery_charge: number
+  discount_amount: number
+  coupon_code: string | null
+  total: number
+  status: string
+  paid_at: string
+  created_at: string
+  order?: Order
+}
+
+export interface RevenueLog {
+  id: string
+  invoice_id: string
+  amount: number
+  source: string
+  description: string | null
+  recorded_at: string
+}
