@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { sendOrderStatusUpdate } from "@/lib/email"
 
 function getSupabase() {
   return createClient(
@@ -67,10 +68,15 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 })
   }
 
+  const oldStatus = order.order_status
   const { error } = await (supabase.from("orders") as any).update({ order_status }).eq("id", order.id)
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  if (oldStatus !== order_status) {
+    sendOrderStatusUpdate(order, toOrderNumber(order.id), oldStatus, order_status).catch(console.error)
   }
 
   return NextResponse.json({ success: true })

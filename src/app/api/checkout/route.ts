@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { sendOrderConfirmation } from "@/lib/email"
 
 function getSupabase() {
   return createClient(
@@ -187,6 +188,9 @@ export async function POST(req: Request) {
         description: `Order ${order_number}`,
       })
     }
+
+    // Send confirmation emails (non-blocking)
+    sendOrderConfirmation({ ...order, order_items: orderItems }, order_number).catch(console.error)
 
     return NextResponse.json({ order_id: order.id, order_number })
   } catch (err) {
