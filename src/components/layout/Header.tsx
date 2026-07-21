@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
 import { useCart } from "@/lib/cart-context"
 
 const navLinks = [
@@ -25,7 +24,6 @@ function CartBadge() {
 
 export function Header() {
   const pathname = usePathname()
-  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <>
@@ -56,9 +54,6 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <button className="material-symbols-outlined md:hidden text-primary" onClick={() => setMenuOpen(!menuOpen)}>
-              {menuOpen ? "close" : "menu"}
-            </button>
             <Link
               href="/appointment"
               className="hidden md:inline-flex bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all"
@@ -72,39 +67,7 @@ export function Header() {
           </div>
         </div>
 
-        {menuOpen && (
-          <div className="md:hidden border-t border-outline-variant/30 bg-surface px-margin-mobile py-4 space-y-3">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`block font-label-md text-label-md py-2 ${
-                    isActive ? "text-primary font-bold" : "text-on-surface-variant"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              )
-            })}
-            <Link
-              href="/appointment"
-              onClick={() => setMenuOpen(false)}
-              className="block bg-primary text-on-primary text-center px-6 py-3 rounded-lg font-label-md text-label-md mt-4"
-            >
-              Book Appointment
-            </Link>
-            <Link
-              href="/cart"
-              onClick={() => setMenuOpen(false)}
-              className="block border border-outline-variant text-center px-6 py-3 rounded-lg font-label-md text-label-md mt-2"
-            >
-              View Cart
-            </Link>
-          </div>
-        )}
+
       </header>
     </>
   )
