@@ -46,12 +46,11 @@ export function Header() {
                 <div key={link.href} className="relative group">
                   <Link
                     href={link.href}
-                    className={`font-label-md text-label-md transition-colors inline-flex items-center gap-1 ${
+                    className={`font-label-md text-label-md transition-colors ${
                       isActive ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary"
                     }`}
                   >
                     {link.label}
-                    <span className="material-symbols-outlined text-[16px] transition-transform group-hover:rotate-180">expand_more</span>
                   </Link>
                   <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                     <div className="bg-surface shadow-xl rounded-xl border border-outline-variant/30 p-2 min-w-[160px]">
