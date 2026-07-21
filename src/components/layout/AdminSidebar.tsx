@@ -16,6 +16,8 @@ const sidebarLinks: SidebarLink[] = [
   { href: "/admin", label: "Dashboard", icon: "dashboard" },
   { href: "/admin/products", label: "Products", icon: "inventory_2" },
   { href: "/admin/categories", label: "Categories", icon: "category" },
+  { href: "/admin/services", label: "Services", icon: "medical_services" },
+  { href: "/admin/team", label: "Team", icon: "group" },
   { href: "/admin/coupons", label: "Coupons", icon: "sell" },
   { href: "/admin/orders", label: "Orders", icon: "shopping_cart" },
   { href: "/admin/invoices", label: "Invoices", icon: "receipt_long" },
