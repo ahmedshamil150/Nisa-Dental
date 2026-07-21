@@ -31,17 +31,12 @@ export function Header() {
     <>
       <header className="bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm sticky top-0 z-50">
         <div className="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16">
-          <div className="flex items-center gap-3">
-            <button className="material-symbols-outlined md:hidden text-primary" onClick={() => setMenuOpen(!menuOpen)}>
-              {menuOpen ? "close" : "menu"}
-            </button>
-            <Link href="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="Nisa Dental" className="h-8 w-auto" />
-              <span className="font-headline-md text-headline-md font-semibold text-primary tracking-tight">
-                NISA DENTAL
-              </span>
-            </Link>
-          </div>
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/logo.png" alt="Nisa Dental" className="h-8 w-auto rounded-full" />
+            <span className="font-headline-md text-headline-md font-semibold text-primary tracking-tight">
+              NISA DENTAL
+            </span>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => {
@@ -61,6 +56,9 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-4">
+            <button className="material-symbols-outlined md:hidden text-primary" onClick={() => setMenuOpen(!menuOpen)}>
+              {menuOpen ? "close" : "menu"}
+            </button>
             <Link
               href="/appointment"
               className="hidden md:inline-flex bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all"
