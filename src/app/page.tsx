@@ -53,6 +53,12 @@ export default async function HomePage() {
             >
               View Our Services
             </Link>
+            <Link
+              href="/shop"
+              className="bg-secondary-container text-on-secondary-container px-6 md:px-8 py-3 md:py-4 rounded-lg font-label-md text-[13px] md:text-label-md hover:shadow-md transition-all active:scale-95 text-center"
+            >
+              Shop Now
+            </Link>
           </div>
         </div>
       </section>
