@@ -2,8 +2,9 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useCart } from "@/lib/cart-context"
+import { gsap } from "gsap"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -30,56 +31,187 @@ export function Header() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [iconsOpen, setIconsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const circleRefs = useRef<(HTMLSpanElement | null)[]>([])
+  const tlRefs = useRef<gsap.core.Timeline[]>([])
+  const activeTweenRefs = useRef<gsap.core.Tween[]>([])
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  useEffect(() => {
+    circleRefs.current.forEach((circle, i) => {
+      if (!circle?.parentElement) return
+      const pill = circle.parentElement
+      const rect = pill.getBoundingClientRect()
+      const w = rect.width
+      const h = rect.height
+      const R = ((w * w) / 4 + h * h) / (2 * h)
+      const D = Math.ceil(2 * R) + 2
+      const delta = Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1
+      const originY = D - delta
+
+      circle.style.width = `${D}px`
+      circle.style.height = `${D}px`
+      circle.style.bottom = `-${delta}px`
+
+      gsap.set(circle, { xPercent: -50, scale: 0, transformOrigin: `50% ${originY}px` })
+
+      const label = pill.querySelector(".pill-label") as HTMLElement | null
+      const hoverLabel = pill.querySelector(".pill-label-hover") as HTMLElement | null
+
+      if (label) gsap.set(label, { y: 0 })
+      if (hoverLabel) gsap.set(hoverLabel, { y: h + 12, opacity: 0 })
+
+      tlRefs.current[i]?.kill()
+      const tl = gsap.timeline({ paused: true })
+      tl.to(circle, { scale: 1.2, xPercent: -50, duration: 2, ease: "power3.easeOut", overwrite: "auto" }, 0)
+      if (label) tl.to(label, { y: -(h + 8), duration: 2, ease: "power3.easeOut", overwrite: "auto" }, 0)
+      if (hoverLabel) {
+        gsap.set(hoverLabel, { y: Math.ceil(h + 100), opacity: 0 })
+        tl.to(hoverLabel, { y: 0, opacity: 1, duration: 2, ease: "power3.easeOut", overwrite: "auto" }, 0)
+      }
+      tlRefs.current[i] = tl
+    })
+  }, [scrolled, pathname])
+
+  const handleEnter = (i: number) => {
+    const tl = tlRefs.current[i]
+    if (!tl) return
+    activeTweenRefs.current[i]?.kill()
+    activeTweenRefs.current[i] = tl.tweenTo(tl.duration(), { duration: 0.3, ease: "power3.easeOut", overwrite: "auto" })
+  }
+
+  const handleLeave = (i: number) => {
+    const tl = tlRefs.current[i]
+    if (!tl) return
+    activeTweenRefs.current[i]?.kill()
+    activeTweenRefs.current[i] = tl.tweenTo(0, { duration: 0.2, ease: "power3.easeOut", overwrite: "auto" })
+  }
+
+  function NavPill({ link, index }: { link: typeof navLinks[0], index: number }) {
+    const isActive = pathname === link.href
+    if (link.dropdown) {
+      return (
+        <div className="relative group">
+          <button
+            onMouseEnter={() => handleEnter(index)}
+            onMouseLeave={() => handleLeave(index)}
+            className={`pill relative overflow-hidden rounded-full px-5 py-1.5 font-label-md text-label-md transition-colors ${
+              isActive ? "text-white" : "text-white/80 hover:text-white"
+            }`}
+          >
+            <span className="hover-circle absolute left-1/2 -bottom-1 w-0 h-0 rounded-full bg-white/20 pointer-events-none"
+              ref={el => { circleRefs.current[index] = el }} />
+            <span className="label-stack relative flex flex-col items-center">
+              <span className="pill-label">{link.label}</span>
+              <span className="pill-label-hover absolute pointer-events-none">{link.label}</span>
+            </span>
+          </button>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+            <div className="bg-surface shadow-xl rounded-xl border border-outline-variant/30 p-2 min-w-[160px]">
+              {link.dropdown.map((sub) => (
+                <Link key={sub.href} href={sub.href}
+                  className="block px-4 py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">
+                  {sub.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )
+    }
+    return (
+      <Link href={link.href}
+        onMouseEnter={() => handleEnter(index)}
+        onMouseLeave={() => handleLeave(index)}
+        className={`pill relative overflow-hidden rounded-full px-5 py-1.5 font-label-md text-label-md transition-colors ${
+          isActive ? "text-white" : "text-white/80 hover:text-white"
+        }`}>
+        <span className="hover-circle absolute left-1/2 -bottom-1 w-0 h-0 rounded-full bg-white/20 pointer-events-none"
+          ref={el => { circleRefs.current[index] = el }} />
+        <span className="label-stack relative flex flex-col items-center">
+          <span className="pill-label">{link.label}</span>
+          <span className="pill-label-hover absolute pointer-events-none">{link.label}</span>
+        </span>
+      </Link>
+    )
+  }
 
   return (
     <>
       {/* --- Desktop Header --- */}
-      <header className="hidden md:block bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm sticky top-0 z-50">
-        <div className="flex justify-between items-center w-full px-margin-desktop h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Nisa Dental" className="h-10 w-auto rounded-full" />
-            <span className="font-headline-md text-headline-md font-semibold text-primary tracking-tight">
+      <header className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "top-4 px-margin-desktop"
+          : "bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm"
+      }`}>
+        <div className={`transition-all duration-300 mx-auto ${
+          scrolled
+            ? "bg-primary shadow-lg rounded-full flex items-center justify-between px-6 h-14 max-w-4xl"
+            : "flex justify-between items-center w-full h-16"
+        }`}>
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <img src="/logo.png" alt="Nisa Dental" className={`rounded-full transition-all duration-300 ${scrolled ? "h-8 w-8" : "h-10 w-auto"}`} />
+            <span className={`font-headline-md font-semibold tracking-tight transition-all duration-300 ${
+              scrolled ? "text-headline-md text-white text-[16px]" : "text-headline-md text-primary"
+            }`}>
               NISA DENTAL
             </span>
           </Link>
 
-          <nav className="flex items-center gap-8">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href
-              if (link.dropdown) {
-                return (
-                  <div key={link.href} className="relative group">
-                    <Link href={link.href}
-                      className={`font-label-md text-label-md transition-colors ${isActive ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary"}`}>
-                      {link.label}
-                    </Link>
-                    <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                      <div className="bg-surface shadow-xl rounded-xl border border-outline-variant/30 p-2 min-w-[160px]">
-                        {link.dropdown.map((sub) => (
-                          <Link key={sub.href} href={sub.href}
-                            className="block px-4 py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">
-                            {sub.label}
-                          </Link>
-                        ))}
+          {scrolled ? (
+            <nav className="flex items-center gap-1">
+              {navLinks.map((link, i) => (
+                <NavPill key={link.href} link={link} index={i} />
+              ))}
+            </nav>
+          ) : (
+            <nav className="flex items-center gap-8">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href
+                if (link.dropdown) {
+                  return (
+                    <div key={link.href} className="relative group">
+                      <Link href={link.href}
+                        className={`font-label-md text-label-md transition-colors ${isActive ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary"}`}>
+                        {link.label}
+                      </Link>
+                      <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                        <div className="bg-surface shadow-xl rounded-xl border border-outline-variant/30 p-2 min-w-[160px]">
+                          {link.dropdown.map((sub) => (
+                            <Link key={sub.href} href={sub.href}
+                              className="block px-4 py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">
+                              {sub.label}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )
+                }
+                return (
+                  <Link key={link.href} href={link.href}
+                    className={`font-label-md text-label-md transition-colors ${isActive ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary"}`}>
+                    {link.label}
+                  </Link>
                 )
-              }
-              return (
-                <Link key={link.href} href={link.href}
-                  className={`font-label-md text-label-md transition-colors ${isActive ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary"}`}>
-                  {link.label}
-                </Link>
-              )
-            })}
-          </nav>
+              })}
+            </nav>
+          )}
 
-          <div className="flex items-center gap-4">
-            <Link href="/appointment" className="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all">
+          <div className="flex items-center gap-4 shrink-0">
+            <Link href={scrolled ? "/appointment" : "/appointment"} className={`transition-all duration-300 ${
+              scrolled
+                ? "bg-white text-primary px-5 py-1.5 rounded-full font-label-md text-label-md hover:shadow-md active:scale-95"
+                : "bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95"
+            }`}>
               Appointment
             </Link>
-            <Link href="/cart" className="relative text-primary hover:scale-110 transition-transform">
+            <Link href="/cart" className={`relative hover:scale-110 transition-transform ${scrolled ? "text-white" : "text-primary"}`}>
               <span className="material-symbols-outlined">shopping_cart</span>
               <CartBadge />
             </Link>
