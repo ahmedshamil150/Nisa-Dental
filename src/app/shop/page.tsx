@@ -2,6 +2,7 @@ import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
 import { AddToCartButton } from "@/components/shop/AddToCartButton"
 import { SortSelect } from "@/components/shop/SortSelect"
+import { SearchBar } from "@/components/shop/SearchBar"
 
 const PAGE_SIZE = 9
 
@@ -128,20 +129,11 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
         </aside>
 
         <div className="flex-grow">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 border-b border-outline-variant/30 pb-4">
+          {/* Desktop header row */}
+          <div className="hidden sm:flex items-center justify-between mb-8 border-b border-outline-variant/30 pb-4">
             <span className="font-body-md text-on-surface-variant whitespace-nowrap">Showing {products.length} products</span>
-
-            <div className="flex items-center gap-4 w-full sm:w-auto">
-              <form action="/shop" method="GET" className="relative flex-1 sm:flex-none">
-                {params.category && <input type="hidden" name="category" value={params.category} />}
-                {params.sort && <input type="hidden" name="sort" value={params.sort} />}
-                {params.discounted && <input type="hidden" name="discounted" value={params.discounted} />}
-                {params.page && <input type="hidden" name="page" value={params.page} />}
-                <input name="search" defaultValue={params.search} placeholder="Search products..."
-                  className="w-full sm:w-52 rounded-lg border border-outline-variant bg-surface px-4 py-2 pl-10 font-body-md text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
-              </form>
-
+            <div className="flex items-center gap-4">
+              <SearchBar defaultValue={params.search} params={params as Record<string, string | undefined>} />
               <div className="flex items-center gap-3">
                 <Link href={buildUrl({ ...params, discounted: params.discounted === "true" ? undefined : "true" })}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-label-md transition-all ${
@@ -152,33 +144,47 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                   <span className="material-symbols-outlined text-[16px]">local_offer</span>
                   Discounted
                 </Link>
-
                 <SortSelect currentSort={params.sort || ""} params={params as Record<string, string>} />
               </div>
             </div>
           </div>
 
-          {/* Mobile categories strip */}
-          <div className="md:hidden overflow-x-auto pb-4 mb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
-            <div className="flex gap-2 whitespace-nowrap min-w-max">
-              <Link href="/shop"
-                className={`px-4 py-2 rounded-full border text-sm font-label-md transition-all ${
-                  !params.category
-                    ? "bg-primary text-on-primary border-primary"
-                    : "border-outline-variant text-on-surface-variant hover:border-primary"
-                }`}>
-                All
-              </Link>
-              {categories.map((cat: any) => (
-                <Link key={cat.id} href={buildUrl({ ...params, category: cat.slug })}
-                  className={`px-4 py-2 rounded-full border text-sm font-label-md transition-all shrink-0 ${
-                    params.category === cat.slug
+          {/* Mobile: search | categories | discounted+sort */}
+          <div className="sm:hidden space-y-3 mb-6">
+            <SearchBar defaultValue={params.search} params={params as Record<string, string | undefined>} />
+            <div className="overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+              <div className="flex gap-2 whitespace-nowrap min-w-max">
+                <Link href="/shop"
+                  className={`px-4 py-2 rounded-full border text-sm font-label-md transition-all ${
+                    !params.category
                       ? "bg-primary text-on-primary border-primary"
                       : "border-outline-variant text-on-surface-variant hover:border-primary"
                   }`}>
-                  {cat.name}
+                  All
                 </Link>
-              ))}
+                {categories.map((cat: any) => (
+                  <Link key={cat.id} href={buildUrl({ ...params, category: cat.slug })}
+                    className={`px-4 py-2 rounded-full border text-sm font-label-md transition-all shrink-0 ${
+                      params.category === cat.slug
+                        ? "bg-primary text-on-primary border-primary"
+                        : "border-outline-variant text-on-surface-variant hover:border-primary"
+                    }`}>
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link href={buildUrl({ ...params, discounted: params.discounted === "true" ? undefined : "true" })}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-label-md transition-all ${
+                  params.discounted === "true"
+                    ? "bg-primary text-on-primary border-primary"
+                    : "border-outline-variant text-on-surface-variant hover:border-primary"
+                }`}>
+                <span className="material-symbols-outlined text-[16px]">local_offer</span>
+                Discounted
+              </Link>
+              <SortSelect currentSort={params.sort || ""} params={params as Record<string, string>} />
             </div>
           </div>
 
