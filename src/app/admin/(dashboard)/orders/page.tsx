@@ -32,7 +32,20 @@ export default function AdminOrdersPage() {
     const sb = getSupabase()
     if (!sb) return
     const { data } = await sb.from("orders").select("*, items:order_items(*)").order("created_at", { ascending: false })
-    setOrders((data || []) as any)
+    const orders = (data || []) as any[]
+    // Fetch product images for order items
+    const productIds = [...new Set(orders.flatMap((o: any) => (o.items || []).map((i: any) => i.product_id)).filter(Boolean))]
+    if (productIds.length > 0) {
+      const { data: products } = await sb.from("products").select("id, image_url, image_urls").in("id", productIds)
+      const productMap = Object.fromEntries((products || []).map((p: any) => [p.id, p]))
+      for (const order of orders) {
+        for (const item of (order.items || [])) {
+          const prod = productMap[item.product_id]
+          if (prod) item.product_image = prod.image_url || prod.image_urls?.[0] || null
+        }
+      }
+    }
+    setOrders(orders)
     setLoading(false)
   }
 
@@ -205,7 +218,12 @@ export default function AdminOrdersPage() {
                 <tbody className="divide-y">
                   {(selected.items || []).map((item: any) => (
                     <tr key={item.id}>
-                      <td className="py-2">{item.product_name}</td>
+                      <td className="py-2 flex items-center gap-3">
+                        {item.product_image && (
+                          <img src={item.product_image} alt="" className="w-10 h-10 rounded-lg object-cover border border-outline-variant/30 shrink-0" />
+                        )}
+                        <span>{item.product_name}</span>
+                      </td>
                       <td className="py-2">{item.quantity}</td>
                       <td className="py-2">PKR {item.unit_price}</td>
                       <td className="py-2 font-medium">PKR {item.total_price}</td>

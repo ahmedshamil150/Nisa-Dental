@@ -1,11 +1,14 @@
-import { getSupabase } from "@/lib/supabase"
+import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent } from "@/components/ui/Card"
 import { RevenueChart } from "@/components/admin/RevenueChart"
 import Link from "next/link"
 
+const sb = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
 async function getStats() {
-  const sb = getSupabase()
-  if (!sb) return { services: 0, products: 0, orders: 0, pendingAppointments: 0, unreadMessages: 0, testimonials: 0, revenue: 0, invoices: 0 }
 
   const [
     { count: servicesCount },
@@ -41,8 +44,6 @@ async function getStats() {
 }
 
 async function getRevenueChart() {
-  const sb = getSupabase()
-  if (!sb) return []
   const { data: raw } = await sb.from("invoices").select("total, created_at")
   const data = raw as any[] | null
   if (!data) return []
@@ -65,8 +66,6 @@ async function getRevenueChart() {
 }
 
 async function getPendingOrders() {
-  const sb = getSupabase()
-  if (!sb) return []
   const { data } = await sb.from("orders")
     .select("id, order_number, customer_name, total, created_at, order_status")
     .eq("order_status", "pending")
@@ -76,8 +75,6 @@ async function getPendingOrders() {
 }
 
 async function getPendingAppointments() {
-  const sb = getSupabase()
-  if (!sb) return []
   const { data } = await sb.from("appointments")
     .select("id, patient_name, phone, service_name, appointment_date, appointment_time, status")
     .eq("status", "pending")
