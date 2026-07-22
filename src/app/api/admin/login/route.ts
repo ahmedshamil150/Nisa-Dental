@@ -2,11 +2,12 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 
 export async function POST(request: Request) {
-  const { password } = await request.json()
+  const { username, password } = await request.json()
+  const adminUsername = process.env.ADMIN_USERNAME
   const adminPassword = process.env.ADMIN_PASSWORD
 
-  if (!adminPassword || password !== adminPassword) {
-    return NextResponse.json({ error: "Invalid password" }, { status: 401 })
+  if (!adminPassword || password !== adminPassword || !adminUsername || username !== adminUsername) {
+    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
   }
 
   const cookieStore = await cookies()
