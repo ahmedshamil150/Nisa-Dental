@@ -13,14 +13,22 @@ function toOrderNumber(id: string) {
   return "NISA-" + id.replace(/-/g, "").slice(0, 8).toUpperCase()
 }
 
+function normalizeOrderId(raw: string) {
+  const upper = raw.trim().toUpperCase().replace(/-/g, "")
+  if (upper.startsWith("NISA")) return "NISA-" + upper.slice(4)
+  return raw
+}
+
 export async function GET(req: Request) {
   const supabase = getSupabase()
   const { searchParams } = new URL(req.url)
-  const id = searchParams.get("id")
+  let id = searchParams.get("id")
 
   if (!id) {
     return NextResponse.json({ error: "Order ID required" }, { status: 400 })
   }
+
+  id = normalizeOrderId(id)
 
   let query = supabase.from("orders").select("*, order_items(*), invoices(*)")
 
@@ -47,11 +55,13 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   const body = await req.json()
-  const { id, order_status } = body
+  let { id, order_status } = body
 
   if (!id || !order_status) {
     return NextResponse.json({ error: "id and order_status required" }, { status: 400 })
   }
+
+  id = normalizeOrderId(id)
 
   const supabase = getSupabase()
 

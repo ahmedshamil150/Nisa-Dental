@@ -10,13 +10,19 @@ export default function TrackOrderLookupPage() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
+  function normalizeOrderNumber(raw: string) {
+    const upper = raw.trim().toUpperCase().replace(/-/g, "")
+    if (upper.startsWith("NISA")) return "NISA-" + upper.slice(4)
+    return raw.trim().toUpperCase()
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
-    const val = orderNumber.trim().toUpperCase()
-    if (!val) {
-      setError("Please enter an order number")
+    const val = normalizeOrderNumber(orderNumber)
+    if (!val || val === "NISA-") {
+      setError("Please enter a valid order number")
       return
     }
 
