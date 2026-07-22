@@ -68,8 +68,8 @@ async function getPendingOrders() {
   const sb = getSupabase()
   if (!sb) return []
   const { data } = await sb.from("orders")
-    .select("id, order_number, customer_name, total, created_at, status")
-    .eq("status", "pending")
+    .select("id, order_number, customer_name, total, created_at, order_status")
+    .eq("order_status", "pending")
     .order("created_at", { ascending: false })
     .limit(3)
   return (data || []) as any[]

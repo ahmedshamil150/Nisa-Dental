@@ -72,6 +72,7 @@ export default function AdminOrdersPage() {
       }
     }
     await (sb.from("orders") as any).update(update).eq("id", id)
+    loadOrders()
   }
 
   async function removeOrder(id: string) {
