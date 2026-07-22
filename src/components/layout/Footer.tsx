@@ -25,9 +25,9 @@ export function Footer() {
           <div>
             <h4 className="font-label-md text-label-md text-primary mb-6">CLINIC</h4>
             <ul className="space-y-4">
-              <li className="text-on-surface-variant/80">123 Care Street, Suite 500</li>
-              <li className="text-on-surface-variant/80">+1 234 567 890</li>
-              <li className="text-on-surface-variant/80">Mon - Fri: 9AM - 6PM</li>
+              <li className="text-on-surface-variant/80">Nisa Dental Clinic<br />Aimnabad Road, Sialkot</li>
+              <li className="text-on-surface-variant/80">Nisa Surgical<br />Kareempura Road, Sialkot</li>
+              <li className="text-on-surface-variant/80"><a href="tel:03341710086" className="hover:text-primary">0334-1710086</a></li>
             </ul>
           </div>
           <div>

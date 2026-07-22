@@ -56,14 +56,15 @@ export default function ContactPage() {
             <span className="material-symbols-outlined text-primary">location_on</span>
             <div>
               <h3 className="font-headline-md text-headline-md text-on-surface">Address</h3>
-              <p className="text-on-surface-variant">123 Care Street, Suite 500<br />Healthcare City, HC 12345</p>
+              <p className="text-on-surface-variant">Nisa Dental Clinic<br />Aimnabad Road, Sialkot</p>
+              <p className="text-on-surface-variant mt-2">Nisa Surgical<br />Kareempura Road, Sialkot</p>
             </div>
           </Card>
           <Card className="p-6 flex items-start gap-4">
             <span className="material-symbols-outlined text-primary">call</span>
             <div>
               <h3 className="font-headline-md text-headline-md text-on-surface">Phone</h3>
-              <p className="text-on-surface-variant">+1 234 567 890</p>
+              <p className="text-on-surface-variant"><a href="tel:03341710086" className="hover:text-primary">0334-1710086</a></p>
             </div>
           </Card>
           <Card className="p-6 flex items-start gap-4">

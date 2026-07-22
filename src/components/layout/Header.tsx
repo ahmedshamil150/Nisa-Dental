@@ -164,9 +164,9 @@ export function Header() {
               </Link>
             </nav>
             <div className="p-5 border-t border-outline-variant/30 space-y-3">
-              <p className="text-caption text-on-surface-variant">123 Care Street, Suite 500</p>
-              <p className="text-caption text-on-surface-variant">+1 234 567 890</p>
-              <p className="text-caption text-on-surface-variant">Mon - Fri: 9AM - 6PM</p>
+              <p className="text-caption text-on-surface-variant">Nisa Dental Clinic, Aimnabad Road</p>
+              <p className="text-caption text-on-surface-variant">Nisa Surgical, Kareempura Road</p>
+              <p className="text-caption text-on-surface-variant"><a href="tel:03341710086" className="hover:text-primary">0334-1710086</a></p>
             </div>
           </div>
         </div>
