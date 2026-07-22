@@ -152,7 +152,7 @@ export function Header() {
       }`}>
         <div className={`transition-all duration-300 ${
           scrolled
-            ? "bg-primary shadow-lg rounded-full flex items-center justify-between px-6 md:px-10 h-14 max-w-[90vw] mx-auto"
+            ? "bg-[#417171] shadow-lg rounded-full flex items-center justify-between px-6 md:px-10 h-14 max-w-[90vw] mx-auto"
             : "flex justify-between items-center w-full px-margin-desktop h-16"
         }`}>
           <Link href="/" className="flex items-center gap-2 shrink-0">
