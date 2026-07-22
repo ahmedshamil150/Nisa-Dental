@@ -21,40 +21,32 @@ function buildUrl(params: Record<string, string | undefined>) {
 
 async function getProducts(searchParams: { category?: string; search?: string; sort?: string; discounted?: string; page?: string }) {
   const sb = getSupabase()
-  if (!sb) return { products: [], count: 0 }
+  if (!sb) return { products: [], totalPages: 1 }
   const page = Math.max(1, parseInt(searchParams.page || "1"))
   const offset = (page - 1) * PAGE_SIZE
 
-  let countQuery = sb.from("products").select("*", { count: "exact", head: true }).eq("is_active", true)
-  let query = sb.from("products").select("*, category:product_categories(*)").eq("is_active", true)
+  let query = sb.from("products").select("*, category:product_categories(*)", { count: "exact" }).eq("is_active", true)
 
   if (searchParams.category) {
-    const filter = "category:product_categories.slug"
-    countQuery = countQuery.eq(filter, searchParams.category)
-    query = query.eq(filter, searchParams.category)
+    query = query.eq("category:product_categories.slug", searchParams.category)
   }
   if (searchParams.search) {
-    countQuery = countQuery.ilike("name", `%${searchParams.search}%`)
     query = query.ilike("name", `%${searchParams.search}%`)
   }
   if (searchParams.discounted === "true") {
-    countQuery = countQuery.gt("discount_percent", 0)
     query = query.gt("discount_percent", 0)
   }
 
-  const { count } = await countQuery
-  const totalPages = Math.ceil((count || 0) / PAGE_SIZE)
-
   if (searchParams.sort === "price_asc") {
-    const { data } = await query.order("price", { ascending: true }).range(offset, offset + PAGE_SIZE - 1)
-    return { products: (data || []) as any[], totalPages }
-  }
-  if (searchParams.sort === "price_desc") {
-    const { data } = await query.order("price", { ascending: false }).range(offset, offset + PAGE_SIZE - 1)
-    return { products: (data || []) as any[], totalPages }
+    query = query.order("price", { ascending: true })
+  } else if (searchParams.sort === "price_desc") {
+    query = query.order("price", { ascending: false })
+  } else {
+    query = query.order("created_at", { ascending: false })
   }
 
-  const { data } = await query.order("created_at", { ascending: false }).range(offset, offset + PAGE_SIZE - 1)
+  const { data, count } = await query.range(offset, offset + PAGE_SIZE - 1)
+  const totalPages = Math.ceil((count || 0) / PAGE_SIZE)
   return { products: (data || []) as any[], totalPages }
 }
 
