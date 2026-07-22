@@ -103,7 +103,7 @@ export function Header() {
 
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
-          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 shadow-sm flex flex-col items-stretch transition-all duration-300 ease-out rounded-2xl ${iconsOpen ? "px-4 py-4 gap-3" : "px-3 py-2.5 gap-2.5"}`}>
+          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 shadow-sm flex flex-col items-stretch transition-all duration-300 ease-out rounded-3xl ${iconsOpen ? "px-4 py-4 gap-3" : "px-3 pt-3 pb-2.5 gap-2.5"}`}>
             <Link href="/cart" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5">
               <span className="material-symbols-outlined text-[22px] shrink-0">shopping_cart</span>
               <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Cart</span>
