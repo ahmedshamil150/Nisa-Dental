@@ -1,13 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+import { Pagination } from "@/components/ui/Pagination"
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<any[]>([])
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ name: "", slug: "", sort_order: "0", is_active: true })
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
+  const totalPages = Math.ceil(categories.length / PAGE_SIZE)
+  const paged = categories.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   useEffect(() => { loadCategories() }, [])
 
@@ -69,6 +74,7 @@ export default function AdminCategoriesPage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">Name</th>
               <th className="px-6 py-3 font-medium">Slug</th>
               <th className="px-6 py-3 font-medium">Order</th>
@@ -78,9 +84,10 @@ export default function AdminCategoriesPage() {
           </thead>
           <tbody className="divide-y">
             {categories.length === 0 ? (
-              <tr><td colSpan={5} className="px-6 py-12 text-center text-on-surface-variant">No categories yet</td></tr>
-            ) : categories.map((c: any) => (
+              <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No categories yet</td></tr>
+            ) : paged.map((c: any, i: number) => (
               <tr key={c.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 font-medium text-on-surface">{c.name}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{c.slug}</td>
                 <td className="px-6 py-4">{c.sort_order}</td>
@@ -100,6 +107,7 @@ export default function AdminCategoriesPage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
       {showForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>

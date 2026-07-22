@@ -3,11 +3,14 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { Pagination } from "@/components/ui/Pagination"
 
 export default function AdminRevenuePage() {
   const [revenue, setRevenue] = useState<any[]>([])
   const [invoices, setInvoices] = useState<any[]>([])
   const [period, setPeriod] = useState("daily")
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
 
   useEffect(() => {
     loadData()
@@ -68,7 +71,8 @@ export default function AdminRevenuePage() {
     return Object.entries(grouped).map(([source, amount]) => ({ source, amount: Math.round(amount) }))
   }, [revenue])
 
-  const latestRevenue = revenue.slice(0, 50)
+  const totalPages = Math.ceil(revenue.length / PAGE_SIZE)
+  const paged = revenue.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   return (
     <div>
@@ -162,6 +166,7 @@ export default function AdminRevenuePage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">Date</th>
               <th className="px-6 py-3 font-medium">Source</th>
               <th className="px-6 py-3 font-medium">Description</th>
@@ -170,10 +175,11 @@ export default function AdminRevenuePage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {latestRevenue.length === 0 ? (
-              <tr><td colSpan={5} className="px-6 py-12 text-center text-on-surface-variant">No revenue entries yet</td></tr>
-            ) : latestRevenue.map((r: any) => (
+            {revenue.length === 0 ? (
+              <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No revenue entries yet</td></tr>
+            ) : paged.map((r: any, i: number) => (
               <tr key={r.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{new Date(r.recorded_at).toLocaleDateString()}</td>
                 <td className="px-6 py-4 capitalize text-on-surface">{r.source.replace(/_/g, " ")}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{r.description || "-"}</td>
@@ -184,6 +190,7 @@ export default function AdminRevenuePage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   )
 }

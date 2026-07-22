@@ -2,12 +2,15 @@
 
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+import { Pagination } from "@/components/ui/Pagination"
 
 const STATUSES = ["", "pending", "confirmed", "completed", "cancelled"]
 
 export default function AdminAppointmentsPage() {
   const [appointments, setAppointments] = useState<any[]>([])
   const [filterStatus, setFilterStatus] = useState("")
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
 
   useEffect(() => { loadAppointments() }, [])
 
@@ -22,6 +25,8 @@ export default function AdminAppointmentsPage() {
     if (!filterStatus) return appointments
     return appointments.filter((a) => a.status === filterStatus)
   }, [appointments, filterStatus])
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   async function updateStatus(id: string, status: string) {
     const sb = getSupabase()
@@ -45,7 +50,7 @@ export default function AdminAppointmentsPage() {
       </div>
 
       <div className="flex flex-wrap gap-3 mb-6 items-center">
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+        <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
           className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
           <option value="">All Statuses</option>
           {STATUSES.filter(Boolean).map((s) => (
@@ -59,6 +64,7 @@ export default function AdminAppointmentsPage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">Patient</th>
               <th className="px-6 py-3 font-medium">Service</th>
               <th className="px-6 py-3 font-medium">Date</th>
@@ -70,9 +76,10 @@ export default function AdminAppointmentsPage() {
           </thead>
           <tbody className="divide-y">
             {filtered.length === 0 ? (
-              <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No appointments match filters</td></tr>
-            ) : filtered.map((a: any) => (
+              <tr><td colSpan={8} className="px-6 py-12 text-center text-on-surface-variant">No appointments match filters</td></tr>
+            ) : paged.map((a: any, i: number) => (
               <tr key={a.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 font-medium text-on-surface">{a.patient_name}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{a.service?.name || "General"}</td>
                 <td className="px-6 py-4">{new Date(a.appointment_date).toLocaleDateString()}</td>
@@ -111,6 +118,7 @@ export default function AdminAppointmentsPage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   )
 }

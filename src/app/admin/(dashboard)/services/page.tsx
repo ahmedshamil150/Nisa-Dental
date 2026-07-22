@@ -1,12 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+import { Pagination } from "@/components/ui/Pagination"
 
 export default function AdminServicesPage() {
   const [services, setServices] = useState<any[]>([])
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
+  const totalPages = Math.ceil(services.length / PAGE_SIZE)
+  const paged = services.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
   const [form, setForm] = useState({
     name: "", slug: "", description: "", short_description: "", icon: "", image_url: "",
     price: "", duration_minutes: "", sort_order: "0", is_featured: false, is_active: true,
@@ -84,6 +89,7 @@ export default function AdminServicesPage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">Name</th>
               <th className="px-6 py-3 font-medium">Price</th>
               <th className="px-6 py-3 font-medium">Duration</th>
@@ -94,9 +100,10 @@ export default function AdminServicesPage() {
           </thead>
           <tbody className="divide-y">
             {services.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No services yet</td></tr>
-            ) : services.map((s: any) => (
+              <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No services yet</td></tr>
+            ) : paged.map((s: any, i: number) => (
               <tr key={s.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 font-medium text-on-surface">{s.name}</td>
                 <td className="px-6 py-4">{s.price ? `PKR ${s.price}` : "-"}</td>
                 <td className="px-6 py-4">{s.duration_minutes ? `${s.duration_minutes} min` : "-"}</td>
@@ -124,6 +131,7 @@ export default function AdminServicesPage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
       {showForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>

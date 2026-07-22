@@ -1,13 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+import { Pagination } from "@/components/ui/Pagination"
 
 export default function AdminTestimonialsPage() {
   const [testimonials, setTestimonials] = useState<any[]>([])
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ patient_name: "", patient_title: "", patient_image: "", content: "", rating: "5", is_featured: false, is_approved: true })
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
+  const totalPages = Math.ceil(testimonials.length / PAGE_SIZE)
+  const paged = testimonials.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   useEffect(() => { loadTestimonials() }, [])
 
@@ -79,6 +84,7 @@ export default function AdminTestimonialsPage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">Patient</th>
               <th className="px-6 py-3 font-medium">Rating</th>
               <th className="px-6 py-3 font-medium">Content</th>
@@ -89,9 +95,10 @@ export default function AdminTestimonialsPage() {
           </thead>
           <tbody className="divide-y">
             {testimonials.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No testimonials yet</td></tr>
-            ) : testimonials.map((t: any) => (
+              <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No testimonials yet</td></tr>
+            ) : paged.map((t: any, i: number) => (
               <tr key={t.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 font-medium text-on-surface">{t.patient_name}</td>
                 <td className="px-6 py-4">{t.rating}/5</td>
                 <td className="px-6 py-4 max-w-xs truncate text-on-surface-variant">{t.content}</td>
@@ -116,6 +123,7 @@ export default function AdminTestimonialsPage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
       {showForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>

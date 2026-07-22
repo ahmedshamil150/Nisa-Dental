@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+import { Pagination } from "@/components/ui/Pagination"
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -21,6 +22,8 @@ export default function AdminOrdersPage() {
 
   const [filterStatus, setFilterStatus] = useState("")
   const [search, setSearch] = useState("")
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
 
   useEffect(() => { loadOrders() }, [])
 
@@ -50,6 +53,8 @@ export default function AdminOrdersPage() {
     }
     return list
   }, [orders, filterStatus, search])
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   async function updateStatus(id: string, order_status: string) {
     const sb = getSupabase()
@@ -88,10 +93,10 @@ export default function AdminOrdersPage() {
         <input
           placeholder="Search name, email, order #..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1) }}
           className="rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none w-full sm:w-60"
         />
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+        <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setPage(1) }}
           className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
           <option value="">All Statuses</option>
           {ORDER_STATUSES.filter(Boolean).map((s) => (
@@ -105,6 +110,7 @@ export default function AdminOrdersPage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">Order #</th>
               <th className="px-6 py-3 font-medium">Customer</th>
               <th className="px-6 py-3 font-medium">Email</th>
@@ -118,11 +124,12 @@ export default function AdminOrdersPage() {
           </thead>
           <tbody className="divide-y">
             {loading ? (
-              <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">Loading...</td></tr>
+              <tr><td colSpan={10} className="px-6 py-12 text-center text-on-surface-variant">Loading...</td></tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">No orders match filters</td></tr>
-            ) : filtered.map((o: any) => (
+              <tr><td colSpan={10} className="px-6 py-12 text-center text-on-surface-variant">No orders match filters</td></tr>
+            ) : paged.map((o: any, i: number) => (
               <tr key={o.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 font-bold text-on-surface">{showOrderNumber(o)}</td>
                 <td className="px-6 py-4 font-medium text-on-surface">{o.customer_name}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{o.customer_email}</td>
@@ -150,6 +157,7 @@ export default function AdminOrdersPage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
       {selected && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setSelected(null)}>

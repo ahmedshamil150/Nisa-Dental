@@ -1,11 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+import { Pagination } from "@/components/ui/Pagination"
 
 export default function AdminProductReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([])
   const [filter, setFilter] = useState("")
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
 
   useEffect(() => { loadReviews() }, [])
 
@@ -31,15 +34,19 @@ export default function AdminProductReviewsPage() {
     loadReviews()
   }
 
-  const filtered = filter
-    ? reviews.filter((r) => r.product?.name?.toLowerCase().includes(filter.toLowerCase()) || r.customer_name?.toLowerCase().includes(filter.toLowerCase()) || r.review_text?.toLowerCase().includes(filter.toLowerCase()))
-    : reviews
+  const filtered = useMemo(() => {
+    return filter
+      ? reviews.filter((r) => r.product?.name?.toLowerCase().includes(filter.toLowerCase()) || r.customer_name?.toLowerCase().includes(filter.toLowerCase()) || r.review_text?.toLowerCase().includes(filter.toLowerCase()))
+      : reviews
+  }, [reviews, filter])
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <h1 className="font-headline-lg text-headline-lg text-on-surface">Product Reviews</h1>
-        <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search reviews..."
+        <input value={filter} onChange={(e) => { setFilter(e.target.value); setPage(1) }} placeholder="Search reviews..."
           className="w-full sm:w-64 rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none" />
       </div>
 
@@ -47,6 +54,7 @@ export default function AdminProductReviewsPage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">Product</th>
               <th className="px-6 py-3 font-medium">Customer</th>
               <th className="px-6 py-3 font-medium">Rating</th>
@@ -58,9 +66,10 @@ export default function AdminProductReviewsPage() {
           </thead>
           <tbody className="divide-y">
             {filtered.length === 0 ? (
-              <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No reviews found</td></tr>
-            ) : filtered.map((r: any) => (
+              <tr><td colSpan={8} className="px-6 py-12 text-center text-on-surface-variant">No reviews found</td></tr>
+            ) : paged.map((r: any, i: number) => (
               <tr key={r.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 font-medium text-on-surface">{r.product?.name || "—"}</td>
                 <td className="px-6 py-4">
                   <div className="text-on-surface">{r.customer_name}</div>
@@ -91,6 +100,7 @@ export default function AdminProductReviewsPage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   )
 }

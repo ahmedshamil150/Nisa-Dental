@@ -2,10 +2,13 @@
 
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+import { Pagination } from "@/components/ui/Pagination"
 
 export default function AdminMessagesPage() {
   const [messages, setMessages] = useState<any[]>([])
   const [filterRead, setFilterRead] = useState("")
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
 
   useEffect(() => { loadMessages() }, [])
 
@@ -21,6 +24,8 @@ export default function AdminMessagesPage() {
     if (filterRead === "unread") return messages.filter((m) => !m.is_read)
     return messages
   }, [messages, filterRead])
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   async function markRead(id: string) {
     const sb = getSupabase()
@@ -44,7 +49,7 @@ export default function AdminMessagesPage() {
       </div>
 
       <div className="flex flex-wrap gap-3 mb-6 items-center">
-        <select value={filterRead} onChange={(e) => setFilterRead(e.target.value)}
+        <select value={filterRead} onChange={(e) => { setFilterRead(e.target.value); setPage(1) }}
           className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
           <option value="">All Messages</option>
           <option value="unread">Unread</option>
@@ -57,6 +62,7 @@ export default function AdminMessagesPage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">From</th>
               <th className="px-6 py-3 font-medium">Subject</th>
               <th className="px-6 py-3 font-medium">Message</th>
@@ -67,9 +73,10 @@ export default function AdminMessagesPage() {
           </thead>
           <tbody className="divide-y">
             {filtered.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No messages match filters</td></tr>
-            ) : filtered.map((m: any) => (
+              <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No messages match filters</td></tr>
+            ) : paged.map((m: any, i: number) => (
               <tr key={m.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4">
                   <p className="font-medium text-on-surface">{m.name}</p>
                   <p className="text-xs text-on-surface-variant">{m.email}{m.phone ? ` | ${m.phone}` : ""}</p>
@@ -95,6 +102,7 @@ export default function AdminMessagesPage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   )
 }

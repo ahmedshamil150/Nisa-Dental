@@ -1,12 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
+import { Pagination } from "@/components/ui/Pagination"
 
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<any[]>([])
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 20
+  const totalPages = Math.ceil(coupons.length / PAGE_SIZE)
+  const paged = coupons.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
   const [form, setForm] = useState({
     code: "", discount_type: "percentage", discount_value: "", min_order_amount: "0",
     max_uses: "", expires_at: "", is_active: true,
@@ -86,6 +91,7 @@ export default function AdminCouponsPage() {
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>
+              <th className="px-4 py-3 font-medium w-10">#</th>
               <th className="px-6 py-3 font-medium">Code</th>
               <th className="px-6 py-3 font-medium">Discount</th>
               <th className="px-6 py-3 font-medium">Type</th>
@@ -98,9 +104,10 @@ export default function AdminCouponsPage() {
           </thead>
           <tbody className="divide-y">
             {coupons.length === 0 ? (
-              <tr><td colSpan={8} className="px-6 py-12 text-center text-on-surface-variant">No coupons yet</td></tr>
-            ) : coupons.map((c: any) => (
+              <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">No coupons yet</td></tr>
+            ) : paged.map((c: any, i: number) => (
               <tr key={c.id} className="hover:bg-surface-container-low">
+                <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 font-bold text-on-surface uppercase">{c.code}</td>
                 <td className="px-6 py-4">{c.discount_type === "percentage" ? `${c.discount_value}%` : `PKR ${c.discount_value}`}</td>
                 <td className="px-6 py-4"><span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">{c.discount_type}</span></td>
@@ -123,6 +130,7 @@ export default function AdminCouponsPage() {
           </tbody>
         </table>
       </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
       {showForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowForm(false)}>
