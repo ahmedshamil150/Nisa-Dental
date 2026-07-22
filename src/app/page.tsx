@@ -83,16 +83,19 @@ export default async function HomePage() {
                     Learn More <span className="material-symbols-outlined">arrow_forward</span>
                   </Link>
                 </div>
-                <div className="w-full md:w-1/2 aspect-square rounded-lg overflow-hidden border border-outline-variant/20 bg-primary-fixed-dim/20 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[80px] text-primary/30">clinical_notes</span>
-                </div>
+                <div className="w-full md:w-1/2 aspect-square rounded-lg overflow-hidden border border-outline-variant/20 bg-cover bg-center" style={{
+                  backgroundImage: services[0]?.image_url ? `url('${services[0].image_url}')` : "url('https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80')"
+                }} />
               </div>
 
-              <div className="md:col-span-4 bg-primary text-on-primary p-8 rounded-xl border border-primary-container flex flex-col justify-between transition-all duration-500 hover:shadow-xl">
-                <div>
-                  <span className="material-symbols-outlined text-on-primary text-4xl mb-4">dentistry</span>
-                  <h3 className="font-headline-md text-headline-md mb-3">Orthodontics</h3>
-                  <p className="text-primary-fixed opacity-90">Align your smile with modern solutions from invisible aligners to precision braces.</p>
+              <div className="md:col-span-4 bg-primary text-on-primary p-8 rounded-xl border border-primary-container flex flex-col justify-between transition-all duration-500 hover:shadow-xl relative overflow-hidden">
+                <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{
+                  backgroundImage: services[1]?.image_url ? `url('${services[1].image_url}')` : "url('https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=600&q=80')"
+                }} />
+                <div className="relative z-10">
+                  <span className="material-symbols-outlined text-on-primary text-4xl mb-4">{services[1]?.icon || "dentistry"}</span>
+                  <h3 className="font-headline-md text-headline-md mb-3">{services[1]?.name || "Orthodontics"}</h3>
+                  <p className="text-primary-fixed opacity-90">{services[1]?.short_description || "Align your smile with modern solutions from invisible aligners to precision braces."}</p>
                 </div>
                 <div className="mt-8">
                   <div className="bg-primary-container/20 p-4 rounded-lg border border-primary-fixed/20 mb-6">
@@ -108,20 +111,23 @@ export default async function HomePage() {
               </div>
 
               <div className="md:col-span-6 bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 transition-all">
-                <div className="mb-6 rounded-lg overflow-hidden h-48 bg-cover bg-center border border-outline-variant/10 bg-primary-fixed-dim/20 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[60px] text-primary/30">brightness_high</span>
-                </div>
-                <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">Teeth Whitening</h3>
-                <p className="text-on-surface-variant mb-6">Professional grade brightening treatments that deliver immediate, safe, and stunning results.</p>
+                <div className="mb-6 rounded-lg overflow-hidden h-48 bg-cover bg-center border border-outline-variant/10" style={{
+                  backgroundImage: services[2]?.image_url ? `url('${services[2].image_url}')` : "url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80')"
+                }} />
+                <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">{services[2]?.name || "Teeth Whitening"}</h3>
+                <p className="text-on-surface-variant mb-6">{services[2]?.short_description || "Professional grade brightening treatments that deliver immediate, safe, and stunning results."}</p>
                 <div className="flex gap-2">
                   <span className="bg-secondary-container px-3 py-1 rounded-full text-[12px] font-bold text-on-secondary-container uppercase tracking-wider">Most Popular</span>
                 </div>
               </div>
 
               <div className="md:col-span-6 bg-tertiary-container text-on-tertiary-container p-8 rounded-xl border border-tertiary flex items-center justify-between overflow-hidden relative">
+                <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{
+                  backgroundImage: services[3]?.image_url ? `url('${services[3].image_url}')` : "url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&q=80')"
+                }} />
                 <div className="z-10 relative">
-                  <h3 className="font-headline-md text-headline-md mb-2">Pediatric Care</h3>
-                  <p className="opacity-80 max-w-xs mb-4">Gentle, fun, and educational dental visits designed specifically for our youngest patients.</p>
+                  <h3 className="font-headline-md text-headline-md mb-2">{services[3]?.name || "Pediatric Care"}</h3>
+                  <p className="opacity-80 max-w-xs mb-4">{services[3]?.short_description || "Gentle, fun, and educational dental visits designed specifically for our youngest patients."}</p>
                   <Link
                     href="/about#services"
                     className="inline-block bg-tertiary text-on-tertiary px-6 py-2 rounded-lg font-label-md text-label-md hover:bg-tertiary/90 transition-all"
@@ -141,9 +147,9 @@ export default async function HomePage() {
         <div className="max-w-container-max mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
             <div className="relative">
-              <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl relative z-10 border border-outline-variant/30 bg-primary-fixed-dim/20 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[100px] text-primary/20">stethoscope</span>
-              </div>
+              <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl relative z-10 border border-outline-variant/30 bg-cover bg-center" style={{
+                backgroundImage: "url('https://images.unsplash.com/photo-1551076805-e1869033e561?w=800&q=80')"
+              }} />
               <div className="absolute -bottom-10 -right-10 bg-surface p-8 rounded-xl shadow-xl z-20 border border-outline-variant/20 hidden lg:block">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="bg-primary text-on-primary w-12 h-12 rounded-full flex items-center justify-center">
