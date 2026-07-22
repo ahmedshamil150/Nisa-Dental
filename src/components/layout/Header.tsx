@@ -92,24 +92,32 @@ export function Header() {
     activeTweenRefs.current[i] = tl.tweenTo(0, { duration: 0.2, ease: "power3.easeOut", overwrite: "auto" })
   }
 
-  function NavPill({ link, index }: { link: typeof navLinks[0], index: number }) {
+  function NavPill({ link, index, scrolledState }: { link: typeof navLinks[0], index: number, scrolledState: boolean }) {
     const isActive = pathname === link.href
+    const textClasses = scrolledState
+      ? (isActive ? "text-white" : "text-white/80 hover:text-white")
+      : (isActive ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary")
+    const circleColor = scrolledState ? "bg-white/20" : "bg-primary/10"
+
+    const linkContent = (
+      <>
+        <span className={`hover-circle absolute left-1/2 -bottom-1 w-0 h-0 rounded-full pointer-events-none ${circleColor}`}
+          ref={el => { circleRefs.current[index] = el }} />
+        <span className="label-stack relative flex flex-col items-center">
+          <span className="pill-label">{link.label}</span>
+          <span className="pill-label-hover absolute pointer-events-none">{link.label}</span>
+        </span>
+      </>
+    )
+
     if (link.dropdown) {
       return (
         <div className="relative group">
           <button
             onMouseEnter={() => handleEnter(index)}
             onMouseLeave={() => handleLeave(index)}
-            className={`pill relative overflow-hidden rounded-full px-5 py-1.5 font-label-md text-label-md transition-colors ${
-              isActive ? "text-white" : "text-white/80 hover:text-white"
-            }`}
-          >
-            <span className="hover-circle absolute left-1/2 -bottom-1 w-0 h-0 rounded-full bg-white/20 pointer-events-none"
-              ref={el => { circleRefs.current[index] = el }} />
-            <span className="label-stack relative flex flex-col items-center">
-              <span className="pill-label">{link.label}</span>
-              <span className="pill-label-hover absolute pointer-events-none">{link.label}</span>
-            </span>
+            className={`pill relative overflow-hidden rounded-full px-4 py-1.5 font-label-md text-label-md transition-colors ${textClasses}`}>
+            {linkContent}
           </button>
           <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
             <div className="bg-surface shadow-xl rounded-xl border border-outline-variant/30 p-2 min-w-[160px]">
@@ -128,15 +136,8 @@ export function Header() {
       <Link href={link.href}
         onMouseEnter={() => handleEnter(index)}
         onMouseLeave={() => handleLeave(index)}
-        className={`pill relative overflow-hidden rounded-full px-5 py-1.5 font-label-md text-label-md transition-colors ${
-          isActive ? "text-white" : "text-white/80 hover:text-white"
-        }`}>
-        <span className="hover-circle absolute left-1/2 -bottom-1 w-0 h-0 rounded-full bg-white/20 pointer-events-none"
-          ref={el => { circleRefs.current[index] = el }} />
-        <span className="label-stack relative flex flex-col items-center">
-          <span className="pill-label">{link.label}</span>
-          <span className="pill-label-hover absolute pointer-events-none">{link.label}</span>
-        </span>
+        className={`pill relative overflow-hidden rounded-full px-4 py-1.5 font-label-md text-label-md transition-colors ${textClasses}`}>
+        {linkContent}
       </Link>
     )
   }
@@ -146,13 +147,13 @@ export function Header() {
       {/* --- Desktop Header --- */}
       <header className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "top-4 px-margin-desktop"
+          ? "top-4"
           : "bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm"
       }`}>
-        <div className={`transition-all duration-300 mx-auto ${
+        <div className={`transition-all duration-300 ${
           scrolled
-            ? "bg-primary shadow-lg rounded-full flex items-center justify-between px-6 h-14 max-w-4xl"
-            : "flex justify-between items-center w-full h-16"
+            ? "bg-primary shadow-lg rounded-full flex items-center justify-between px-6 md:px-10 h-14 max-w-[90vw] mx-auto"
+            : "flex justify-between items-center w-full px-margin-desktop h-16"
         }`}>
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <img src="/logo.png" alt="Nisa Dental" className={`rounded-full transition-all duration-300 ${scrolled ? "h-8 w-8" : "h-10 w-auto"}`} />
@@ -163,48 +164,14 @@ export function Header() {
             </span>
           </Link>
 
-          {scrolled ? (
-            <nav className="flex items-center gap-1">
-              {navLinks.map((link, i) => (
-                <NavPill key={link.href} link={link} index={i} />
-              ))}
-            </nav>
-          ) : (
-            <nav className="flex items-center gap-8">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href
-                if (link.dropdown) {
-                  return (
-                    <div key={link.href} className="relative group">
-                      <Link href={link.href}
-                        className={`font-label-md text-label-md transition-colors ${isActive ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary"}`}>
-                        {link.label}
-                      </Link>
-                      <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                        <div className="bg-surface shadow-xl rounded-xl border border-outline-variant/30 p-2 min-w-[160px]">
-                          {link.dropdown.map((sub) => (
-                            <Link key={sub.href} href={sub.href}
-                              className="block px-4 py-2.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">
-                              {sub.label}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )
-                }
-                return (
-                  <Link key={link.href} href={link.href}
-                    className={`font-label-md text-label-md transition-colors ${isActive ? "text-primary font-bold" : "text-on-surface-variant hover:text-primary"}`}>
-                    {link.label}
-                  </Link>
-                )
-              })}
-            </nav>
-          )}
+          <nav className="flex items-center gap-1">
+            {navLinks.map((link, i) => (
+              <NavPill key={link.href} link={link} index={i} scrolledState={scrolled} />
+            ))}
+          </nav>
 
           <div className="flex items-center gap-4 shrink-0">
-            <Link href={scrolled ? "/appointment" : "/appointment"} className={`transition-all duration-300 ${
+            <Link href="/appointment" className={`transition-all duration-300 ${
               scrolled
                 ? "bg-white text-primary px-5 py-1.5 rounded-full font-label-md text-label-md hover:shadow-md active:scale-95"
                 : "bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95"
