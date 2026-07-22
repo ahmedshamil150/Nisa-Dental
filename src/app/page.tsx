@@ -27,7 +27,7 @@ export default async function HomePage() {
           <div className="w-full h-full bg-cover bg-center" style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1600&q=80')"
           }} />
-          <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-surface/90 via-surface/40 via-primary/10 to-transparent" />
         </div>
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 bg-secondary-container/50 px-3 md:px-4 py-1 rounded-full mb-4 md:mb-6">
