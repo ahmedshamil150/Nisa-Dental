@@ -22,7 +22,7 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-margin-mobile md:px-margin-desktop pt-16 md:pt-section-gap pb-section-gap min-h-[80vh] md:min-h-[90vh] flex items-center">
+      <section className="relative overflow-hidden -mt-14 px-margin-mobile md:px-margin-desktop pt-14 md:pt-section-gap pb-section-gap min-h-[80vh] md:min-h-[90vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full bg-cover bg-center" style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1600&q=80')"
