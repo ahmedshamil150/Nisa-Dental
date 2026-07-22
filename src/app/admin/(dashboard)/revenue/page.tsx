@@ -155,7 +155,7 @@ export default function AdminRevenuePage() {
         </div>
       </div>
 
-      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
+      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-x-auto">
         <div className="p-6 border-b">
           <h2 className="font-headline-md text-headline-md text-on-surface">Recent Transactions</h2>
         </div>

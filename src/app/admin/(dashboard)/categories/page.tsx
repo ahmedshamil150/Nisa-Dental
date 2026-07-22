@@ -65,7 +65,7 @@ export default function AdminCategoriesPage() {
         </button>
       </div>
 
-      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
+      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>

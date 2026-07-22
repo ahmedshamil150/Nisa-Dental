@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { PanelLeft, LogOut } from "lucide-react"
+import { PanelLeft, LogOut, X, Menu } from "lucide-react"
 import { useState } from "react"
 
 interface SidebarLink {
@@ -32,43 +32,78 @@ const sidebarLinks: SidebarLink[] = [
 export function AdminSidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <aside className={cn("flex h-screen flex-col border-r bg-white transition-all duration-300", collapsed ? "w-16" : "w-64")}>
-      <div className="flex h-16 items-center justify-between border-b px-4">
-        {!collapsed && <Link href="/admin" className="font-headline-md text-headline-md text-primary font-semibold">Admin</Link>}
-        <button onClick={() => setCollapsed(!collapsed)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-surface-container">
-          <PanelLeft className={cn("h-5 w-5 transition-transform", collapsed && "rotate-180")} />
-        </button>
-      </div>
+    <>
+      {/* Mobile hamburger */}
+      <button onClick={() => setMobileOpen(true)}
+        className="fixed top-4 left-4 z-50 lg:hidden bg-white border border-outline-variant/30 rounded-lg p-2 shadow-sm">
+        <Menu className="h-5 w-5 text-on-surface" />
+      </button>
 
-      <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
-        {sidebarLinks.map((link) => {
-          const isActive = pathname === link.href || (link.href !== "/admin" && pathname.startsWith(link.href))
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                isActive ? "bg-primary-fixed/30 text-primary" : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface",
-                collapsed && "justify-center"
-              )}
-              title={collapsed ? link.label : undefined}
-            >
-              <span className="material-symbols-outlined text-[20px]">{link.icon}</span>
-              {!collapsed && <span>{link.label}</span>}
-            </Link>
-          )
-        })}
-      </nav>
+      {/* Mobile overlay backdrop */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setMobileOpen(false)} />
+      )}
 
-      <div className="border-t p-2">
-        <Link href="/" className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container transition-colors", collapsed && "justify-center")}>
-          <LogOut className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>Back to Site</span>}
-        </Link>
-      </div>
-    </aside>
+      {/* Sidebar */}
+      <aside className={cn(
+        "flex h-screen flex-col bg-white transition-all duration-300",
+        "lg:relative lg:flex lg:border-r",
+        collapsed ? "lg:w-16" : "lg:w-64",
+        mobileOpen
+          ? "fixed inset-y-0 left-0 z-50 w-72 shadow-xl"
+          : "fixed -left-80 z-50 lg:left-0 lg:z-auto",
+      )}>
+        <div className="flex h-16 items-center justify-between border-b px-4">
+          <Link href="/admin" className="font-headline-md text-headline-md text-primary font-semibold truncate">
+            {collapsed && mobileOpen === false ? "" : "Admin"}
+          </Link>
+          <button onClick={() => { if (mobileOpen) setMobileOpen(false); else setCollapsed(!collapsed) }}
+            className="rounded-md p-1.5 text-on-surface-variant hover:bg-surface-container">
+            {mobileOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <PanelLeft className={cn("h-5 w-5 transition-transform", collapsed && "rotate-180")} />
+            )}
+          </button>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
+          {sidebarLinks.map((link) => {
+            const isActive = pathname === link.href || (link.href !== "/admin" && pathname.startsWith(link.href))
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  isActive ? "bg-primary-fixed/30 text-primary" : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface",
+                  collapsed && "justify-center"
+                )}
+                title={collapsed ? link.label : undefined}
+              >
+                <span className="material-symbols-outlined text-[20px]">{link.icon}</span>
+                <span className={cn("shrink-0", collapsed && "lg:hidden")}>{link.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="border-t p-2">
+          <Link href="/"
+            onClick={() => setMobileOpen(false)}
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container transition-colors",
+              collapsed && "justify-center"
+            )}>
+            <LogOut className="h-5 w-5 shrink-0" />
+            {!collapsed && <span className="lg:inline hidden">Back to Site</span>}
+          </Link>
+        </div>
+      </aside>
+    </>
   )
 }

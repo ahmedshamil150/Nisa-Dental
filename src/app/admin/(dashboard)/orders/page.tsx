@@ -89,7 +89,7 @@ export default function AdminOrdersPage() {
           placeholder="Search name, email, order #..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none w-60"
+          className="rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none w-full sm:w-60"
         />
         <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
           className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm focus:border-primary outline-none">
@@ -101,7 +101,7 @@ export default function AdminOrdersPage() {
         <span className="text-xs text-on-surface-variant">{filtered.length} of {orders.length}</span>
       </div>
 
-      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
+      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>

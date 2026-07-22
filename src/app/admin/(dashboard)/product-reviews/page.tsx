@@ -37,13 +37,13 @@ export default function AdminProductReviewsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <h1 className="font-headline-lg text-headline-lg text-on-surface">Product Reviews</h1>
         <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search reviews..."
-          className="w-64 rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none" />
+          className="w-full sm:w-64 rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none" />
       </div>
 
-      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
+      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
             <tr>

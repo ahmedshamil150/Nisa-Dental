@@ -30,35 +30,40 @@ export default function CartPage() {
         <div className="grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
-              <div key={item.id} className="bg-surface p-6 rounded-xl border border-outline-variant/30 flex items-center gap-6">
-                <div className="w-20 h-20 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-outline-variant/50">inventory_2</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <Link href={`/shop/${item.slug}`} className="font-headline-md text-headline-md text-on-surface hover:text-primary transition-colors">
-                    {item.name}
-                  </Link>
-                  <p className="font-headline-md text-headline-md text-primary mt-1">PKR {item.price}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                    className="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">remove</span>
-                  </button>
-                  <span className="font-label-md text-label-md w-8 text-center">{item.quantity}</span>
-                  <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">add</span>
+              <div key={item.id} className="bg-surface p-4 md:p-6 rounded-xl border border-outline-variant/30">
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-outline-variant/50">inventory_2</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <Link href={`/shop/${item.slug}`} className="font-label-lg md:font-headline-md text-label-lg md:text-headline-md text-on-surface hover:text-primary transition-colors line-clamp-2">
+                        {item.name}
+                      </Link>
+                      <button onClick={() => removeItem(item.id)} className="text-on-surface-variant hover:text-error transition-colors shrink-0 md:hidden">
+                        <span className="material-symbols-outlined text-[20px]">delete</span>
+                      </button>
+                    </div>
+                    <p className="font-label-md md:font-headline-md text-label-md md:text-headline-md text-primary mt-1">PKR {item.price}</p>
+                  </div>
+                  <button onClick={() => removeItem(item.id)} className="text-on-surface-variant hover:text-error transition-colors shrink-0 hidden md:block">
+                    <span className="material-symbols-outlined">delete</span>
                   </button>
                 </div>
-                <p className="font-headline-md text-headline-md text-on-surface w-24 text-right">PKR {item.price * item.quantity}</p>
-                <button onClick={() => removeItem(item.id)} className="text-on-surface-variant hover:text-error transition-colors">
-                  <span className="material-symbols-outlined">delete</span>
-                </button>
+                <div className="flex items-center justify-between mt-4 md:mt-3 pl-0 md:pl-24">
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      className="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">remove</span>
+                    </button>
+                    <span className="font-label-md text-label-md w-8 text-center">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      className="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">add</span>
+                    </button>
+                  </div>
+                  <p className="font-label-lg md:font-headline-md text-label-lg md:text-headline-md text-on-surface">PKR {item.price * item.quantity}</p>
+                </div>
               </div>
             ))}
           </div>
