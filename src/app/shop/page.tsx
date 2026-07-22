@@ -197,8 +197,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                         <h3 className="font-headline-md text-headline-md text-on-surface mb-1 line-clamp-1">{product.name}</h3>
                       </Link>
                       <p className="text-caption font-caption text-on-surface-variant mb-3 uppercase tracking-widest">{product.category?.name || "Product"}</p>
-                      <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 text-sm">{product.short_description}</p>
-                      <div className="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/20">
+                      <div className="mt-auto flex items-end justify-between pt-4 border-t border-outline-variant/20">
                         <div>
                           {price.sale ? (
                             <div className="flex items-baseline gap-2">
