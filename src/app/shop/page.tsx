@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
 import { AddToCartButton } from "@/components/shop/AddToCartButton"
+import { SortSelect } from "@/components/shop/SortSelect"
 
 const PAGE_SIZE = 9
 
@@ -152,18 +153,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                   Discounted
                 </Link>
 
-                <div className="relative">
-                  <select value={params.sort || ""} onChange={(e) => {
-                    const v = e.target.value
-                    window.location.href = buildUrl({ ...params, sort: v || undefined })
-                  }}
-                    className="appearance-none rounded-lg border border-outline-variant bg-surface px-4 py-2 pr-8 font-body-md text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none cursor-pointer">
-                    <option value="">Sort: Latest</option>
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
-                  </select>
-                  <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant pointer-events-none">unfold_more</span>
-                </div>
+                <SortSelect currentSort={params.sort || ""} params={params as Record<string, string>} />
               </div>
             </div>
           </div>
