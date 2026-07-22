@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const sb = getSupabase()
   if (!sb) return Response.json({ error: "DB not available" }, { status: 500 })
-  const { error } = await sb.from("product_reviews").insert({
+  const { error } = await (sb.from("product_reviews") as any).insert({
     product_id: body.product_id,
     customer_name: body.customer_name,
     customer_email: body.customer_email || null,
