@@ -224,9 +224,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                       <div className="mt-auto flex items-end justify-between pt-4 border-t border-outline-variant/20">
                         <div>
                           {price.sale ? (
-                            <div className="flex items-baseline gap-2">
-                              <span className="font-headline-md text-headline-md text-primary">PKR {price.sale}</span>
-                              <span className="font-body-md text-body-md text-on-surface-variant line-through text-sm">PKR {price.original}</span>
+                            <div className="flex flex-col">
+                              <span className="text-xs text-on-surface-variant line-through">{price.original.toLocaleString()}</span>
+                              <span className="font-headline-md text-headline-md text-primary">{price.sale.toLocaleString()}</span>
                             </div>
                           ) : (
                             <span className="font-headline-md text-headline-md text-primary">PKR {product.price}</span>

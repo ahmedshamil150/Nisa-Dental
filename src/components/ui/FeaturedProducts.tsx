@@ -78,9 +78,9 @@ export function FeaturedProducts({ products }: { products: any[] }) {
                     <div className="mt-auto flex items-center justify-between pt-3">
                       <div>
                         {price.sale ? (
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="font-headline-md text-headline-md text-primary">PKR {price.sale}</span>
-                            <span className="text-[11px] text-on-surface-variant line-through">PKR {price.original}</span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-on-surface-variant line-through">{price.original.toLocaleString()}</span>
+                            <span className="font-headline-md text-headline-md text-primary">{price.sale.toLocaleString()}</span>
                           </div>
                         ) : (
                           <span className="font-headline-md text-headline-md text-primary">PKR {product.price}</span>
