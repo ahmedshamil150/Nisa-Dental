@@ -33,10 +33,7 @@ export default function AdminOrdersPage() {
     setLoading(false)
   }
 
-  const showOrderNumber = (o: any) => {
-    const shortId = o.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
-    return "NISA-" + shortId
-  }
+  const showOrderNumber = (o: any) => o.order_number || "NISA-" + o.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
 
   const filtered = useMemo(() => {
     let list = [...orders]

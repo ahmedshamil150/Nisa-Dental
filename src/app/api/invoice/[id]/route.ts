@@ -41,8 +41,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const discount = inv.discount_amount || 0
   const total = inv.total || order.total || 0
 
-  const shortId = order.id?.toString().replace(/-/g, "").slice(0, 8).toUpperCase() || ""
-  const orderNumber = "NISA-" + shortId
+  const orderNumber = order.order_number || "NISA-" + order.id?.toString().replace(/-/g, "").slice(0, 8).toUpperCase() || ""
 
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Invoice ${inv.invoice_number}</title>

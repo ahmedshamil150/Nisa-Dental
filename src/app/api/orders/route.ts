@@ -9,10 +9,6 @@ function getSupabase() {
   )
 }
 
-function toOrderNumber(id: string) {
-  return "NISA-" + id.replace(/-/g, "").slice(0, 8).toUpperCase()
-}
-
 function normalizeOrderId(raw: string) {
   const upper = raw.trim().toUpperCase().replace(/-/g, "")
   if (upper.startsWith("NISA")) return "NISA-" + upper.slice(4)
@@ -33,8 +29,7 @@ export async function GET(req: Request) {
   let query = supabase.from("orders").select("*, order_items(*), invoices(*)")
 
   if (id.startsWith("NISA-")) {
-    const seq = id.replace("NISA-", "")
-    query = query.ilike("notes", `%Order#NISA-${seq}%`)
+    query = query.eq("order_number", id)
   } else {
     query = query.eq("id", id)
   }
@@ -47,7 +42,7 @@ export async function GET(req: Request) {
 
   return NextResponse.json({
     ...order,
-    order_number: toOrderNumber(order.id),
+    order_number: order.order_number,
     status: order.order_status,
     delivery_charge: order.shipping_cost,
   })
@@ -65,10 +60,9 @@ export async function PATCH(req: Request) {
 
   const supabase = getSupabase()
 
-  let query = supabase.from("orders").select("id, order_status")
+  let query = supabase.from("orders").select("id, order_status, order_number")
   if (id.startsWith("NISA-")) {
-    const seq = id.replace("NISA-", "")
-    query = query.ilike("notes", `%Order#NISA-${seq}%`)
+    query = query.eq("order_number", id)
   } else {
     query = query.eq("id", id)
   }
@@ -86,7 +80,7 @@ export async function PATCH(req: Request) {
   }
 
   if (oldStatus !== order_status) {
-    sendOrderStatusUpdate(order, toOrderNumber(order.id), oldStatus, order_status).catch(console.error)
+    sendOrderStatusUpdate(order, order.order_number, oldStatus, order_status).catch(console.error)
   }
 
   return NextResponse.json({ success: true })

@@ -122,10 +122,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
     }
 
-    const order_number = toOrderNumber(order.id)
+    // Generate sequential order number from DB sequence
+    const { data: orderNumData } = await supabase.rpc("generate_order_number")
+    const order_number = orderNumData || toOrderNumber(order.id)
 
-    // Update notes with order number
+    // Update order with order number
     await supabase.from("orders").update({
+      order_number,
       notes: `Order#${order_number}${appliedCouponCode ? ` | Coupon: ${appliedCouponCode} (-PKR ${discount.toFixed(0)})` : ""}${total_weight ? ` | Weight: ${total_weight}kg` : ""}`,
     }).eq("id", order.id)
 
