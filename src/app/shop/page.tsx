@@ -94,12 +94,12 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       </section>
 
       <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-12 flex flex-col md:flex-row gap-gutter">
-        <aside className="w-full md:w-64 flex-shrink-0 space-y-8">
+        <aside className="hidden md:block w-64 flex-shrink-0 space-y-8">
           <div>
             <h3 className="font-label-md text-label-md text-primary uppercase tracking-widest mb-6">Categories</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/shop" className={`flex items-center gap-3 group ${!params.category && !params.search && !params.sort && !params.discounted ? "font-bold text-primary" : ""}`}>
+                <Link href="/shop" className={`flex items-center gap-3 group ${!params.category ? "font-bold text-primary" : ""}`}>
                   <span className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${!params.category ? 'bg-primary border-primary' : 'border-outline-variant'}`}>
                     {!params.category && <span className="w-2 h-2 rounded-sm bg-white" />}
                   </span>
@@ -155,6 +155,30 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
 
                 <SortSelect currentSort={params.sort || ""} params={params as Record<string, string>} />
               </div>
+            </div>
+          </div>
+
+          {/* Mobile categories strip */}
+          <div className="md:hidden overflow-x-auto pb-4 mb-4 scrollbar-hide" style={{ scrollbarWidth: "none" }}>
+            <div className="flex gap-2 whitespace-nowrap min-w-max">
+              <Link href="/shop"
+                className={`px-4 py-2 rounded-full border text-sm font-label-md transition-all ${
+                  !params.category
+                    ? "bg-primary text-on-primary border-primary"
+                    : "border-outline-variant text-on-surface-variant hover:border-primary"
+                }`}>
+                All
+              </Link>
+              {categories.map((cat: any) => (
+                <Link key={cat.id} href={buildUrl({ ...params, category: cat.slug })}
+                  className={`px-4 py-2 rounded-full border text-sm font-label-md transition-all shrink-0 ${
+                    params.category === cat.slug
+                      ? "bg-primary text-on-primary border-primary"
+                      : "border-outline-variant text-on-surface-variant hover:border-primary"
+                  }`}>
+                  {cat.name}
+                </Link>
+              ))}
             </div>
           </div>
 
