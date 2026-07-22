@@ -45,7 +45,7 @@ export default function TrackOrderLookupPage() {
         </div>
         <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2">Track Your Order</h1>
         <p className="font-body-lg text-on-surface-variant">
-          Enter your order number (e.g., NISA-00000001) to track its status.
+          Enter your order number (e.g., NISA-A1B2C3D4E5) to track its status.
         </p>
       </div>
 
@@ -55,9 +55,9 @@ export default function TrackOrderLookupPage() {
           <input
             value={orderNumber}
             onChange={(e) => setOrderNumber(e.target.value.toUpperCase())}
-            placeholder="NISA-00000001"
+            placeholder="NISA-A1B2C3D4E5"
             className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-4 font-headline-md text-headline-md focus:border-primary focus:ring-1 focus:ring-primary outline-none text-center tracking-widest"
-            maxLength={13}
+            maxLength={15}
           />
         </div>
 

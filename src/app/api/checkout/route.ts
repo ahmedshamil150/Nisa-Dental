@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { sendOrderConfirmation } from "@/lib/email"
+import { randomBytes } from "crypto"
 
 function getSupabase() {
   return createClient(
@@ -13,8 +14,8 @@ function getSetting(settings: any[], key: string, fallback: string) {
   return settings.find((s: any) => s.key === key)?.value || fallback
 }
 
-function toOrderNumber(id: string) {
-  return "NISA-" + id.replace(/-/g, "").slice(0, 8).toUpperCase()
+function generateOrderNumber() {
+  return "NISA-" + randomBytes(5).toString("hex").toUpperCase()
 }
 
 export async function POST(req: Request) {
@@ -122,9 +123,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
     }
 
-    // Generate sequential order number from DB sequence
-    const { data: orderNumData } = await supabase.rpc("generate_order_number")
-    const order_number = orderNumData || toOrderNumber(order.id)
+    // Generate random order number
+    const order_number = generateOrderNumber()
 
     // Update order with order number
     await supabase.from("orders").update({
