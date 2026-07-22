@@ -24,6 +24,7 @@ const sidebarLinks: SidebarLink[] = [
   { href: "/admin/invoices", label: "Invoices", icon: "receipt_long" },
   { href: "/admin/appointments", label: "Appointments", icon: "calendar_today" },
   { href: "/admin/testimonials", label: "Testimonials", icon: "star" },
+  { href: "/admin/product-reviews", label: "Product Reviews", icon: "reviews" },
   { href: "/admin/messages", label: "Messages", icon: "mail" },
   { href: "/admin/settings", label: "Settings", icon: "settings" },
 ]

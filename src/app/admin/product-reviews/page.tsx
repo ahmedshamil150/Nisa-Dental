@@ -1,0 +1,96 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { getSupabase } from "@/lib/supabase"
+
+export default function AdminProductReviewsPage() {
+  const [reviews, setReviews] = useState<any[]>([])
+  const [filter, setFilter] = useState("")
+
+  useEffect(() => { loadReviews() }, [])
+
+  async function loadReviews() {
+    const sb = getSupabase()
+    if (!sb) return
+    const { data } = await sb.from("product_reviews").select("*, product:products(name)").order("created_at", { ascending: false })
+    setReviews((data || []) as any[])
+  }
+
+  async function toggleApproved(r: any) {
+    const sb = getSupabase()
+    if (!sb) return
+    await (sb.from("product_reviews") as any).update({ is_approved: !r.is_approved }).eq("id", r.id)
+    loadReviews()
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Delete this review?")) return
+    const sb = getSupabase()
+    if (!sb) return
+    await sb.from("product_reviews").delete().eq("id", id)
+    loadReviews()
+  }
+
+  const filtered = filter
+    ? reviews.filter((r) => r.product?.name?.toLowerCase().includes(filter.toLowerCase()) || r.customer_name?.toLowerCase().includes(filter.toLowerCase()) || r.review_text?.toLowerCase().includes(filter.toLowerCase()))
+    : reviews
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface">Product Reviews</h1>
+        <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search reviews..."
+          className="w-64 rounded-lg border border-outline-variant bg-surface px-4 py-2 font-body-md text-sm focus:border-primary outline-none" />
+      </div>
+
+      <div className="bg-surface rounded-xl border border-outline-variant/30 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="border-b bg-surface-container text-left text-caption uppercase text-on-surface-variant">
+            <tr>
+              <th className="px-6 py-3 font-medium">Product</th>
+              <th className="px-6 py-3 font-medium">Customer</th>
+              <th className="px-6 py-3 font-medium">Rating</th>
+              <th className="px-6 py-3 font-medium">Review</th>
+              <th className="px-6 py-3 font-medium">Date</th>
+              <th className="px-6 py-3 font-medium">Approved</th>
+              <th className="px-6 py-3 font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {filtered.length === 0 ? (
+              <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No reviews found</td></tr>
+            ) : filtered.map((r: any) => (
+              <tr key={r.id} className="hover:bg-surface-container-low">
+                <td className="px-6 py-4 font-medium text-on-surface">{r.product?.name || "—"}</td>
+                <td className="px-6 py-4">
+                  <div className="text-on-surface">{r.customer_name}</div>
+                  {r.customer_email && <div className="text-xs text-on-surface-variant">{r.customer_email}</div>}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: r.rating }).map((_, i) => (
+                      <span key={i} className="material-symbols-outlined text-[16px] text-primary">star</span>
+                    ))}
+                  </div>
+                </td>
+                <td className="px-6 py-4 max-w-xs">
+                  <p className="line-clamp-2 text-on-surface">{r.review_text}</p>
+                </td>
+                <td className="px-6 py-4 text-on-surface-variant whitespace-nowrap">{new Date(r.created_at).toLocaleDateString()}</td>
+                <td className="px-6 py-4">
+                  <button onClick={() => toggleApproved(r)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${r.is_approved ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
+                    {r.is_approved ? "Approved" : "Pending"}
+                  </button>
+                </td>
+                <td className="px-6 py-4">
+                  <button onClick={() => remove(r.id)} className="text-red-600 hover:underline font-label-md text-label-md">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}

@@ -28,3 +28,12 @@ export async function POST(req: Request) {
   }
   return NextResponse.json({ success: true })
 }
+
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const key = searchParams.get("key")
+  if (!key) return NextResponse.json({ error: "key required" }, { status: 400 })
+  const supabase = getSupabase()
+  await supabase.from("site_settings").delete().eq("key", key)
+  return NextResponse.json({ success: true })
+}

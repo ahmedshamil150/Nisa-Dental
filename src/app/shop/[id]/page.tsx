@@ -2,6 +2,8 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
 import { AddToCartLargeButton } from "@/components/shop/AddToCartLargeButton"
+import { ProductImageCarousel } from "@/components/shop/ProductImageCarousel"
+import { ProductReviews } from "@/components/shop/ProductReviews"
 
 async function getProduct(slug: string) {
   const sb = getSupabase()
@@ -18,6 +20,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const discount = product.discount_percent || 0
   const salePrice = discount > 0 ? Math.round(product.price * (100 - discount) / 100) : null
 
+  const images = [product.image_url, ...(product.image_urls || [])].filter(Boolean) as string[]
+
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-12">
       <Link href="/shop" className="inline-flex items-center gap-2 font-label-md text-label-md text-on-surface-variant hover:text-primary mb-8">
@@ -26,25 +30,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       </Link>
 
       <div className="grid gap-12 md:grid-cols-2">
-        <div className="space-y-4">
-          <div className="aspect-square rounded-xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-center relative overflow-hidden">
-            {product.image_url ? (
-              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-            ) : (
-              <span className="material-symbols-outlined text-[120px] text-outline-variant/40">inventory_2</span>
-            )}
-            {discount > 0 && (
-              <span className="absolute top-4 right-4 bg-red-500 text-white font-label-md text-sm px-3 py-1 rounded">
-                -{discount}%
-              </span>
-            )}
-          </div>
-          {product.image_urls?.[1] && (
-            <div className="aspect-video rounded-xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-center overflow-hidden">
-              <img src={product.image_urls[1]} alt="" className="w-full h-full object-cover" />
-            </div>
-          )}
-        </div>
+        <ProductImageCarousel images={images} productName={product.name} discount={discount} />
 
         <div>
           <p className="text-caption font-caption text-on-surface-variant uppercase tracking-widest mb-2">{product.category?.name || "Product"}</p>
@@ -79,6 +65,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </Link>
         </div>
       </div>
+
+      <ProductReviews productId={product.id} />
     </div>
   )
 }
