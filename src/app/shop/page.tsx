@@ -80,13 +80,13 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="overflow-x-hidden">
-      <section className="relative h-[353px] md:h-[353px] flex items-center overflow-hidden bg-primary-container -mt-14 pt-14 md:pt-0 md:mt-0">
+      <section className="relative overflow-hidden bg-primary-container -mt-14 md:mt-0">
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full opacity-40 bg-cover bg-center" style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1600&q=80')"
           }} />
         </div>
-        <div className="container mx-auto px-margin-mobile md:px-margin-desktop relative z-10">
+        <div className="container mx-auto px-margin-mobile md:px-margin-desktop relative z-10 py-16 md:py-20 pt-20 md:pt-20">
           <h1 className="font-headline-xl text-headline-xl text-on-primary-container max-w-2xl">Elevate Your Daily Ritual</h1>
           <p className="font-body-lg text-body-lg text-on-primary-container/80 mt-4 max-w-lg">
             Curated professional-grade dental care products recommended by our clinical experts for a healthier smile at home.
