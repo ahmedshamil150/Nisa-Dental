@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
 import { TestimonialsCarousel } from "@/components/ui/TestimonialsCarousel"
+import { FeaturedProducts } from "@/components/ui/FeaturedProducts"
 
 async function getServices() {
   const sb = getSupabase()
@@ -16,8 +17,15 @@ async function getTestimonials() {
   return (data || []) as any[]
 }
 
+async function getFeaturedProducts() {
+  const sb = getSupabase()
+  if (!sb) return []
+  const { data } = await sb.from("products").select("*").eq("is_active", true).eq("is_featured", true).order("created_at", { ascending: false })
+  return (data || []) as any[]
+}
+
 export default async function HomePage() {
-  const [services, testimonials] = await Promise.all([getServices(), getTestimonials()])
+  const [services, testimonials, featuredProducts] = await Promise.all([getServices(), getTestimonials(), getFeaturedProducts()])
 
   return (
     <>
@@ -147,6 +155,8 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      <FeaturedProducts products={featuredProducts} />
 
       {/* Why Choose Us */}
       <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-section-gap border-y border-outline-variant/20">
