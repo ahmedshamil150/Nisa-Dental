@@ -2,6 +2,8 @@ import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
 import { AddToCartButton } from "@/components/shop/AddToCartButton"
 
+const PAGE_SIZE = 9
+
 async function getCategories() {
   const sb = getSupabase()
   if (!sb) return []
@@ -17,32 +19,43 @@ function buildUrl(params: Record<string, string | undefined>) {
   return `/shop${qs ? `?${qs}` : ""}`
 }
 
-async function getProducts(searchParams: { category?: string; search?: string; sort?: string; discounted?: string }) {
+async function getProducts(searchParams: { category?: string; search?: string; sort?: string; discounted?: string; page?: string }) {
   const sb = getSupabase()
-  if (!sb) return []
+  if (!sb) return { products: [], count: 0 }
+  const page = Math.max(1, parseInt(searchParams.page || "1"))
+  const offset = (page - 1) * PAGE_SIZE
+
+  let countQuery = sb.from("products").select("*", { count: "exact", head: true }).eq("is_active", true)
   let query = sb.from("products").select("*, category:product_categories(*)").eq("is_active", true)
 
   if (searchParams.category) {
-    query = query.eq("category:product_categories.slug", searchParams.category)
+    const filter = "category:product_categories.slug"
+    countQuery = countQuery.eq(filter, searchParams.category)
+    query = query.eq(filter, searchParams.category)
   }
   if (searchParams.search) {
+    countQuery = countQuery.ilike("name", `%${searchParams.search}%`)
     query = query.ilike("name", `%${searchParams.search}%`)
   }
   if (searchParams.discounted === "true") {
+    countQuery = countQuery.gt("discount_percent", 0)
     query = query.gt("discount_percent", 0)
   }
 
+  const { count } = await countQuery
+  const totalPages = Math.ceil((count || 0) / PAGE_SIZE)
+
   if (searchParams.sort === "price_asc") {
-    const { data } = await query.order("price", { ascending: true })
-    return (data || []) as any[]
+    const { data } = await query.order("price", { ascending: true }).range(offset, offset + PAGE_SIZE - 1)
+    return { products: (data || []) as any[], totalPages }
   }
   if (searchParams.sort === "price_desc") {
-    const { data } = await query.order("price", { ascending: false })
-    return (data || []) as any[]
+    const { data } = await query.order("price", { ascending: false }).range(offset, offset + PAGE_SIZE - 1)
+    return { products: (data || []) as any[], totalPages }
   }
 
-  const { data } = await query.order("created_at", { ascending: false })
-  return (data || []) as any[]
+  const { data } = await query.order("created_at", { ascending: false }).range(offset, offset + PAGE_SIZE - 1)
+  return { products: (data || []) as any[], totalPages }
 }
 
 function calcPrice(product: any) {
@@ -53,9 +66,23 @@ function calcPrice(product: any) {
   return { original: product.price, sale: null, percent: 0 }
 }
 
-export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string; search?: string; sort?: string; discounted?: string }> }) {
+export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string; search?: string; sort?: string; discounted?: string; page?: string }> }) {
   const params = await searchParams
-  const [categories, products] = await Promise.all([getCategories(), getProducts(params)])
+  const [categories, { products, totalPages = 1 }] = await Promise.all([getCategories(), getProducts(params)])
+  const currentPage = Math.max(1, parseInt(params.page || "1"))
+
+  function PageLink({ p }: { p: number }) {
+    return (
+      <Link href={buildUrl({ ...params, page: String(p) })}
+        className={`w-10 h-10 flex items-center justify-center rounded-lg font-label-md text-label-md transition-all ${
+          p === currentPage
+            ? "bg-primary text-on-primary shadow-sm"
+            : "hover:bg-surface-container text-on-surface-variant border border-outline-variant"
+        }`}>
+        {p}
+      </Link>
+    )
+  }
 
   return (
     <>
@@ -116,6 +143,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                 {params.category && <input type="hidden" name="category" value={params.category} />}
                 {params.sort && <input type="hidden" name="sort" value={params.sort} />}
                 {params.discounted && <input type="hidden" name="discounted" value={params.discounted} />}
+                {params.page && <input type="hidden" name="page" value={params.page} />}
                 <input name="search" defaultValue={params.search} placeholder="Search products..."
                   className="w-full sm:w-52 rounded-lg border border-outline-variant bg-surface px-4 py-2 pl-10 font-body-md text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
@@ -205,6 +233,26 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                   </div>
                 )
               })}
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="mt-12 flex justify-center items-center gap-2">
+              {currentPage > 1 && (
+                <Link href={buildUrl({ ...params, page: String(currentPage - 1) })}
+                  className="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-all text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                </Link>
+              )}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <PageLink key={p} p={p} />
+              ))}
+              {currentPage < totalPages && (
+                <Link href={buildUrl({ ...params, page: String(currentPage + 1) })}
+                  className="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-all text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                </Link>
+              )}
             </div>
           )}
         </div>
