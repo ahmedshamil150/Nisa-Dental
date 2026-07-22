@@ -79,8 +79,8 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   }
 
   return (
-    <>
-      <section className="relative h-[353px] flex items-center overflow-hidden bg-primary-container">
+    <div className="overflow-x-hidden">
+      <section className="relative h-[353px] md:h-[353px] flex items-center overflow-hidden bg-primary-container -mt-14 pt-14 md:pt-0 md:mt-0">
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full opacity-40 bg-cover bg-center" style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1600&q=80')"
@@ -268,6 +268,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
