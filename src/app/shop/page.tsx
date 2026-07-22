@@ -9,16 +9,38 @@ async function getCategories() {
   return data || []
 }
 
-async function getProducts(searchParams: { category?: string; search?: string }) {
+function buildUrl(params: Record<string, string | undefined>) {
+  const sp = new URLSearchParams()
+  const all = { ...params }
+  Object.entries(all).forEach(([k, v]) => { if (v) sp.set(k, v) })
+  const qs = sp.toString()
+  return `/shop${qs ? `?${qs}` : ""}`
+}
+
+async function getProducts(searchParams: { category?: string; search?: string; sort?: string; discounted?: string }) {
   const sb = getSupabase()
   if (!sb) return []
   let query = sb.from("products").select("*, category:product_categories(*)").eq("is_active", true)
+
   if (searchParams.category) {
     query = query.eq("category:product_categories.slug", searchParams.category)
   }
   if (searchParams.search) {
     query = query.ilike("name", `%${searchParams.search}%`)
   }
+  if (searchParams.discounted === "true") {
+    query = query.gt("discount_percent", 0)
+  }
+
+  if (searchParams.sort === "price_asc") {
+    const { data } = await query.order("price", { ascending: true })
+    return (data || []) as any[]
+  }
+  if (searchParams.sort === "price_desc") {
+    const { data } = await query.order("price", { ascending: false })
+    return (data || []) as any[]
+  }
+
   const { data } = await query.order("created_at", { ascending: false })
   return (data || []) as any[]
 }
@@ -31,7 +53,7 @@ function calcPrice(product: any) {
   return { original: product.price, sale: null, percent: 0 }
 }
 
-export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string; search?: string }> }) {
+export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string; search?: string; sort?: string; discounted?: string }> }) {
   const params = await searchParams
   const [categories, products] = await Promise.all([getCategories(), getProducts(params)])
 
@@ -57,7 +79,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
             <h3 className="font-label-md text-label-md text-primary uppercase tracking-widest mb-6">Categories</h3>
             <ul className="space-y-4">
               <li>
-                <Link href="/shop" className={`flex items-center gap-3 group ${!params.category ? "font-bold text-primary" : ""}`}>
+                <Link href="/shop" className={`flex items-center gap-3 group ${!params.category && !params.search && !params.sort && !params.discounted ? "font-bold text-primary" : ""}`}>
                   <span className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${!params.category ? 'bg-primary border-primary' : 'border-outline-variant'}`}>
                     {!params.category && <span className="w-2 h-2 rounded-sm bg-white" />}
                   </span>
@@ -66,7 +88,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
               </li>
               {categories.map((cat: any) => (
                 <li key={cat.id}>
-                  <Link href={`/shop?category=${cat.slug}`} className={`flex items-center gap-3 group ${params.category === cat.slug ? "font-bold text-primary" : ""}`}>
+                  <Link href={buildUrl({ ...params, category: cat.slug })} className={`flex items-center gap-3 group ${params.category === cat.slug ? "font-bold text-primary" : ""}`}>
                     <span className={`w-4 h-4 rounded-sm border-2 flex items-center justify-center ${params.category === cat.slug ? 'bg-primary border-primary' : 'border-outline-variant'}`}>
                       {params.category === cat.slug && <span className="w-2 h-2 rounded-sm bg-white" />}
                     </span>
@@ -86,80 +108,103 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
         </aside>
 
         <div className="flex-grow">
-          <div className="flex justify-between items-center mb-8 border-b border-outline-variant/30 pb-4">
-            <span className="font-body-md text-on-surface-variant">Showing {products.length} products</span>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 border-b border-outline-variant/30 pb-4">
+            <span className="font-body-md text-on-surface-variant whitespace-nowrap">Showing {products.length} products</span>
+
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <form action="/shop" method="GET" className="relative flex-1 sm:flex-none">
+                {params.category && <input type="hidden" name="category" value={params.category} />}
+                {params.sort && <input type="hidden" name="sort" value={params.sort} />}
+                {params.discounted && <input type="hidden" name="discounted" value={params.discounted} />}
+                <input name="search" defaultValue={params.search} placeholder="Search products..."
+                  className="w-full sm:w-52 rounded-lg border border-outline-variant bg-surface px-4 py-2 pl-10 font-body-md text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none" />
+                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant">search</span>
+              </form>
+
+              <div className="flex items-center gap-3">
+                <Link href={buildUrl({ ...params, discounted: params.discounted === "true" ? undefined : "true" })}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-label-md transition-all ${
+                    params.discounted === "true"
+                      ? "bg-primary text-on-primary border-primary"
+                      : "border-outline-variant text-on-surface-variant hover:border-primary"
+                  }`}>
+                  <span className="material-symbols-outlined text-[16px]">local_offer</span>
+                  Discounted
+                </Link>
+
+                <div className="relative">
+                  <select value={params.sort || ""} onChange={(e) => {
+                    const v = e.target.value
+                    window.location.href = buildUrl({ ...params, sort: v || undefined })
+                  }}
+                    className="appearance-none rounded-lg border border-outline-variant bg-surface px-4 py-2 pr-8 font-body-md text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none cursor-pointer">
+                    <option value="">Sort: Latest</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                  </select>
+                  <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-on-surface-variant pointer-events-none">unfold_more</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {products.length === 0 ? (
             <div className="text-center py-16 border-2 border-dashed border-outline-variant/30 rounded-xl">
               <span className="material-symbols-outlined text-[48px] text-outline-variant">inventory_2</span>
               <p className="font-body-md text-on-surface-variant mt-4">No products found</p>
+              <Link href="/shop" className="mt-4 inline-block text-primary font-label-md text-label-md hover:underline">Clear filters</Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map((product: any) => {
                 const price = calcPrice(product)
                 return (
-                  <div key={product.id} className="group relative bg-white border border-outline-variant/30 p-6 flex flex-col transition-all hover:shadow-lg hover:shadow-primary/5">
-                    <Link href={`/shop/${product.slug}`}>
-                      <div className="relative aspect-square mb-6 overflow-hidden bg-surface flex items-center justify-center">
-                        {product.image_url ? (
-                          <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                        ) : (
+                  <div key={product.id} className="group relative bg-surface border border-outline-variant/30 rounded-xl overflow-hidden flex flex-col transition-all hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 duration-300">
+                    <Link href={`/shop/${product.slug}`} className="block relative aspect-square overflow-hidden bg-surface-container">
+                      {product.image_url ? (
+                        <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
                           <span className="material-symbols-outlined text-[60px] text-outline-variant/50">inventory_2</span>
-                        )}
-                        {product.image_urls?.[1] && (
-                          <img src={product.image_urls[1]} alt="" className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        )}
-                      </div>
-                    </Link>
-                    <div className="absolute top-4 right-4 flex flex-col gap-1">
+                        </div>
+                      )}
+                      {product.image_urls?.[1] && (
+                        <img src={product.image_urls[1]} alt="" className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      )}
                       {price.percent > 0 && (
-                        <span className="bg-red-500 text-white font-label-md text-[10px] px-2 py-1 uppercase tracking-tighter rounded">
+                        <span className="absolute top-3 left-3 bg-red-500 text-white font-label-md text-[11px] px-2.5 py-1 rounded-full font-bold">
                           -{price.percent}%
                         </span>
                       )}
                       {product.is_featured && !price.percent && (
-                        <span className="bg-primary text-white font-label-md text-[10px] px-2 py-1 uppercase tracking-tighter">Bestseller</span>
+                        <span className="absolute top-3 left-3 bg-primary/90 text-on-primary font-label-md text-[11px] px-2.5 py-1 rounded-full font-bold backdrop-blur-sm">
+                          Bestseller
+                        </span>
                       )}
-                    </div>
-                    <div className="flex-grow">
+                    </Link>
+                    <div className="flex flex-col flex-grow p-5">
                       <Link href={`/shop/${product.slug}`}>
-                        <h3 className="font-headline-md text-headline-md text-on-surface mb-1">{product.name}</h3>
+                        <h3 className="font-headline-md text-headline-md text-on-surface mb-1 line-clamp-1">{product.name}</h3>
                       </Link>
-                      <p className="text-caption font-caption text-on-surface-variant mb-4 uppercase tracking-widest">{product.category?.name || "Product"}</p>
-                      <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">{product.short_description}</p>
-                    </div>
-                    <div className="mt-6 flex items-center justify-between">
-                      <div>
-                        {price.sale ? (
-                          <>
-                            <span className="font-headline-md text-headline-md text-primary">PKR {price.sale}</span>
-                            <span className="font-body-md text-body-md text-on-surface-variant line-through ml-2">PKR {price.original}</span>
-                          </>
-                        ) : (
-                          <span className="font-headline-md text-headline-md text-primary">PKR {product.price}</span>
-                        )}
+                      <p className="text-caption font-caption text-on-surface-variant mb-3 uppercase tracking-widest">{product.category?.name || "Product"}</p>
+                      <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2 mb-4 text-sm">{product.short_description}</p>
+                      <div className="mt-auto flex items-center justify-between pt-4 border-t border-outline-variant/20">
+                        <div>
+                          {price.sale ? (
+                            <div className="flex items-baseline gap-2">
+                              <span className="font-headline-md text-headline-md text-primary">PKR {price.sale}</span>
+                              <span className="font-body-md text-body-md text-on-surface-variant line-through text-sm">PKR {price.original}</span>
+                            </div>
+                          ) : (
+                            <span className="font-headline-md text-headline-md text-primary">PKR {product.price}</span>
+                          )}
+                        </div>
+                        <AddToCartButton product={product} />
                       </div>
-                      <AddToCartButton product={product} />
                     </div>
                   </div>
                 )
               })}
-            </div>
-          )}
-
-          {products.length > 0 && (
-            <div className="mt-16 flex justify-center items-center gap-4">
-              <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors disabled:opacity-30" disabled>
-                <span className="material-symbols-outlined">chevron_left</span>
-              </button>
-              <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-on-primary font-label-md text-label-md">1</button>
-              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors font-label-md text-label-md">2</button>
-              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container transition-colors font-label-md text-label-md">3</button>
-              <button className="w-10 h-10 flex items-center justify-center rounded-lg border border-outline-variant hover:bg-surface-container transition-colors">
-                <span className="material-symbols-outlined">chevron_right</span>
-              </button>
             </div>
           )}
         </div>
