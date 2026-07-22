@@ -91,41 +91,41 @@ export function Header() {
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 px-margin-mobile py-2 flex items-center gap-2 pointer-events-none">
         {/* Hamburger */}
         <button onClick={() => setMenuOpen(true)}
-          className="pointer-events-auto h-9 w-9 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0 self-start mt-0.5">
-          <span className="material-symbols-outlined text-[20px]">menu</span>
+          className="pointer-events-auto h-11 w-11 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0 self-start mt-0.5">
+          <span className="material-symbols-outlined text-[24px]">menu</span>
         </button>
 
         {/* Logo + text capsule */}
-        <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-3 h-9 shadow-sm mx-auto self-start mt-0.5">
-          <img src="/logo.png" alt="" className="h-7 w-7 rounded-full" />
-          <span className={`font-headline-md text-[14px] font-semibold text-on-primary tracking-tight transition-all duration-300 ease-out ${iconsOpen ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-[60px]"}`}>NISA</span>
+        <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-4 h-11 shadow-sm mx-auto self-start mt-0.5">
+          <img src="/logo.png" alt="" className="h-9 w-9 rounded-full" />
+          <span className={`font-headline-md text-[16px] font-semibold text-on-primary tracking-tight transition-all duration-300 ease-out ${iconsOpen ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-[60px]"}`}>NISA</span>
         </Link>
 
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
-          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-2xl shadow-sm flex flex-col items-stretch transition-all duration-300 ease-out ${iconsOpen ? "px-4 py-3 gap-3" : "px-3 py-2 gap-2"}`}>
+          <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-2xl shadow-sm flex flex-col items-stretch transition-all duration-300 ease-out ${iconsOpen ? "px-4 py-3 gap-3" : "px-3 py-2.5 gap-2.5"}`}>
             <Link href="/cart" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5">
-              <span className="material-symbols-outlined text-[20px] shrink-0">shopping_cart</span>
-              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Cart</span>
+              <span className="material-symbols-outlined text-[22px] shrink-0">shopping_cart</span>
+              <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Cart</span>
             </Link>
             <Link href="/appointment" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5">
-              <span className="material-symbols-outlined text-[20px] shrink-0">calendar_month</span>
-              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Appointment</span>
+              <span className="material-symbols-outlined text-[22px] shrink-0">calendar_month</span>
+              <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Appointment</span>
             </Link>
             <Link href="/track" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5">
-              <span className="material-symbols-outlined text-[20px] shrink-0">local_shipping</span>
-              <span className={`font-label-md text-label-md whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Track</span>
+              <span className="material-symbols-outlined text-[22px] shrink-0">local_shipping</span>
+              <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Track</span>
             </Link>
             <button onClick={() => setIconsOpen(!iconsOpen)}
               className="flex items-center justify-center text-on-primary/70 hover:text-on-primary transition-colors pt-0.5">
-              <span className="material-symbols-outlined text-[18px]">{iconsOpen ? "chevron_right" : "chevron_left"}</span>
+              <span className="material-symbols-outlined text-[20px]">{iconsOpen ? "chevron_right" : "chevron_left"}</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* Spacer for mobile */}
-      <div className="md:hidden h-12" />
+      <div className="md:hidden h-14" />
 
       {/* Side Drawer */}
       {menuOpen && (
