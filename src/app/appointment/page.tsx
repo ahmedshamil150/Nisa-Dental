@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { Suspense, useState, useEffect } from "react"
 import Link from "next/link"
 import { Card } from "@/components/ui/Card"
 
@@ -8,6 +8,11 @@ function AppointmentForm() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [services, setServices] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch("/api/services").then((r) => r.json()).then(setServices).catch(console.error)
+  }, [])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -95,7 +100,10 @@ function AppointmentForm() {
                 <label htmlFor="service_id" className="font-label-md text-label-md text-on-surface block mb-1">Service</label>
                 <select name="service_id" id="service_id"
                   className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                  <option value="">General Consultation</option>
+                  <option value="">Select a service</option>
+                  {services.map((s: any) => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
                 </select>
               </div>
             </div>
