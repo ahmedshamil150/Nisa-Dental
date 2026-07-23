@@ -36,7 +36,7 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden -mt-14 px-margin-mobile md:px-margin-desktop pt-14 md:pt-section-gap pb-section-gap min-h-[80vh] md:min-h-screen flex items-center">
         <div className="absolute inset-0 z-0">
-          <Image src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1600&q=80" alt="" fill sizes="100vw" className="object-cover" priority />
+          <Image src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1200&q=80" alt="" fill sizes="100vw" className="object-cover" priority quality={60} />
           <div className="absolute inset-0 bg-gradient-to-r from-surface/90 via-surface/40 via-primary/10 to-transparent" />
         </div>
         <div className="relative z-10 max-w-2xl">
