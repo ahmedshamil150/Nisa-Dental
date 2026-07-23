@@ -47,7 +47,8 @@ export function FeaturedProducts({ products }: { products: any[] }) {
         <div className="relative group/carousel">
           {!atStart && (
             <button onClick={() => scroll(-1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 w-10 h-10 rounded-full bg-surface shadow-md border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-all opacity-0 group-hover/carousel:opacity-100">
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 w-10 h-10 rounded-full bg-surface shadow-md border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-all opacity-0 group-hover/carousel:opacity-100"
+              aria-label="Scroll products left">
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
             </button>
           )}
@@ -97,7 +98,8 @@ export function FeaturedProducts({ products }: { products: any[] }) {
 
           {!atEnd && (
             <button onClick={() => scroll(1)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 w-10 h-10 rounded-full bg-surface shadow-md border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-all opacity-0 group-hover/carousel:opacity-100">
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 w-10 h-10 rounded-full bg-surface shadow-md border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-all opacity-0 group-hover/carousel:opacity-100"
+              aria-label="Scroll products right">
               <span className="material-symbols-outlined text-[20px]">chevron_right</span>
             </button>
           )}

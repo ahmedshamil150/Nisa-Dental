@@ -3,6 +3,7 @@ import { Manrope, Noto_Serif } from "next/font/google"
 import "./globals.css"
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper"
 import { SchemaJsonLd } from "@/components/seo/SchemaJsonLd"
+import { MaterialSymbolsLoader } from "@/components/seo/MaterialSymbolsLoader"
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -56,9 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..1&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..1&display=swap" />
       </head>
       <body className="flex min-h-screen flex-col antialiased">
+        <MaterialSymbolsLoader />
         <SchemaJsonLd />
         <LayoutWrapper>{children}</LayoutWrapper>
       </body>

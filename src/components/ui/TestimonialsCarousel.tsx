@@ -63,17 +63,20 @@ export function TestimonialsCarousel({ testimonials }: { testimonials: any[] }) 
 
           <div className="flex items-center justify-center gap-4 mt-6">
             <button onClick={() => setIndex((i) => (i - 1 + testimonials.length) % testimonials.length)}
-              className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+              className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors"
+              aria-label="Previous testimonial">
               <span className="material-symbols-outlined text-[20px]">chevron_left</span>
             </button>
             <div className="flex gap-2">
               {testimonials.map((_, i) => (
                 <button key={i} onClick={() => setIndex(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${i === index ? "bg-primary w-6" : "bg-outline-variant"}`} />
+                  className={`w-2 h-2 rounded-full transition-all ${i === index ? "bg-primary w-6" : "bg-outline-variant"}`}
+                  aria-label={`Go to testimonial ${i + 1}`} />
               ))}
             </div>
             <button onClick={() => setIndex((i) => (i + 1) % testimonials.length)}
-              className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+              className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors"
+              aria-label="Next testimonial">
               <span className="material-symbols-outlined text-[20px]">chevron_right</span>
             </button>
           </div>

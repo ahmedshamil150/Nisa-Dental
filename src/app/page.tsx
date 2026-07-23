@@ -117,7 +117,7 @@ export default async function HomePage() {
                 <div className="relative z-10">
                   <span className="material-symbols-outlined text-on-primary text-4xl mb-4">{services[1]?.icon || "dentistry"}</span>
                   <h3 className="font-headline-md text-headline-md mb-3">{services[1]?.name || "Orthodontics"}</h3>
-                  <p className="text-primary-fixed opacity-90">{services[1]?.short_description || "Align your smile with modern solutions from invisible aligners to precision braces."}</p>
+                  <p className="text-on-primary/80">{services[1]?.short_description || "Align your smile with modern solutions from invisible aligners to precision braces."}</p>
                 </div>
                 <div className="mt-8">
                   <div className="bg-primary-container/20 p-4 rounded-lg border border-primary-fixed/20 mb-6">
@@ -202,7 +202,7 @@ export default async function HomePage() {
                     <span className="material-symbols-outlined text-primary">stethoscope</span>
                   </div>
                   <div>
-                    <h4 className="font-headline-md text-headline-md text-on-surface mb-1">Expert Doctors</h4>
+                    <h3 className="font-headline-md text-headline-md text-on-surface mb-1">Expert Doctors</h3>
                     <p className="text-on-surface-variant">Our clinicians are board-certified specialists committed to ongoing research and advanced techniques.</p>
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default async function HomePage() {
                     <span className="material-symbols-outlined text-primary">biotech</span>
                   </div>
                   <div>
-                    <h4 className="font-headline-md text-headline-md text-on-surface mb-1">Modern Tech</h4>
+                    <h3 className="font-headline-md text-headline-md text-on-surface mb-1">Modern Tech</h3>
                     <p className="text-on-surface-variant">Utilizing AI-driven diagnostics, 3D imaging, and laser dentistry for minimally invasive procedures.</p>
                   </div>
                 </div>
@@ -220,7 +220,7 @@ export default async function HomePage() {
                     <span className="material-symbols-outlined text-primary">volunteer_activism</span>
                   </div>
                   <div>
-                    <h4 className="font-headline-md text-headline-md text-on-surface mb-1">Gentle Care</h4>
+                    <h3 className="font-headline-md text-headline-md text-on-surface mb-1">Gentle Care</h3>
                     <p className="text-on-surface-variant">Specialized comfort protocols to ensure a pain-free and anxiety-free experience for every patient.</p>
                   </div>
                 </div>
@@ -241,7 +241,7 @@ export default async function HomePage() {
         <div className="max-w-container-max mx-auto bg-primary rounded-2xl p-12 md:p-20 text-center relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="font-headline-lg text-headline-lg text-on-primary mb-6">Ready to transform your smile?</h2>
-            <p className="text-primary-fixed opacity-90 max-w-xl mx-auto mb-10 font-body-lg">Schedule your initial consultation today and experience the difference of clinical excellence and patient-focused care.</p>
+            <p className="text-on-primary/80 max-w-xl mx-auto mb-10 font-body-lg">Schedule your initial consultation today and experience the difference of clinical excellence and patient-focused care.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/appointment" className="bg-surface text-primary px-10 py-4 rounded-lg font-label-md text-label-md hover:shadow-xl transition-all active:scale-95">
                 Book Your Appointment
