@@ -110,7 +110,7 @@ export default async function HomePage() {
 
               <AnimateOnScroll delay={0.1} className="md:col-span-4">
               <div className="bg-primary text-on-primary p-8 rounded-xl border border-primary-container flex flex-col justify-between transition-all duration-500 hover:shadow-xl relative overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{
+                <div className="absolute inset-0 bg-cover bg-center opacity-20 pointer-events-none" style={{
                   backgroundImage: services[1]?.image_url ? `url('${services[1].image_url}')` : "url('https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=600&q=80')"
                 }} />
                 <div className="relative z-10">
@@ -147,7 +147,7 @@ export default async function HomePage() {
 
               <AnimateOnScroll delay={0.3} className="md:col-span-6">
               <div className="bg-tertiary-container text-on-tertiary-container p-8 rounded-xl border border-tertiary flex items-center justify-between overflow-hidden relative">
-                <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{
+                <div className="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none" style={{
                   backgroundImage: services[3]?.image_url ? `url('${services[3].image_url}')` : "url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&q=80')"
                 }} />
                 <div className="z-10 relative">
