@@ -219,7 +219,8 @@ export function Header() {
               <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Track</span>
             </Link>
             <button onClick={() => setIconsOpen(!iconsOpen)}
-              className="flex items-center justify-center text-on-primary/70 hover:text-on-primary transition-colors pt-0.5">
+              className="flex items-center justify-center text-on-primary/70 hover:text-on-primary transition-colors pt-0.5"
+              aria-label={iconsOpen ? "Collapse icons" : "Expand icons"}>
               <span className="material-symbols-outlined text-[20px]">{iconsOpen ? "chevron_right" : "chevron_left"}</span>
             </button>
           </div>
@@ -239,7 +240,7 @@ export function Header() {
                 <Image src="/logo.png" alt="Nisa Dental" className="h-10 w-10 rounded-full" width={40} height={40} />
                 <span className="font-headline-md text-headline-md font-semibold text-primary">NISA DENTAL</span>
               </Link>
-              <button onClick={() => setMenuOpen(false)} className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+              <button onClick={() => setMenuOpen(false)} className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" aria-label="Close menu">
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
