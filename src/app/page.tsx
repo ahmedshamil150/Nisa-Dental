@@ -1,9 +1,11 @@
 import Image from "next/image"
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { getSupabase } from "@/lib/supabase"
-import { TestimonialsCarousel } from "@/components/ui/TestimonialsCarousel"
-import { FeaturedProducts } from "@/components/ui/FeaturedProducts"
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
+
+const TestimonialsCarousel = dynamic(() => import("@/components/ui/TestimonialsCarousel").then(m => ({ default: m.TestimonialsCarousel })))
+const FeaturedProducts = dynamic(() => import("@/components/ui/FeaturedProducts").then(m => ({ default: m.FeaturedProducts })))
 
 async function getServices() {
   const sb = getSupabase()
@@ -35,7 +37,7 @@ export default async function HomePage() {
       <AnimateOnScroll direction="none" distance={0}>
       <section className="relative overflow-hidden -mt-14 px-margin-mobile md:px-margin-desktop pt-14 md:pt-section-gap pb-section-gap min-h-[80vh] md:min-h-screen flex items-center">
         <div className="absolute inset-0 z-0">
-          <Image src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1600&q=80" alt="" fill className="object-cover" priority />
+          <Image src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1600&q=80" alt="" fill sizes="100vw" className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-r from-surface/90 via-surface/40 via-primary/10 to-transparent" />
         </div>
         <div className="relative z-10 max-w-2xl">
@@ -175,9 +177,9 @@ export default async function HomePage() {
         <div className="max-w-container-max mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
             <div className="relative">
-              <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl relative z-10 border border-outline-variant/30 bg-cover bg-center" style={{
-                backgroundImage: "url('https://images.unsplash.com/photo-1551076805-e1869033e561?w=800&q=80')"
-              }} />
+              <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl relative z-10 border border-outline-variant/30">
+                <Image src="https://images.unsplash.com/photo-1551076805-e1869033e561?w=800&q=80" alt="Nisa Dental Clinic interior showing modern treatment facility" fill sizes="(max-width: 768px) 100vw, 400px" className="object-cover" />
+              </div>
               <div className="absolute -bottom-10 -right-10 bg-surface p-8 rounded-xl shadow-xl z-20 border border-outline-variant/20 hidden lg:block">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="bg-primary text-on-primary w-12 h-12 rounded-full flex items-center justify-center">

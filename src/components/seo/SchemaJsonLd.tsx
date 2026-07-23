@@ -49,6 +49,47 @@ export function SchemaJsonLd() {
         isPartOf: { "@id": "https://nisa-dental.vercel.app/#website" },
         about: { "@id": "https://nisa-dental.vercel.app/#business" },
       },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://nisa-dental.vercel.app/#breadcrumb",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://nisa-dental.vercel.app/" },
+          { "@type": "ListItem", position: 2, name: "Shop", item: "https://nisa-dental.vercel.app/shop" },
+          { "@type": "ListItem", position: 3, name: "Appointment", item: "https://nisa-dental.vercel.app/appointment" },
+          { "@type": "ListItem", position: 4, name: "About", item: "https://nisa-dental.vercel.app/about" },
+          { "@type": "ListItem", position: 5, name: "Contact", item: "https://nisa-dental.vercel.app/contact" },
+        ],
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://nisa-dental.vercel.app/#faq",
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: "What dental services do you offer?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "We offer general dentistry, cosmetic dentistry, orthodontics, oral surgery, and pediatric care at our Sialkot clinic.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "How do I book an appointment?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "You can book an appointment through our website's appointment form or by calling us at +92-334-1710086.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Do you sell dental products online?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Yes, we offer a range of premium dental care and surgical products through our online shop with delivery in Sialkot.",
+            },
+          },
+        ],
+      },
     ],
   }
 

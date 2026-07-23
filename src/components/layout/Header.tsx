@@ -169,7 +169,7 @@ export function Header() {
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-1" aria-label="Main navigation">
             {navLinks.map((link, i) => (
               <NavPill key={link.href} link={link} index={i} scrolledState={scrolled} />
             ))}
@@ -196,7 +196,7 @@ export function Header() {
         {/* Hamburger */}
         <button onClick={() => setMenuOpen(true)}
           className="pointer-events-auto h-11 w-11 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0 self-start mt-0.5"
-          aria-label="Open menu">
+          aria-label="Open menu" aria-expanded="false" aria-haspopup="dialog">
           <span className="material-symbols-outlined text-[24px]">menu</span>
         </button>
 
@@ -209,22 +209,22 @@ export function Header() {
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
           <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 shadow-sm flex flex-col items-stretch transition-all duration-300 ease-out rounded-3xl ${iconsOpen ? "px-4 py-4 gap-3" : "px-3 pt-3 pb-2.5 gap-2.5"}`}>
-            <Link href="/cart" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5 relative">
+            <Link href="/cart" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5 relative" aria-label="Shopping cart">
               <span className="material-symbols-outlined text-[22px] shrink-0">shopping_cart</span>
               <CartBadge />
               <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Cart</span>
             </Link>
-            <Link href="/appointment" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5">
+            <Link href="/appointment" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5" aria-label="Book appointment">
               <span className="material-symbols-outlined text-[22px] shrink-0">calendar_month</span>
               <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Appointment</span>
             </Link>
-            <Link href="/track" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5">
+            <Link href="/track" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5" aria-label="Track order">
               <span className="material-symbols-outlined text-[22px] shrink-0">local_shipping</span>
               <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Track</span>
             </Link>
             <button onClick={() => setIconsOpen(!iconsOpen)}
               className="flex items-center justify-center text-on-primary/70 hover:text-on-primary transition-colors pt-0.5"
-              aria-label={iconsOpen ? "Collapse icons" : "Expand icons"}>
+              aria-label={iconsOpen ? "Collapse icons" : "Expand icons"} aria-expanded={iconsOpen}>
               <span className="material-symbols-outlined text-[20px]">{iconsOpen ? "chevron_right" : "chevron_left"}</span>
             </button>
           </div>
@@ -238,7 +238,7 @@ export function Header() {
       {menuOpen && (
         <div className="fixed inset-0 z-[100] md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMenuOpen(false)} />
-          <div className="absolute top-0 left-0 h-full w-72 max-w-[85vw] bg-surface shadow-2xl flex flex-col animate-slide-in-left">
+          <div className="absolute top-0 left-0 h-full w-72 max-w-[85vw] bg-surface shadow-2xl flex flex-col animate-slide-in-left" role="dialog" aria-modal="true" aria-label="Navigation menu">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant/30">
               <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
                 <Image src="/logo.png" alt="Nisa Dental" className="h-10 w-10 rounded-full" width={40} height={40} />
@@ -248,7 +248,7 @@ export function Header() {
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
-            <nav className="flex-1 overflow-y-auto p-5 space-y-1">
+            <nav className="flex-1 overflow-y-auto p-5 space-y-1" aria-label="Mobile navigation">
               <Link href="/" onClick={() => setMenuOpen(false)}
                 className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname === "/" ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>
                 Home

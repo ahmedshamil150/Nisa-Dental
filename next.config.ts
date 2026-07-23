@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    formats: ["image/avif", "image/webp"],
+    formats: ["image/webp"],
     deviceSizes: [480, 768, 1024, 1280, 1536],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
