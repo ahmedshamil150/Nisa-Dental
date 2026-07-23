@@ -16,7 +16,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     <CartProvider>
       <ToastProvider>
         <Header />
-        <main className="flex-1 animate-fade-in-up">{children}</main>
+        <main className="flex-1">{children}</main>
         <Footer />
       </ToastProvider>
     </CartProvider>
