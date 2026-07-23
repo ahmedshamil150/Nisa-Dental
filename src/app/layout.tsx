@@ -7,14 +7,14 @@ import { SchemaJsonLd } from "@/components/seo/SchemaJsonLd"
 const manrope = Manrope({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  display: "swap",
+  display: "optional",
   variable: "--font-manrope",
 })
 
 const notoSerif = Noto_Serif({
   subsets: ["latin"],
   weight: ["500", "600"],
-  display: "swap",
+  display: "optional",
   variable: "--font-noto-serif",
 })
 
@@ -55,7 +55,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${manrope.variable} ${notoSerif.variable}`}>
       <head>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..1&display=block" rel="stylesheet" />
+        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..1&display=block" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..1&display=block" />
       </head>
       <body className="flex min-h-screen flex-col antialiased">
         <SchemaJsonLd />

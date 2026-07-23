@@ -191,7 +191,8 @@ export function Header() {
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 px-margin-mobile py-2 flex items-center gap-2 pointer-events-none">
         {/* Hamburger */}
         <button onClick={() => setMenuOpen(true)}
-          className="pointer-events-auto h-11 w-11 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0 self-start mt-0.5">
+          className="pointer-events-auto h-11 w-11 rounded-full bg-primary text-on-primary shadow-md flex items-center justify-center active:scale-95 transition-transform shrink-0 self-start mt-0.5"
+          aria-label="Open menu">
           <span className="material-symbols-outlined text-[24px]">menu</span>
         </button>
 
