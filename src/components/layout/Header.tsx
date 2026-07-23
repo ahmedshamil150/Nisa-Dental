@@ -5,7 +5,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { useCart } from "@/lib/cart-context"
-import { gsap } from "gsap"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -44,7 +43,10 @@ export function Header() {
   }, [])
 
   useEffect(() => {
-    circleRefs.current.forEach((circle, i) => {
+    let cancelled = false
+    import("gsap").then(({ default: gsap }) => {
+      if (cancelled) return
+      circleRefs.current.forEach((circle, i) => {
       if (!circle?.parentElement) return
       const pill = circle.parentElement
       const rect = pill.getBoundingClientRect()
@@ -76,7 +78,9 @@ export function Header() {
         tl.to(hoverLabel, { y: 0, opacity: 1, duration: 2, ease: "power3.easeOut", overwrite: "auto" }, 0)
       }
       tlRefs.current[i] = tl
+      })
     })
+    return () => { cancelled = true }
   }, [scrolled, pathname])
 
   const handleEnter = (i: number) => {
