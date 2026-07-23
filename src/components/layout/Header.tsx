@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
@@ -156,7 +157,7 @@ export function Header() {
             : "flex justify-between items-center w-full px-margin-desktop h-16"
         }`}>
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <img src="/logo.png" alt="Nisa Dental" className={`rounded-full transition-all duration-300 ${scrolled ? "h-8 w-8" : "h-10 w-auto"}`} />
+            <Image src="/logo.png" alt="Nisa Dental" width={40} height={40} className={`rounded-full transition-all duration-300 ${scrolled ? "h-8 w-8" : "h-10 w-auto max-h-10"}`} />
             <span className={`font-headline-md font-semibold tracking-tight transition-all duration-300 ${
               scrolled ? "text-headline-md text-white text-[16px]" : "text-headline-md text-primary"
             }`}>
@@ -196,7 +197,7 @@ export function Header() {
 
         {/* Logo + text capsule */}
         <Link href="/" className="pointer-events-auto flex items-center gap-1.5 bg-primary/90 backdrop-blur-md border border-primary-border/40 rounded-full px-4 h-11 shadow-sm mx-auto self-start mt-0.5">
-          <img src="/logo.png" alt="" className="h-9 w-9 rounded-full" />
+          <Image src="/logo.png" alt="" className="h-9 w-9 rounded-full" width={36} height={36} />
           <span className={`font-headline-md text-[16px] font-semibold text-on-primary tracking-tight transition-all duration-300 ease-out ${iconsOpen ? "opacity-0 max-w-0 overflow-hidden" : "opacity-100 max-w-[60px]"}`}>NISA</span>
         </Link>
 
@@ -234,7 +235,7 @@ export function Header() {
           <div className="absolute top-0 left-0 h-full w-72 max-w-[85vw] bg-surface shadow-2xl flex flex-col animate-slide-in-left">
             <div className="flex items-center justify-between p-5 border-b border-outline-variant/30">
               <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
-                <img src="/logo.png" alt="Nisa Dental" className="h-10 w-10 rounded-full" />
+                <Image src="/logo.png" alt="Nisa Dental" className="h-10 w-10 rounded-full" width={40} height={40} />
                 <span className="font-headline-md text-headline-md font-semibold text-primary">NISA DENTAL</span>
               </Link>
               <button onClick={() => setMenuOpen(false)} className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">

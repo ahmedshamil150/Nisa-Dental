@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
 import { AddToCartButton } from "@/components/shop/AddToCartButton"
@@ -202,14 +203,14 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
                   <div key={product.id} className="group relative bg-surface border border-outline-variant/30 rounded-xl overflow-hidden flex flex-col transition-all hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 duration-300">
                     <Link href={`/shop/${product.slug}`} className="block relative aspect-square overflow-hidden bg-surface-container">
                       {product.image_url ? (
-                        <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <Image src={product.image_url} alt={product.name} fill sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <span className="material-symbols-outlined text-[60px] text-outline-variant/50">inventory_2</span>
                         </div>
                       )}
                       {product.image_urls?.[1] && (
-                        <img src={product.image_urls[1]} alt="" className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <Image src={product.image_urls[1]} alt="" fill sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       )}
                       {price.percent > 0 && (
                         <span className="absolute top-3 left-3 bg-red-500 text-white font-label-md text-[11px] px-2.5 py-1 rounded-full font-bold">

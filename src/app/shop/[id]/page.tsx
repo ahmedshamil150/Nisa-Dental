@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import type { Metadata } from "next"
 import { getSupabase } from "@/lib/supabase"
 import { AddToCartLargeButton } from "@/components/shop/AddToCartLargeButton"
 import { ProductImageCarousel } from "@/components/shop/ProductImageCarousel"
@@ -10,6 +11,21 @@ async function getProduct(slug: string) {
   if (!sb) return null
   const { data } = await sb.from("products").select("*, category:product_categories(*)").eq("slug", slug).eq("is_active", true).single()
   return data as any
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const product = await getProduct(id)
+  if (!product) return { title: "Product Not Found" }
+  return {
+    title: product.name,
+    description: product.description?.slice(0, 160) || `${product.name} - available at Nisa Dental & Surgical`,
+    openGraph: {
+      title: product.name,
+      description: product.description?.slice(0, 160) || `${product.name} - available at Nisa Dental & Surgical`,
+      images: product.image_url ? [{ url: product.image_url }] : [],
+    },
+  }
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -33,6 +49,22 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         <ProductImageCarousel images={images} productName={product.name} discount={discount} />
 
         <div>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: product.name,
+            description: product.description,
+            image: images,
+            sku: product.sku || product.id,
+            brand: product.manufacturer ? { "@type": "Brand", name: product.manufacturer } : undefined,
+            offers: {
+              "@type": "Offer",
+              price: salePrice || product.price,
+              priceCurrency: "PKR",
+              availability: product.stock_quantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              url: `https://nisa-dental.vercel.app/shop/${product.slug}`,
+            },
+          })}} />
           <p className="text-caption font-caption text-on-surface-variant uppercase tracking-widest mb-2">{product.category?.name || "Product"}</p>
           <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">{product.name}</h1>
 

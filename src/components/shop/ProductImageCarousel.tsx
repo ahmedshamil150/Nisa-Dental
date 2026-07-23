@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 
 export function ProductImageCarousel({ images, productName, discount }: { images: string[]; productName: string; discount: number }) {
   const [idx, setIdx] = useState(0)
@@ -11,9 +12,9 @@ export function ProductImageCarousel({ images, productName, discount }: { images
   return (
     <div className="space-y-4">
       <div className="aspect-square rounded-xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-center relative overflow-hidden group">
-        <img src={current} alt={productName} className="w-full h-full object-cover" />
+        <Image src={current} alt={productName} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" priority />
         {discount > 0 && (
-          <span className="absolute top-4 right-4 bg-red-500 text-white font-label-md text-sm px-3 py-1 rounded-full">
+          <span className="absolute top-4 right-4 bg-red-500 text-white font-label-md text-sm px-3 py-1 rounded-full z-10">
             -{discount}%
           </span>
         )}
@@ -21,13 +22,13 @@ export function ProductImageCarousel({ images, productName, discount }: { images
           <>
             {idx > 0 && (
               <button onClick={() => setIdx(idx - 1)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 shadow-md flex items-center justify-center text-on-surface hover:bg-white transition-all opacity-0 group-hover:opacity-100">
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 shadow-md flex items-center justify-center text-on-surface hover:bg-white transition-all opacity-0 group-hover:opacity-100 z-10">
                 <span className="material-symbols-outlined text-[20px]">chevron_left</span>
               </button>
             )}
             {idx < images.length - 1 && (
               <button onClick={() => setIdx(idx + 1)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 shadow-md flex items-center justify-center text-on-surface hover:bg-white transition-all opacity-0 group-hover:opacity-100">
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 shadow-md flex items-center justify-center text-on-surface hover:bg-white transition-all opacity-0 group-hover:opacity-100 z-10">
                 <span className="material-symbols-outlined text-[20px]">chevron_right</span>
               </button>
             )}
@@ -41,7 +42,7 @@ export function ProductImageCarousel({ images, productName, discount }: { images
               className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                 i === idx ? "border-primary" : "border-outline-variant/30 opacity-60 hover:opacity-100"
               }`}>
-              <img src={img} alt="" className="w-full h-full object-cover" />
+              <Image src={img} alt="" width={64} height={64} className="object-cover w-full h-full" />
             </button>
           ))}
         </div>

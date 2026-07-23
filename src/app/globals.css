@@ -48,13 +48,13 @@
   --color-inverse-on-surface: #f0f1f1;
   --color-on-background: #191c1c;
 
-  --font-label-md: Manrope, sans-serif;
-  --font-caption: Manrope, sans-serif;
-  --font-headline-xl: "Noto Serif", serif;
-  --font-body-lg: Manrope, sans-serif;
-  --font-body-md: Manrope, sans-serif;
-  --font-headline-md: "Noto Serif", serif;
-  --font-headline-lg: "Noto Serif", serif;
+  --font-label-md: var(--font-manrope), Manrope, sans-serif;
+  --font-caption: var(--font-manrope), Manrope, sans-serif;
+  --font-headline-xl: var(--font-noto-serif), "Noto Serif", serif;
+  --font-body-lg: var(--font-manrope), Manrope, sans-serif;
+  --font-body-md: var(--font-manrope), Manrope, sans-serif;
+  --font-headline-md: var(--font-noto-serif), "Noto Serif", serif;
+  --font-headline-lg: var(--font-noto-serif), "Noto Serif", serif;
 
   --text-label-md: 14px;
   --text-label-md--line-height: 1.2;

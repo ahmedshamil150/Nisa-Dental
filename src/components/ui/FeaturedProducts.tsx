@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { AddToCartButton } from "@/components/shop/AddToCartButton"
 
@@ -61,7 +62,7 @@ export function FeaturedProducts({ products }: { products: any[] }) {
                   className="flex-shrink-0 w-[260px] snap-start bg-surface border border-outline-variant/30 rounded-xl overflow-hidden flex flex-col transition-all hover:shadow-lg hover:-translate-y-1 duration-300">
                   <Link href={`/shop/${product.slug}`} className="block aspect-square overflow-hidden bg-surface-container relative">
                     {product.image_url ? (
-                      <img src={product.image_url} alt={product.name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                      <Image src={product.image_url} alt={product.name} fill sizes="260px" className="object-cover hover:scale-105 transition-transform duration-500" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <span className="material-symbols-outlined text-[50px] text-outline-variant/50">inventory_2</span>
