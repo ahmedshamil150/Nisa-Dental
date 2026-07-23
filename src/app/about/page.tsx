@@ -1,4 +1,5 @@
 import { getSupabase } from "@/lib/supabase"
+import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
 
 async function getServices() {
   const sb = getSupabase()
@@ -19,6 +20,7 @@ export default async function AboutPage() {
 
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+      <AnimateOnScroll>
       <div className="max-w-3xl mx-auto text-center mb-20">
         <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">About NISA Dental</h1>
         <div className="w-16 h-1 bg-primary mx-auto rounded-full mb-6" />
@@ -26,7 +28,9 @@ export default async function AboutPage() {
           At NISA Dental Clinic, we are committed to providing exceptional dental care combined with premium surgical products. Our state-of-the-art facility and experienced team ensure every patient receives personalized, comfortable treatment.
         </p>
       </div>
+      </AnimateOnScroll>
 
+      <AnimateOnScroll delay={0.15}>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-20">
         <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 text-center">
           <span className="material-symbols-outlined text-primary text-4xl mb-4">calendar_today</span>
@@ -44,8 +48,9 @@ export default async function AboutPage() {
           <p className="text-on-surface-variant">Premium Products</p>
         </div>
       </div>
-
+      </AnimateOnScroll>
       {services.length > 0 && (
+        <AnimateOnScroll>
         <section id="services" className="mb-20 scroll-mt-20">
           <h2 className="font-headline-lg text-headline-lg text-on-surface text-center mb-12">Our Services</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -63,9 +68,11 @@ export default async function AboutPage() {
             ))}
           </div>
         </section>
+        </AnimateOnScroll>
       )}
 
       {team.length > 0 && (
+        <AnimateOnScroll>
         <section id="team" className="scroll-mt-20">
           <h2 className="font-headline-lg text-headline-lg text-on-surface text-center mb-12">Meet Our Team</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -87,6 +94,7 @@ export default async function AboutPage() {
             ))}
           </div>
         </section>
+        </AnimateOnScroll>
       )}
     </div>
   )

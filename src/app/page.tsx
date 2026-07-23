@@ -2,6 +2,7 @@ import Link from "next/link"
 import { getSupabase } from "@/lib/supabase"
 import { TestimonialsCarousel } from "@/components/ui/TestimonialsCarousel"
 import { FeaturedProducts } from "@/components/ui/FeaturedProducts"
+import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
 
 async function getServices() {
   const sb = getSupabase()
@@ -30,6 +31,7 @@ export default async function HomePage() {
   return (
     <>
       {/* Hero Section */}
+      <AnimateOnScroll direction="none" distance={0}>
       <section className="relative overflow-hidden -mt-14 px-margin-mobile md:px-margin-desktop pt-14 md:pt-section-gap pb-section-gap min-h-screen flex items-center">
         <div className="absolute inset-0 z-0">
           <div className="w-full h-full bg-cover bg-center" style={{
@@ -69,18 +71,21 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
+      </section></AnimateOnScroll>
 
       {/* Services Bento Grid */}
       <section className="px-margin-mobile md:px-margin-desktop py-section-gap">
+        <AnimateOnScroll>
         <div className="text-center mb-16">
           <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Our Services</h2>
           <div className="w-16 h-1 bg-primary mx-auto rounded-full" />
         </div>
+        </AnimateOnScroll>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter max-w-container-max mx-auto">
           {services.length > 0 && (
             <>
-              <div className="md:col-span-8 bg-surface-container-low p-8 md:p-10 rounded-xl border border-outline-variant/30 flex flex-col md:flex-row gap-8 items-center overflow-hidden group transition-all duration-500 hover:shadow-sm">
+              <AnimateOnScroll delay={0} className="md:col-span-8">
+              <div className="bg-surface-container-low p-8 md:p-10 rounded-xl border border-outline-variant/30 flex flex-col md:flex-row gap-8 items-center overflow-hidden group transition-all duration-500 hover:shadow-sm">
                 <div className="flex-1">
                   <span className="material-symbols-outlined text-primary text-4xl mb-4">clinical_notes</span>
                   <h3 className="font-headline-md text-headline-md mb-3 text-on-surface">{services[0]?.name}</h3>
@@ -101,8 +106,10 @@ export default async function HomePage() {
                   backgroundImage: services[0]?.image_url ? `url('${services[0].image_url}')` : "url('https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80')"
                 }} />
               </div>
+              </AnimateOnScroll>
 
-              <div className="md:col-span-4 bg-primary text-on-primary p-8 rounded-xl border border-primary-container flex flex-col justify-between transition-all duration-500 hover:shadow-xl relative overflow-hidden">
+              <AnimateOnScroll delay={0.1} className="md:col-span-4">
+              <div className="bg-primary text-on-primary p-8 rounded-xl border border-primary-container flex flex-col justify-between transition-all duration-500 hover:shadow-xl relative overflow-hidden">
                 <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{
                   backgroundImage: services[1]?.image_url ? `url('${services[1].image_url}')` : "url('https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=600&q=80')"
                 }} />
@@ -123,8 +130,10 @@ export default async function HomePage() {
                   </Link>
                 </div>
               </div>
+              </AnimateOnScroll>
 
-              <div className="md:col-span-6 bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 transition-all">
+              <AnimateOnScroll delay={0.2} className="md:col-span-6">
+              <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 transition-all">
                 <div className="mb-6 rounded-lg overflow-hidden h-48 bg-cover bg-center border border-outline-variant/10" style={{
                   backgroundImage: services[2]?.image_url ? `url('${services[2].image_url}')` : "url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80')"
                 }} />
@@ -134,8 +143,10 @@ export default async function HomePage() {
                   <span className="bg-secondary-container px-3 py-1 rounded-full text-[12px] font-bold text-on-secondary-container uppercase tracking-wider">Most Popular</span>
                 </div>
               </div>
+              </AnimateOnScroll>
 
-              <div className="md:col-span-6 bg-tertiary-container text-on-tertiary-container p-8 rounded-xl border border-tertiary flex items-center justify-between overflow-hidden relative">
+              <AnimateOnScroll delay={0.3} className="md:col-span-6">
+              <div className="bg-tertiary-container text-on-tertiary-container p-8 rounded-xl border border-tertiary flex items-center justify-between overflow-hidden relative">
                 <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{
                   backgroundImage: services[3]?.image_url ? `url('${services[3].image_url}')` : "url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&q=80')"
                 }} />
@@ -151,6 +162,7 @@ export default async function HomePage() {
                 </div>
                 <span className="material-symbols-outlined text-[120px] absolute -right-4 -bottom-4 opacity-10 rotate-12">child_care</span>
               </div>
+              </AnimateOnScroll>
             </>
           )}
         </div>
@@ -160,6 +172,7 @@ export default async function HomePage() {
 
       {/* Why Choose Us */}
       <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-section-gap border-y border-outline-variant/20">
+        <AnimateOnScroll>
         <div className="max-w-container-max mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
             <div className="relative">
@@ -214,11 +227,15 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
+        </AnimateOnScroll>
       </section>
 
+      <AnimateOnScroll>
       <TestimonialsCarousel testimonials={testimonials} />
+      </AnimateOnScroll>
 
       {/* CTA Section */}
+      <AnimateOnScroll>
       <section className="px-margin-mobile md:px-margin-desktop py-section-gap">
         <div className="max-w-container-max mx-auto bg-primary rounded-2xl p-12 md:p-20 text-center relative overflow-hidden">
           <div className="relative z-10">
@@ -236,7 +253,7 @@ export default async function HomePage() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-3xl" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/5 rounded-full -ml-32 -mb-32 blur-3xl" />
         </div>
-      </section>
+      </section></AnimateOnScroll>
     </>
   )
 }
