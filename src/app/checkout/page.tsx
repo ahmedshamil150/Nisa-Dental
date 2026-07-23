@@ -4,9 +4,11 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useCart } from "@/lib/cart-context"
+import { useToast } from "@/lib/toast-context"
 
 export default function CheckoutPage() {
   const { items, subtotal, totalWeight, clearCart } = useCart()
+  const { addToast } = useToast()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -57,6 +59,7 @@ export default function CheckoutPage() {
       }
 
       clearCart()
+      addToast("Order placed successfully!")
       router.push(`/track/${result.order_number}`)
     } catch (err) {
       console.error("Checkout error:", err)

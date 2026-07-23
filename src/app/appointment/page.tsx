@@ -3,12 +3,14 @@
 import { Suspense, useState, useEffect } from "react"
 import Link from "next/link"
 import { Card } from "@/components/ui/Card"
+import { useToast } from "@/lib/toast-context"
 
 function AppointmentForm() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [services, setServices] = useState<any[]>([])
+  const { addToast } = useToast()
 
   useEffect(() => {
     fetch("/api/services").then((r) => r.json()).then(setServices).catch(console.error)
@@ -24,6 +26,7 @@ function AppointmentForm() {
       const res = await fetch("/api/appointment", { method: "POST", body: fd })
       const data = await res.json()
       if (res.ok && data.success) {
+        addToast("Appointment request submitted!")
         setSubmitted(true)
       } else {
         setError(data.error === "missing-fields" ? "Please fill in all required fields." : "Something went wrong. Please try again.")

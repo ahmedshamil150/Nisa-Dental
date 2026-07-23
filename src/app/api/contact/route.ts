@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const message = formData.get("message") as string
 
     if (!name || !email || !message) {
-      return NextResponse.redirect(new URL("/contact?error=missing-fields", request.url))
+      return NextResponse.json({ success: false, error: "missing-fields" })
     }
 
     const { error } = await supabase.from("contacts").insert([
@@ -22,9 +22,9 @@ export async function POST(request: Request) {
 
     if (error) throw error
 
-    return NextResponse.redirect(new URL("/contact?success=true", request.url))
+    return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Contact form error:", error)
-    return NextResponse.redirect(new URL("/contact?error=true", request.url))
+    return NextResponse.json({ success: false, error: "server-error" })
   }
 }

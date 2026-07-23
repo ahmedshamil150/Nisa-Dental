@@ -1,6 +1,32 @@
+"use client"
+
+import { useState } from "react"
 import { Card } from "@/components/ui/Card"
+import { useToast } from "@/lib/toast-context"
 
 export default function ContactPage() {
+  const [loading, setLoading] = useState(false)
+  const { addToast } = useToast()
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setLoading(true)
+    const fd = new FormData(e.currentTarget)
+    try {
+      const res = await fetch("/api/contact", { method: "POST", body: fd })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        addToast("Message sent successfully!")
+        e.currentTarget.reset()
+      } else {
+        addToast("Please fill in all required fields.", "error")
+      }
+    } catch {
+      addToast("Something went wrong. Please try again.", "error")
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
       <div className="max-w-3xl mx-auto text-center mb-16">
@@ -12,7 +38,7 @@ export default function ContactPage() {
       <div className="grid gap-12 md:grid-cols-2">
         <Card className="p-8">
           <h2 className="font-headline-md text-headline-md text-on-surface mb-6">Send Us a Message</h2>
-          <form action="/api/contact" method="POST" className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
                 <label htmlFor="name" className="font-label-md text-label-md text-on-surface block mb-1">Name *</label>
@@ -45,8 +71,9 @@ export default function ContactPage() {
                 className="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                 placeholder="Tell us more..." />
             </div>
-            <button type="submit" className="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all">
-              Send Message
+            <button type="submit" disabled={loading}
+              className="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50">
+              {loading ? "Sending..." : "Send Message"}
             </button>
           </form>
         </Card>
