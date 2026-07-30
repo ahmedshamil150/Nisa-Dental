@@ -2,9 +2,18 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { createClient } from "@supabase/supabase-js"
 import { scryptSync } from "crypto"
+import { signSession } from "@/lib/session"
+import { csrfGuard } from "@/lib/csrf"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
   try {
+    const rl = checkRateLimit(request)
+    if (rl) return rl
+
+    const csrf = csrfGuard(request)
+    if (csrf) return csrf
+
     const { username, password } = await request.json()
 
     const supabase = createClient(
@@ -37,7 +46,7 @@ export async function POST(request: Request) {
     }
 
     const cookieStore = await cookies()
-    cookieStore.set("admin_session", "authenticated", {
+    cookieStore.set("admin_session", await signSession(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

@@ -2,6 +2,10 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { sendOrderConfirmation } from "@/lib/email"
 import { randomBytes } from "crypto"
+import { csrfGuard } from "@/lib/csrf"
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PHONE_RE = /^[\d\s\-\+\(\)]{7,20}$/
 
 function getSupabase() {
   return createClient(
@@ -18,17 +22,58 @@ function generateOrderNumber() {
   return "NISA-" + randomBytes(5).toString("hex").toUpperCase()
 }
 
+function sanitize(str: string, maxLen = 500): string {
+  return str.trim().slice(0, maxLen)
+}
+
 export async function POST(req: Request) {
   try {
+    const csrf = csrfGuard(req)
+    if (csrf) return csrf
+
     const body = await req.json()
-    const { customer_name, customer_email, customer_phone, shipping_address, coupon_code, items, subtotal, delivery, total_weight } = body
+    const customer_name = sanitize(body.customer_name || "", 100)
+    const customer_email = sanitize(body.customer_email || "", 254)
+    const customer_phone = body.customer_phone ? sanitize(body.customer_phone, 20) : null
+    const shipping_address = body.shipping_address
+    const coupon_code = body.coupon_code ? sanitize(body.coupon_code, 50).toUpperCase() : null
+    const items = body.items
+    const subtotal = Number(body.subtotal) || 0
+    const delivery = body.delivery != null ? Number(body.delivery) : null
+    const total_weight = body.total_weight != null ? Number(body.total_weight) : null
 
     if (!customer_name || !customer_email || !shipping_address) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
+    if (!EMAIL_RE.test(customer_email)) {
+      return NextResponse.json({ error: "Invalid email" }, { status: 400 })
+    }
+
+    if (customer_phone && !PHONE_RE.test(customer_phone)) {
+      return NextResponse.json({ error: "Invalid phone" }, { status: 400 })
+    }
+
+    if (!shipping_address.line1 || !shipping_address.city) {
+      return NextResponse.json({ error: "Address requires line1 and city" }, { status: 400 })
+    }
+
     if (!items || items.length === 0) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
+    }
+
+    for (const item of items) {
+      if (!item.product_id || typeof item.product_id !== "string") {
+        return NextResponse.json({ error: "Invalid item: missing product_id" }, { status: 400 })
+      }
+      const qty = Number(item.quantity)
+      const price = Number(item.unit_price)
+      if (!Number.isInteger(qty) || qty < 1 || qty > 99) {
+        return NextResponse.json({ error: `Invalid quantity for "${item.product_name || "item"}"` }, { status: 400 })
+      }
+      if (typeof price !== "number" || price <= 0 || price > 999999) {
+        return NextResponse.json({ error: `Invalid price for "${item.product_name || "item"}"` }, { status: 400 })
+      }
     }
 
     const supabase = getSupabase()
@@ -69,7 +114,7 @@ export async function POST(req: Request) {
       const { data: coupon, error: couponErr } = await supabase
         .from("coupons")
         .select("*")
-        .eq("code", coupon_code.toUpperCase())
+        .eq("code", coupon_code)
         .eq("is_active", true)
         .single()
 

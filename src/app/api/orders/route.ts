@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { sendOrderStatusUpdate } from "@/lib/email"
+import { requireAdmin } from "@/lib/admin-auth"
+import { csrfGuard } from "@/lib/csrf"
 
 function getSupabase() {
   return createClient(
@@ -49,6 +51,12 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
+  const auth = await requireAdmin(req)
+  if (auth) return auth
+
+  const csrf = csrfGuard(req)
+  if (csrf) return csrf
+
   const body = await req.json()
   let { id, order_status } = body
 
