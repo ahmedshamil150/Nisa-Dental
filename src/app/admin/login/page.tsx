@@ -27,7 +27,8 @@ export default function AdminLoginPage() {
         router.push("/admin")
         router.refresh()
       } else {
-        setError("Invalid password")
+        const data = await res.json().catch(() => null)
+        setError(data?.error || `Login failed (${res.status})`)
       }
     } catch {
       setError("Something went wrong")

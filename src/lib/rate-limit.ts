@@ -1,19 +1,14 @@
 import { NextResponse } from "next/server"
 
 type RateLimitEntry = {
-  count: number
+  failures: number
   resetAt: number
 }
 
 const store = new Map<string, RateLimitEntry>()
 
-type RateLimitConfig = {
-  maxAttempts: number
-  windowMs: number
-}
-
-const DEFAULTS: RateLimitConfig = {
-  maxAttempts: 5,
+const DEFAULTS = {
+  maxFailures: 5,
   windowMs: 15 * 60 * 1000,
 }
 
@@ -22,46 +17,52 @@ function getKey(request: Request): string {
   return forwarded?.split(",")[0]?.trim() || "unknown"
 }
 
-export function checkRateLimit(request: Request, config?: Partial<RateLimitConfig>): NextResponse | null {
-  const { maxAttempts, windowMs } = { ...DEFAULTS, ...config }
+// Returns a 429 response if the client has too many FAILED attempts.
+export function checkRateLimit(request: Request): NextResponse | null {
+  const key = getKey(request)
+  const entry = store.get(key)
+  if (!entry) return null
+  if (Date.now() > entry.resetAt) {
+    store.delete(key)
+    return null
+  }
+  if (entry.failures >= DEFAULTS.maxFailures) {
+    const retryAfter = Math.ceil((entry.resetAt - Date.now()) / 1000)
+    return NextResponse.json(
+      { error: "Too many failed attempts. Try again later." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    )
+  }
+  return null
+}
+
+// Record a failed attempt (only called when credentials are wrong).
+export function recordRateLimitFailure(request: Request): void {
   const key = getKey(request)
   const now = Date.now()
   const entry = store.get(key)
-
   if (!entry || now > entry.resetAt) {
-    store.set(key, { count: 1, resetAt: now + windowMs })
-    return null
+    store.set(key, { failures: 1, resetAt: now + DEFAULTS.windowMs })
+    return
   }
+  entry.failures++
+}
 
-  if (entry.count >= maxAttempts) {
-    const retryAfter = Math.ceil((entry.resetAt - now) / 1000)
-    return NextResponse.json(
-      { error: "Too many requests. Try again later." },
-      {
-        status: 429,
-        headers: { "Retry-After": String(retryAfter) },
-      }
-    )
-  }
-
-  entry.count++
-  return null
+// Clear the counter after a successful login.
+export function resetRateLimit(request: Request): void {
+  const key = getKey(request)
+  store.delete(key)
 }
 
 /*
  * Production note:
- * The in-memory Map resets on server restart and doesn't work across
- * serverless instances. For production on Vercel, replace with Vercel KV:
+ * The in-memory Map resets on restart and doesn't work across serverless
+ * instances. For production on Vercel, replace with Vercel KV:
  *
  *   import { kv } from "@vercel/kv"
+ *   const key = `rl:${ip}`
  *
- *   export async function checkRateLimit(request: Request): Promise<Response | null> {
- *     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
- *     const key = `rl:${ip}:login`
- *     const current = await kv.get<number>(key) ?? 0
- *     if (current >= 5) return NextResponse.json({ error: "...", status: 429 })
- *     await kv.incr(key)
- *     await kv.expire(key, 900)
- *     return null
- *   }
+ *   checkRateLimit: const f = await kv.get(key); return f >= 5 ? 429 : null
+ *   recordRateLimitFailure: incr + expire(key, 900)
+ *   resetRateLimit: del(key)
  */

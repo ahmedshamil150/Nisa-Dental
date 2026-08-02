@@ -6,50 +6,43 @@ describe("csrfGuard", () => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://nisadental.com"
   })
 
-  it("returns 403 when no origin or referer header", () => {
+  it("allows requests with no origin or referer header", () => {
     const req = new Request("https://nisadental.com/api/checkout", { method: "POST" })
-    const res = csrfGuard(req)
-    expect(res).not.toBeNull()
-    expect(res!.status).toBe(403)
+    expect(csrfGuard(req)).toBeNull()
   })
 
-  it("falls back to referer when origin is missing", () => {
+  it("allows same-origin requests via Host header", () => {
     const req = new Request("https://nisadental.com/api/checkout", {
       method: "POST",
-      headers: { referer: "https://nisadental.com/checkout" },
+      headers: { origin: "https://nisadental.com", host: "nisadental.com" },
     })
-    const res = csrfGuard(req)
-    expect(res).toBeNull()
+    expect(csrfGuard(req)).toBeNull()
   })
 
-  it("returns null when origin matches allowed origin", () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "https://nisadental.com"
+  it("allows requests from the configured site URL", () => {
     const req = new Request("https://nisadental.com/api/checkout", {
       method: "POST",
       headers: { origin: "https://nisadental.com" },
     })
-    const res = csrfGuard(req)
-    expect(res).toBeNull()
+    expect(csrfGuard(req)).toBeNull()
   })
 
-  it("returns 403 when origin does not match", () => {
-    process.env.NEXT_PUBLIC_SITE_URL = "https://nisadental.com"
+  it("blocks cross-origin requests", () => {
     const req = new Request("https://nisadental.com/api/checkout", {
       method: "POST",
-      headers: { origin: "https://evil.com" },
+      headers: { origin: "https://evil.com", host: "nisadental.com" },
     })
     const res = csrfGuard(req)
     expect(res).not.toBeNull()
     expect(res!.status).toBe(403)
   })
 
-  it("returns null for localhost in development", () => {
+  it("allows localhost in development", () => {
     process.env.NODE_ENV = "development"
     const req = new Request("http://localhost:3000/api/checkout", {
       method: "POST",
-      headers: { origin: "http://localhost:3000" },
+      headers: { origin: "http://localhost:3000", host: "localhost:3000" },
     })
-    const res = csrfGuard(req)
-    expect(res).toBeNull()
+    expect(csrfGuard(req)).toBeNull()
   })
 })

@@ -4,7 +4,11 @@ import { createClient } from "@supabase/supabase-js"
 import { scryptSync } from "crypto"
 import { signSession } from "@/lib/session"
 import { csrfGuard } from "@/lib/csrf"
-import { checkRateLimit } from "@/lib/rate-limit"
+import {
+  checkRateLimit,
+  recordRateLimitFailure,
+  resetRateLimit,
+} from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
   try {
@@ -28,12 +32,14 @@ export async function POST(request: Request) {
       .single()
 
     if (error || !user) {
+      recordRateLimitFailure(request)
       console.error("Login user lookup error:", error?.message || "user not found")
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
     const [salt, storedHash] = user.password_hash.split(":")
     if (!salt || !storedHash) {
+      recordRateLimitFailure(request)
       console.error("Invalid password_hash format for user:", username)
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
@@ -42,8 +48,11 @@ export async function POST(request: Request) {
     const valid = hash === storedHash
 
     if (!valid) {
+      recordRateLimitFailure(request)
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
+
+    resetRateLimit(request)
 
     const cookieStore = await cookies()
     cookieStore.set("admin_session", await signSession(), {
