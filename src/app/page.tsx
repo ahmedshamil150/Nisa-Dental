@@ -84,47 +84,63 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter max-w-container-max mx-auto">
           {services.length > 0 && (
             <>
-              <AnimateOnScroll delay={0} className="md:col-span-8">
-              <div className="bg-surface-container-low p-8 md:p-10 rounded-xl border border-outline-variant/30 flex flex-col md:flex-row gap-8 items-center overflow-hidden group transition-all duration-500 hover:shadow-sm">
-                <div className="flex-1">
-                  <span className="material-symbols-outlined text-primary text-4xl mb-4">clinical_notes</span>
-                  <h3 className="font-headline-md text-headline-md mb-3 text-on-surface">{services[0]?.name}</h3>
-                  <p className="text-on-surface-variant mb-6">{services[0]?.short_description}</p>
-                  <ul className="space-y-2 mb-8">
-                    <li className="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
-                      <span className="material-symbols-outlined text-primary text-[18px]">check_circle</span> Routine Check-ups
-                    </li>
-                    <li className="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
-                      <span className="material-symbols-outlined text-primary text-[18px]">check_circle</span> Professional Cleaning
-                    </li>
-                  </ul>
-                  <Link href="/about#services" className="text-primary font-bold flex items-center gap-2 group-hover:gap-4 transition-all">
-                    Learn More <span className="material-symbols-outlined">arrow_forward</span>
+              {/* Featured service */}
+              <AnimateOnScroll delay={0} className="md:col-span-12 lg:col-span-7">
+              <div className="group flex flex-col md:flex-row overflow-hidden rounded-2xl border border-outline-variant/30 bg-white transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+                <div className="flex flex-1 flex-col justify-between p-7 md:p-9">
+                  <div>
+                    <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                      <span className="material-symbols-outlined text-primary text-2xl">{services[0]?.icon || "clinical_notes"}</span>
+                    </div>
+                    <h3 className="font-headline-md text-headline-md mb-3 text-on-surface">{services[0]?.name}</h3>
+                    <p className="text-on-surface-variant">{services[0]?.short_description}</p>
+                    <ul className="mt-6 space-y-2.5">
+                      <li className="flex items-center gap-2.5 font-label-md text-label-md text-on-surface-variant">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-fixed/60">
+                          <span className="material-symbols-outlined text-primary text-[14px]">check</span>
+                        </span>
+                        Routine Check-ups
+                      </li>
+                      <li className="flex items-center gap-2.5 font-label-md text-label-md text-on-surface-variant">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-fixed/60">
+                          <span className="material-symbols-outlined text-primary text-[14px]">check</span>
+                        </span>
+                        Professional Cleaning
+                      </li>
+                    </ul>
+                  </div>
+                  <Link href="/about#services" className="mt-8 inline-flex items-center gap-2 font-label-md text-label-md font-bold text-primary transition-all group-hover:gap-3.5">
+                    Learn More <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </Link>
                 </div>
-                <div className="w-full md:w-1/2 aspect-square rounded-lg overflow-hidden border border-outline-variant/20 bg-cover bg-center" style={{
-                  backgroundImage: services[0]?.image_url ? `url('${services[0].image_url}')` : "url('https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80')"
-                }} />
+                <div className="relative min-h-[220px] md:min-h-full md:w-[42%] overflow-hidden">
+                  <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style={{
+                    backgroundImage: services[0]?.image_url ? `url('${services[0].image_url}')` : "url('https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=600&q=80')"
+                  }} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent md:bg-gradient-to-r md:from-transparent md:to-black/5" />
+                </div>
               </div>
               </AnimateOnScroll>
 
-              <AnimateOnScroll delay={0.1} className="md:col-span-4">
-              <div className="bg-primary text-on-primary p-8 rounded-xl border border-primary-container flex flex-col justify-between transition-all duration-500 hover:shadow-xl relative overflow-hidden">
-                <div className="absolute inset-0 bg-cover bg-center opacity-20 pointer-events-none" style={{
-                  backgroundImage: services[1]?.image_url ? `url('${services[1].image_url}')` : "url('https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=600&q=80')"
-                }} />
+              {/* Highlight card */}
+              <AnimateOnScroll delay={0.1} className="md:col-span-12 lg:col-span-5">
+              <div className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl bg-primary p-7 md:p-9 text-on-primary transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
+                <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5" />
+                <div className="absolute -bottom-16 -left-10 h-48 w-48 rounded-full bg-black/10" />
                 <div className="relative z-10">
-                  <span className="material-symbols-outlined text-on-primary text-4xl mb-4">{services[1]?.icon || "dentistry"}</span>
-                  <h3 className="font-headline-md text-headline-md mb-3">{services[1]?.name || "Orthodontics"}</h3>
-                  <p className="text-on-primary/80">{services[1]?.short_description || "Align your smile with modern solutions from invisible aligners to precision braces."}</p>
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
+                    <span className="material-symbols-outlined text-2xl">{services[1]?.icon || "auto_awesome"}</span>
+                  </div>
+                  <h3 className="font-headline-md text-headline-md mb-3">{services[1]?.name || "Cosmetic Dentistry"}</h3>
+                  <p className="text-on-primary/85">{services[1]?.short_description || "Smile makeovers and whitening designed around you."}</p>
                 </div>
-                <div className="mt-8">
-                  <div className="bg-primary-container/20 p-4 rounded-lg border border-primary-fixed/20 mb-6">
+                <div className="relative z-10 mt-8 space-y-5">
+                  <div className="rounded-xl border border-white/15 bg-white/10 p-4">
                     <p className="font-label-md text-label-md italic">&ldquo;Life changing results.&rdquo;</p>
                   </div>
                   <Link
                     href="/appointment"
-                    className="block w-full bg-surface text-primary py-3 rounded-lg font-label-md text-label-md hover:bg-surface-dim transition-colors text-center"
+                    className="block w-full rounded-xl bg-surface py-3.5 text-center font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-dim"
                   >
                     Book Consultant
                   </Link>
@@ -132,35 +148,44 @@ export default async function HomePage() {
               </div>
               </AnimateOnScroll>
 
+              {/* Image card */}
               <AnimateOnScroll delay={0.2} className="md:col-span-6">
-              <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 transition-all">
-                <div className="mb-6 rounded-lg overflow-hidden h-48 bg-cover bg-center border border-outline-variant/10" style={{
-                  backgroundImage: services[2]?.image_url ? `url('${services[2].image_url}')` : "url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80')"
-                }} />
-                <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">{services[2]?.name || "Teeth Whitening"}</h3>
-                <p className="text-on-surface-variant mb-6">{services[2]?.short_description || "Professional grade brightening treatments that deliver immediate, safe, and stunning results."}</p>
-                <div className="flex gap-2">
-                  <span className="bg-secondary-container px-3 py-1 rounded-full text-[12px] font-bold text-on-secondary-container uppercase tracking-wider">Most Popular</span>
+              <div className="group h-full overflow-hidden rounded-2xl border border-outline-variant/30 bg-white transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+                <div className="relative h-52 overflow-hidden">
+                  <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style={{
+                    backgroundImage: services[2]?.image_url ? `url('${services[2].image_url}')` : "url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80')"
+                  }} />
+                  <span className="absolute left-4 top-4 rounded-full bg-secondary-container px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-on-secondary-container">Most Popular</span>
+                </div>
+                <div className="p-7">
+                  <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">{services[2]?.name || "Teeth Whitening"}</h3>
+                  <p className="text-on-surface-variant">{services[2]?.short_description || "Professional grade brightening treatments that deliver immediate, safe, and stunning results."}</p>
+                  <Link href="/about#services" className="mt-5 inline-flex items-center gap-2 font-label-md text-label-md font-bold text-primary transition-all group-hover:gap-3.5">
+                    Learn More <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  </Link>
                 </div>
               </div>
               </AnimateOnScroll>
 
+              {/* Tertiary card */}
               <AnimateOnScroll delay={0.3} className="md:col-span-6">
-              <div className="bg-tertiary-container text-on-tertiary-container p-8 rounded-xl border border-tertiary flex items-center justify-between overflow-hidden relative">
-                <div className="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none" style={{
-                  backgroundImage: services[3]?.image_url ? `url('${services[3].image_url}')` : "url('https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&q=80')"
-                }} />
-                <div className="z-10 relative">
-                  <h3 className="font-headline-md text-headline-md mb-2">{services[3]?.name || "Pediatric Care"}</h3>
-                  <p className="opacity-80 max-w-xs mb-4">{services[3]?.short_description || "Gentle, fun, and educational dental visits designed specifically for our youngest patients."}</p>
+              <div className="group relative h-full overflow-hidden rounded-2xl bg-tertiary-container p-7 text-on-tertiary-container transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-tertiary/20">
+                <div className="relative z-10 flex h-full flex-col justify-between">
+                  <div>
+                    <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-white/15">
+                      <span className="material-symbols-outlined text-2xl">{services[3]?.icon || "child_care"}</span>
+                    </div>
+                    <h3 className="font-headline-md text-headline-md mb-2">{services[3]?.name || "Pediatric Care"}</h3>
+                    <p className="max-w-xs opacity-85">{services[3]?.short_description || "Gentle, fun, and educational dental visits designed specifically for our youngest patients."}</p>
+                  </div>
                   <Link
                     href="/about#services"
-                    className="inline-block bg-tertiary text-on-tertiary px-6 py-2 rounded-lg font-label-md text-label-md hover:bg-tertiary/90 transition-all"
+                    className="mt-8 inline-flex items-center gap-2 self-start rounded-xl bg-white px-6 py-3 font-label-md text-label-md font-bold text-on-tertiary-container transition-all hover:gap-3.5 hover:bg-surface-dim"
                   >
-                    Explore
+                    Explore <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </Link>
                 </div>
-                <span className="material-symbols-outlined text-[120px] absolute -right-4 -bottom-4 opacity-10 rotate-12">child_care</span>
+                <span className="material-symbols-outlined absolute -bottom-6 -right-4 text-[140px] opacity-10 rotate-12">{services[3]?.icon || "child_care"}</span>
               </div>
               </AnimateOnScroll>
             </>
