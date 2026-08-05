@@ -49,7 +49,7 @@ export default function AdminOrdersPage() {
     setLoading(false)
   }
 
-  const showOrderNumber = (o: any) => o.order_number || "NISA-" + o.id.toString().replace(/-/g, "").slice(0, 8).toUpperCase()
+  const showOrderNumber = (o: any) => o.order_number || "NISA-" + String(o.id || "").replace(/-/g, "").slice(0, 8).toUpperCase()
 
   const filtered = useMemo(() => {
     let list = [...orders]
@@ -59,8 +59,8 @@ export default function AdminOrdersPage() {
     if (search) {
       const q = search.toLowerCase()
       list = list.filter((o) =>
-        o.customer_name.toLowerCase().includes(q) ||
-        o.customer_email.toLowerCase().includes(q) ||
+        (o.customer_name || "").toLowerCase().includes(q) ||
+        (o.customer_email || "").toLowerCase().includes(q) ||
         showOrderNumber(o).toLowerCase().includes(q)
       )
     }

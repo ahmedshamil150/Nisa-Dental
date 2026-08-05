@@ -1,28 +1,29 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { getServiceSupabase } from "@/lib/supabase"
 import { requireAdmin } from "@/lib/admin-auth"
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin(request)
   if (auth) return auth
-  const { id } = await params
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  try {
+    const { id } = await params
+    const supabase = getServiceSupabase()
+    if (!supabase) {
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+    }
 
-  let invoice: any
+    let invoice: any
 
-  // Try as invoice ID first, then as order ID
-  const { data: byInv } = await supabase.from("invoices").select("*, order:orders(*, order_items(*))").eq("id", id).maybeSingle()
-  if (byInv) {
-    invoice = byInv
-  } else {
-    const { data: byOrd } = await supabase.from("invoices").select("*, order:orders(*, order_items(*))").eq("order_id", id).maybeSingle()
-    if (byOrd) invoice = byOrd
-  }
+    // Try as invoice ID first, then as order ID
+    const { data: byInv } = await supabase.from("invoices").select("*, order:orders(*, order_items(*))").eq("id", id).maybeSingle()
+    if (byInv) {
+      invoice = byInv
+    } else {
+      const { data: byOrd } = await supabase.from("invoices").select("*, order:orders(*, order_items(*))").eq("order_id", id).maybeSingle()
+      if (byOrd) invoice = byOrd
+    }
 
-  if (!invoice) return NextResponse.json({ error: "Invoice not found" }, { status: 404 })
+    if (!invoice) return NextResponse.json({ error: "Invoice not found" }, { status: 404 })
 
   const inv = invoice as any
   const order = inv.order || {}
@@ -114,4 +115,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       "Content-Disposition": `inline; filename="invoice-${inv.invoice_number}.html"`,
     },
   })
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
 }

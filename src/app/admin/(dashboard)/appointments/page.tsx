@@ -82,7 +82,7 @@ export default function AdminAppointmentsPage() {
                 <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td className="px-6 py-4 font-medium text-on-surface">{a.patient_name}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{a.service?.name || "General"}</td>
-                <td className="px-6 py-4">{new Date(a.appointment_date).toLocaleDateString()}</td>
+                <td className="px-6 py-4">{(a.appointment_date && !isNaN(new Date(a.appointment_date).getTime())) ? new Date(a.appointment_date).toLocaleDateString() : "-"}</td>
                 <td className="px-6 py-4">{a.appointment_time?.slice(0, 5)}</td>
                 <td className="px-6 py-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${

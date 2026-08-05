@@ -36,7 +36,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const discount = product.discount_percent || 0
   const salePrice = discount > 0 ? Math.round(product.price * (100 - discount) / 100) : null
 
-  const images = [product.image_url, ...(product.image_urls || [])].filter(Boolean) as string[]
+  const extraImages = Array.isArray(product.image_urls) ? product.image_urls : []
+  const images = [product.image_url, ...extraImages].filter(Boolean) as string[]
 
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-12">

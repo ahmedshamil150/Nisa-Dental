@@ -32,12 +32,12 @@ export default function AdminRevenuePage() {
     const now = new Date()
     const thisMonth = revenue.filter((r) => {
       const d = new Date(r.recorded_at)
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+      return !isNaN(d.getTime()) && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
     })
     const monthTotal = thisMonth.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
     const today = revenue.filter((r) => {
       const d = new Date(r.recorded_at)
-      return d.toDateString() === now.toDateString()
+      return !isNaN(d.getTime()) && d.toDateString() === now.toDateString()
     })
     const todayTotal = today.reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
     return { total, monthTotal, todayTotal, count: revenue.length }
@@ -47,6 +47,7 @@ export default function AdminRevenuePage() {
     const grouped: Record<string, number> = {}
     revenue.forEach((r) => {
       const d = new Date(r.recorded_at)
+      if (isNaN(d.getTime())) return
       let key: string
       if (period === "daily") {
         key = d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
@@ -114,7 +115,7 @@ export default function AdminRevenuePage() {
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e1e3e3" />
               <XAxis dataKey="date" tick={{ fontSize: 12, fill: "#717977" }} />
-              <YAxis tick={{ fontSize: 12, fill: "#717977" }} tickFormatter={(v: any) => `PKR ${(v as number / 1000).toFixed(0)}k`} />
+              <YAxis tick={{ fontSize: 12, fill: "#717977" }} tickFormatter={(v: any) => `PKR ${(Number(v) / 1000).toFixed(0)}k`} />
               <Tooltip formatter={(value: any) => [`PKR ${(value as number).toLocaleString()}`, "Revenue"]} />
               <Bar dataKey="amount" fill="#3f625f" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -131,7 +132,7 @@ export default function AdminRevenuePage() {
             <div className="space-y-3">
               {sourceBreakdown.map((s) => (
                 <div key={s.source} className="flex items-center justify-between">
-                  <span className="text-sm text-on-surface-variant capitalize">{s.source.replace(/_/g, " ")}</span>
+                  <span className="text-sm text-on-surface-variant capitalize">{(s.source || "other").replace(/_/g, " ")}</span>
                   <span className="font-medium text-on-surface">PKR {s.amount.toLocaleString()}</span>
                 </div>
               ))}
@@ -180,11 +181,11 @@ export default function AdminRevenuePage() {
             ) : paged.map((r: any, i: number) => (
               <tr key={r.id} className="hover:bg-surface-container-low">
                 <td className="px-4 py-4 text-on-surface-variant text-sm">{(page - 1) * PAGE_SIZE + i + 1}</td>
-                <td className="px-6 py-4 text-on-surface-variant">{new Date(r.recorded_at).toLocaleDateString()}</td>
-                <td className="px-6 py-4 capitalize text-on-surface">{r.source.replace(/_/g, " ")}</td>
+                <td className="px-6 py-4 text-on-surface-variant">{(r.recorded_at && !isNaN(new Date(r.recorded_at).getTime())) ? new Date(r.recorded_at).toLocaleDateString() : "-"}</td>
+                <td className="px-6 py-4 capitalize text-on-surface">{(r.source || "other").replace(/_/g, " ")}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{r.description || "-"}</td>
                 <td className="px-6 py-4 text-on-surface-variant">{r.invoice_id?.slice(0, 8) || "-"}</td>
-                <td className="px-6 py-4 font-bold text-on-surface">PKR {parseFloat(r.amount).toLocaleString()}</td>
+                <td className="px-6 py-4 font-bold text-on-surface">PKR {(parseFloat(r.amount) || 0).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>

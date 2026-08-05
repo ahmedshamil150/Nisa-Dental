@@ -35,7 +35,7 @@ export default async function AdminOrderDetailPage({
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">
-          Order #{order.id.slice(0, 8)}
+          Order #{String(order.id).slice(0, 8)}
         </h1>
         <Badge variant="success" className="text-sm">{order.order_status}</Badge>
       </div>

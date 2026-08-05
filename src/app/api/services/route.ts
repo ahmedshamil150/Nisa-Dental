@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { getServiceSupabase } from "@/lib/supabase"
 
 export async function GET() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-  const { data } = await supabase.from("services").select("*").eq("is_active", true).order("sort_order")
-  return NextResponse.json(data || [])
+  try {
+    const supabase = getServiceSupabase()
+    if (!supabase) {
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+    }
+    const { data, error } = await supabase.from("services").select("*").eq("is_active", true).order("sort_order")
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    return NextResponse.json(data || [])
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
 }

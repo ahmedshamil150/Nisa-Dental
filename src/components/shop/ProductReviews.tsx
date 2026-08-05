@@ -11,7 +11,7 @@ export function ProductReviews({ productId }: { productId: string }) {
   useEffect(() => {
     fetch(`/api/product-reviews?product_id=${productId}`)
       .then((r) => r.json())
-      .then((data) => { setReviews(data || []); setLoading(false) })
+      .then((data) => { setReviews(Array.isArray(data) ? data : []); setLoading(false) })
       .catch(() => setLoading(false))
   }, [productId])
 
@@ -39,20 +39,23 @@ export function ProductReviews({ productId }: { productId: string }) {
         <p className="text-on-surface-variant mb-8">No reviews yet. Be the first to review this product.</p>
       ) : (
         <div className="space-y-6 mb-10">
-          {reviews.map((r: any) => (
+          {reviews.map((r: any) => {
+            const filled = Math.min(Math.max(Math.round(Number(r?.rating) || 0), 0), 5)
+            return (
             <div key={r.id} className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30">
               <div className="flex items-center gap-2 mb-2">
-                {Array.from({ length: r.rating }).map((_, i) => (
+                {Array.from({ length: filled }).map((_, i) => (
                   <span key={i} className="material-symbols-outlined text-[18px] text-primary">star</span>
                 ))}
-                {Array.from({ length: 5 - r.rating }).map((_, i) => (
+                {Array.from({ length: 5 - filled }).map((_, i) => (
                   <span key={i} className="material-symbols-outlined text-[18px] text-outline-variant">star</span>
                 ))}
               </div>
               <p className="font-body-md text-body-md text-on-surface mb-1">{r.review_text}</p>
-              <p className="text-caption text-on-surface-variant">— {r.customer_name}</p>
+              <p className="text-caption text-on-surface-variant">— {r.customer_name || "Anonymous"}</p>
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

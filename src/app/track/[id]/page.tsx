@@ -29,25 +29,39 @@ export default function TrackOrderPage() {
 
   const handleCancel = async () => {
     if (!confirm("Are you sure you want to cancel this order?")) return
-    const res = await fetch("/api/orders", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: params.id, order_status: "cancelled" }),
-    })
-    if (res.ok) {
-      setOrder((prev: any) => ({ ...prev, status: "cancelled" }))
+    try {
+      const res = await fetch("/api/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: params.id, order_status: "cancelled" }),
+      })
+      if (res.ok) {
+        setOrder((prev: any) => ({ ...prev, status: "cancelled" }))
+      } else {
+        const data = await res.json().catch(() => null)
+        alert(data?.error || "Unable to cancel order. Please contact support.")
+      }
+    } catch {
+      alert("Something went wrong. Please try again.")
     }
   }
 
   const handleReturn = async () => {
     if (!confirm("Request a return for this order?")) return
-    const res = await fetch("/api/orders", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: params.id, order_status: "requested_return" }),
-    })
-    if (res.ok) {
-      setOrder((prev: any) => ({ ...prev, status: "requested_return" }))
+    try {
+      const res = await fetch("/api/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: params.id, order_status: "requested_return" }),
+      })
+      if (res.ok) {
+        setOrder((prev: any) => ({ ...prev, status: "requested_return" }))
+      } else {
+        const data = await res.json().catch(() => null)
+        alert(data?.error || "Unable to request return. Please contact support.")
+      }
+    } catch {
+      alert("Something went wrong. Please try again.")
     }
   }
 

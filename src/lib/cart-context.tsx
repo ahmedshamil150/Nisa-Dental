@@ -32,7 +32,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("nisa-cart")
-      if (saved) setItems(JSON.parse(saved))
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) {
+          const valid = parsed.filter(
+            (i): i is CartItem =>
+              i && typeof i === "object" && typeof i.id === "string" && typeof i.name === "string" && typeof i.price === "number" && typeof i.quantity === "number"
+          )
+          if (valid.length > 0) {
+            const timer = setTimeout(() => setItems(valid), 0)
+            return () => clearTimeout(timer)
+          }
+        }
+      }
     } catch {}
   }, [])
 

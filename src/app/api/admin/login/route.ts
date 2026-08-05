@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
-import { createClient } from "@supabase/supabase-js"
+import { getServiceSupabase } from "@/lib/supabase"
 import { scryptSync } from "crypto"
 import { signSession } from "@/lib/session"
 import { csrfGuard } from "@/lib/csrf"
@@ -18,12 +18,26 @@ export async function POST(request: Request) {
     const csrf = csrfGuard(request)
     if (csrf) return csrf
 
-    const { username, password } = await request.json()
+    let username: string
+    let password: string
+    try {
+      const body = await request.json()
+      username = typeof body?.username === "string" ? body.username.trim() : ""
+      password = typeof body?.password === "string" ? body.password : ""
+    } catch {
+      return NextResponse.json({ error: "Invalid request" }, { status: 400 })
+    }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    if (!username || !password) {
+      recordRateLimitFailure(request)
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
+    }
+
+    const supabase = getServiceSupabase()
+    if (!supabase) {
+      console.error("Login: Supabase server configuration missing")
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+    }
 
     const { data: user, error } = await supabase
       .from("admin_users")

@@ -1,9 +1,13 @@
-import { describe, it, expect, beforeEach } from "vitest"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { csrfGuard } from "./csrf"
 
 describe("csrfGuard", () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_SITE_URL = "https://nisadental.com"
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
   it("allows requests with no origin or referer header", () => {
@@ -38,7 +42,7 @@ describe("csrfGuard", () => {
   })
 
   it("allows localhost in development", () => {
-    process.env.NODE_ENV = "development"
+    vi.stubEnv("NODE_ENV", "development")
     const req = new Request("http://localhost:3000/api/checkout", {
       method: "POST",
       headers: { origin: "http://localhost:3000", host: "localhost:3000" },

@@ -1,16 +1,18 @@
-import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent } from "@/components/ui/Card"
 import { RevenueChart } from "@/components/admin/RevenueChart"
 import Link from "next/link"
+import { getServiceSupabase } from "@/lib/supabase"
 
 export const dynamic = "force-dynamic"
 
-const sb = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSb() {
+  const sb = getServiceSupabase()
+  if (!sb) throw new Error("Supabase server configuration missing")
+  return sb
+}
 
 async function getStats() {
+  const sb = getSb()
 
   const [
     { count: servicesCount },
@@ -46,6 +48,7 @@ async function getStats() {
 }
 
 async function getRevenueChart() {
+  const sb = getSb()
   const { data: raw } = await sb.from("invoices").select("total, created_at")
   const data = raw as any[] | null
   if (!data) return []
@@ -68,6 +71,7 @@ async function getRevenueChart() {
 }
 
 async function getPendingOrders() {
+  const sb = getSb()
   const { data } = await sb.from("orders")
     .select("id, order_number, customer_name, total, created_at, order_status")
     .eq("order_status", "pending")
@@ -77,6 +81,7 @@ async function getPendingOrders() {
 }
 
 async function getPendingAppointments() {
+  const sb = getSb()
   const { data } = await sb.from("appointments")
     .select("id, patient_name, phone, service_name, appointment_date, appointment_time, status")
     .eq("status", "pending")

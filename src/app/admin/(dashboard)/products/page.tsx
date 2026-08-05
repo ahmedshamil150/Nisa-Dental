@@ -81,7 +81,7 @@ export default function AdminProductsPage() {
     let list = [...products]
     if (search) {
       const q = search.toLowerCase()
-      list = list.filter((p) => p.name.toLowerCase().includes(q))
+      list = list.filter((p) => (p.name || "").toLowerCase().includes(q))
     }
     if (filterCat) {
       list = list.filter((p) => p.category_id === filterCat)

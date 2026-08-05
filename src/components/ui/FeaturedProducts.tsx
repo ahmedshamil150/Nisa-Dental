@@ -6,19 +6,22 @@ import Link from "next/link"
 import { AddToCartButton } from "@/components/shop/AddToCartButton"
 
 function calcPrice(product: any) {
-  if (product.discount_percent > 0) {
-    const sale = product.price * (100 - product.discount_percent) / 100
-    return { original: product.price, sale: Math.round(sale), percent: product.discount_percent }
+  const price = Number(product?.price) || 0
+  const percent = Number(product?.discount_percent) || 0
+  if (percent > 0) {
+    const sale = price * (100 - percent) / 100
+    return { original: price, sale: Math.round(sale), percent }
   }
-  return { original: product.price, sale: null, percent: 0 }
+  return { original: price, sale: null, percent: 0 }
 }
 
 export function FeaturedProducts({ products }: { products: any[] }) {
+  const items = (Array.isArray(products) ? products : []).filter((p) => p && typeof p === "object")
   const scrollRef = useRef<HTMLDivElement>(null)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(false)
 
-  if (products.length === 0) return null
+  if (items.length === 0) return null
 
   function checkScroll() {
     const el = scrollRef.current
@@ -56,7 +59,7 @@ export function FeaturedProducts({ products }: { products: any[] }) {
           <div ref={scrollRef} onScroll={checkScroll}
             className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-2"
             style={{ scrollbarWidth: "none" }}>
-            {products.map((product: any) => {
+            {items.map((product: any) => {
               const price = calcPrice(product)
               return (
                 <div key={product.id}

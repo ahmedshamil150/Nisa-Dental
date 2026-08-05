@@ -88,7 +88,7 @@ export default function AdminMessagesPage() {
                     {m.is_read ? "Read" : "New"}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-on-surface-variant">{new Date(m.created_at).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-on-surface-variant">{(m.created_at && !isNaN(new Date(m.created_at).getTime())) ? new Date(m.created_at).toLocaleDateString() : "-"}</td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
                     {!m.is_read && (

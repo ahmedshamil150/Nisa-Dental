@@ -3,8 +3,10 @@ const encoder = new TextEncoder()
 
 function getSecret(): string {
   const secret = process.env.SESSION_SECRET
-  if (!secret) throw new Error("SESSION_SECRET is not configured")
-  return secret
+  if (secret) return secret
+  const derived = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+  if (!derived) throw new Error("No session secret or Supabase key configured")
+  return `derived:${derived}`
 }
 
 function hex(buf: ArrayBuffer): string {

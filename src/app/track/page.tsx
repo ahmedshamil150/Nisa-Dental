@@ -27,14 +27,19 @@ export default function TrackOrderLookupPage() {
     }
 
     setLoading(true)
-    const res = await fetch(`/api/orders?id=${encodeURIComponent(val)}`)
-    if (!res.ok) {
-      setError("Order not found. Please check your order number.")
+    try {
+      const res = await fetch(`/api/orders?id=${encodeURIComponent(val)}`)
+      if (!res.ok) {
+        setError("Order not found. Please check your order number.")
+        setLoading(false)
+        return
+      }
+      const data = await res.json()
+      router.push(`/track/${data.order_number}`)
+    } catch {
+      setError("Something went wrong. Please try again.")
       setLoading(false)
-      return
     }
-    const data = await res.json()
-    router.push(`/track/${data.order_number}`)
   }
 
   return (

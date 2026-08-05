@@ -16,10 +16,11 @@ export default function AdminSettingsPage() {
     fetch("/api/settings")
       .then((r) => r.json())
       .then((data) => {
-        setSettings(data)
-        const dr = data.find((s: any) => s.key === "delivery_rate_per_kg")
+        const list = Array.isArray(data) ? data : []
+        setSettings(list)
+        const dr = list.find((s: any) => s.key === "delivery_rate_per_kg")
         if (dr) setDeliveryRate(dr.value)
-        const tr = data.find((s: any) => s.key === "tax_rate")
+        const tr = list.find((s: any) => s.key === "tax_rate")
         if (tr) setTaxRate(tr.value)
       })
       .catch(console.error)
@@ -27,29 +28,37 @@ export default function AdminSettingsPage() {
 
   const save = async (key: string, value: string) => {
     setSaving(true)
-    await fetch("/api/settings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key, value }),
-    })
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value }),
+      })
+    } catch {
+      setMsg("Failed to save")
+    }
     setSaving(false)
     setMsg("Saved!")
     setTimeout(() => setMsg(""), 2000)
   }
 
   async function saveInline(key: string, value: string) {
-    await fetch("/api/settings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key, value }),
-    })
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, value }),
+      })
+    } catch {}
     setSettings((prev) => prev.map((s) => (s.key === key ? { ...s, value } : s)))
     setEditingKey(null)
   }
 
   async function deleteKey(key: string) {
-    const res = await fetch(`/api/settings?key=${encodeURIComponent(key)}`, { method: "DELETE" })
-    if (res.ok) setSettings((prev) => prev.filter((s) => s.key !== key))
+    try {
+      const res = await fetch(`/api/settings?key=${encodeURIComponent(key)}`, { method: "DELETE" })
+      if (res.ok) setSettings((prev) => prev.filter((s) => s.key !== key))
+    } catch {}
   }
 
   return (

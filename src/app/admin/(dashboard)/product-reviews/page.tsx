@@ -77,15 +77,15 @@ export default function AdminProductReviewsPage() {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex gap-0.5">
-                    {Array.from({ length: r.rating }).map((_, i) => (
+                    {Array.from({ length: Math.min(Math.max(Math.round(Number(r.rating) || 0), 0), 5) }).map((_, i) => (
                       <span key={i} className="material-symbols-outlined text-[16px] text-primary">star</span>
                     ))}
                   </div>
                 </td>
                 <td className="px-6 py-4 max-w-xs">
-                  <p className="line-clamp-2 text-on-surface">{r.review_text}</p>
+                  <p className="line-clamp-2 text-on-surface">{r.review_text || "-"}</p>
                 </td>
-                <td className="px-6 py-4 text-on-surface-variant whitespace-nowrap">{new Date(r.created_at).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-on-surface-variant whitespace-nowrap">{(r.created_at && !isNaN(new Date(r.created_at).getTime())) ? new Date(r.created_at).toLocaleDateString() : "-"}</td>
                 <td className="px-6 py-4">
                   <button onClick={() => toggleApproved(r)}
                     className={`px-3 py-1 rounded-full text-xs font-medium ${r.is_approved ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>

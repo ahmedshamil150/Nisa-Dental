@@ -1,6 +1,7 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 
-let supabaseInstance: ReturnType<typeof createClient> | null = null
+let supabaseInstance: SupabaseClient | null = null
+let serviceInstance: SupabaseClient | null = null
 
 export function getSupabase() {
   if (supabaseInstance) return supabaseInstance
@@ -12,4 +13,16 @@ export function getSupabase() {
 
   supabaseInstance = createClient(supabaseUrl, supabaseAnonKey)
   return supabaseInstance
+}
+
+export function getServiceSupabase() {
+  if (serviceInstance) return serviceInstance
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceKey) return null
+
+  serviceInstance = createClient(supabaseUrl, serviceKey)
+  return serviceInstance
 }

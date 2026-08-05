@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { getServiceSupabase } from "@/lib/supabase"
 import { requireAdmin } from "@/lib/admin-auth"
 import { csrfGuard } from "@/lib/csrf"
 
@@ -47,10 +47,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "File content does not match its type" }, { status: 400 })
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const supabase = getServiceSupabase()
+    if (!supabase) {
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+    }
 
     const ext = file.name.split(".").pop()
     const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
