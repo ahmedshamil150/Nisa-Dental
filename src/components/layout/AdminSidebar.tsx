@@ -62,15 +62,15 @@ export function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [section, setSection] = useState<SectionKey>(() => sectionForPath(pathname))
+  const [lastPath, setLastPath] = useState(pathname)
 
-  // Keep the active page visible: if the current page isn't in the selected
-  // section, switch to the section that contains it. Dashboard is always shown.
-  if (pathname !== "/admin") {
+  // Keep the active page visible: when the user navigates to a page that isn't
+  // in the currently selected section, switch to the section that contains it.
+  // Only reacts to navigation (pathname changes), so manual tab clicks are respected.
+  if (pathname !== "/admin" && lastPath !== pathname) {
+    setLastPath(pathname)
     const pathSection = sectionForPath(pathname)
-    const visible = linksFor(section).some(
-      (l) => pathname === l.href || (l.href !== "/admin" && pathname.startsWith(l.href))
-    )
-    if (!visible && pathSection !== section) {
+    if (pathSection !== section) {
       setSection(pathSection)
     }
   }
