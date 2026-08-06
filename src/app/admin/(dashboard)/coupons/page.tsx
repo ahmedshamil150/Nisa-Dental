@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [page, setPage] = useState(1)
@@ -24,6 +26,7 @@ export default function AdminCouponsPage() {
     if (!sb) return
     const { data } = await sb.from("coupons").select("*").order("created_at", { ascending: false })
     setCoupons((data || []) as any[])
+    setLoading(false)
   }
 
   function openNew() {
@@ -103,7 +106,9 @@ export default function AdminCouponsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {coupons.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={9} />
+            ) : coupons.length === 0 ? (
               <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">No coupons yet</td></tr>
             ) : paged.map((c: any, i: number) => (
               <tr key={c.id} className="hover:bg-surface-container-low">

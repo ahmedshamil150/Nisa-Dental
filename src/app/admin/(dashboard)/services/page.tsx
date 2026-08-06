@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminServicesPage() {
   const [services, setServices] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [page, setPage] = useState(1)
@@ -24,6 +26,7 @@ export default function AdminServicesPage() {
     if (!sb) return
     const { data } = await sb.from("services").select("*").order("sort_order")
     setServices((data || []) as any[])
+    setLoading(false)
   }
 
   function openNew() {
@@ -99,7 +102,9 @@ export default function AdminServicesPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {services.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={7} />
+            ) : services.length === 0 ? (
               <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No services yet</td></tr>
             ) : paged.map((s: any, i: number) => (
               <tr key={s.id} className="hover:bg-surface-container-low">

@@ -4,10 +4,12 @@ import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Pagination } from "@/components/ui/Pagination"
+import { Skeleton, SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminRevenuePage() {
   const [revenue, setRevenue] = useState<any[]>([])
   const [invoices, setInvoices] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState("daily")
   const [page, setPage] = useState(1)
   const PAGE_SIZE = 20
@@ -25,6 +27,7 @@ export default function AdminRevenuePage() {
     ])
     setRevenue((r.data || []) as any[])
     setInvoices((i.data || []) as any[])
+    setLoading(false)
   }
 
   const summary = useMemo(() => {
@@ -80,22 +83,33 @@ export default function AdminRevenuePage() {
       <h1 className="font-headline-lg text-headline-lg text-on-surface mb-6">Revenue</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
-          <p className="text-caption uppercase text-on-surface-variant mb-1">Total Revenue</p>
-          <p className="font-headline-lg text-headline-lg text-on-surface">PKR {summary.total.toLocaleString()}</p>
-        </div>
-        <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
-          <p className="text-caption uppercase text-on-surface-variant mb-1">This Month</p>
-          <p className="font-headline-lg text-headline-lg text-on-surface">PKR {summary.monthTotal.toLocaleString()}</p>
-        </div>
-        <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
-          <p className="text-caption uppercase text-on-surface-variant mb-1">Today</p>
-          <p className="font-headline-lg text-headline-lg text-on-surface">PKR {summary.todayTotal.toLocaleString()}</p>
-        </div>
-        <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
-          <p className="text-caption uppercase text-on-surface-variant mb-1">Total Transactions</p>
-          <p className="font-headline-lg text-headline-lg text-on-surface">{summary.count}</p>
-        </div>
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-surface rounded-xl border border-outline-variant/30 p-6">
+              <Skeleton className="h-3 w-24 mb-3" />
+              <Skeleton className="h-7 w-32" />
+            </div>
+          ))
+        ) : (
+          <>
+            <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
+              <p className="text-caption uppercase text-on-surface-variant mb-1">Total Revenue</p>
+              <p className="font-headline-lg text-headline-lg text-on-surface">PKR {summary.total.toLocaleString()}</p>
+            </div>
+            <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
+              <p className="text-caption uppercase text-on-surface-variant mb-1">This Month</p>
+              <p className="font-headline-lg text-headline-lg text-on-surface">PKR {summary.monthTotal.toLocaleString()}</p>
+            </div>
+            <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
+              <p className="text-caption uppercase text-on-surface-variant mb-1">Today</p>
+              <p className="font-headline-lg text-headline-lg text-on-surface">PKR {summary.todayTotal.toLocaleString()}</p>
+            </div>
+            <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
+              <p className="text-caption uppercase text-on-surface-variant mb-1">Total Transactions</p>
+              <p className="font-headline-lg text-headline-lg text-on-surface">{summary.count}</p>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="bg-surface rounded-xl border border-outline-variant/30 p-6 mb-8">
@@ -108,7 +122,9 @@ export default function AdminRevenuePage() {
             <option value="monthly">Monthly</option>
           </select>
         </div>
-        {chartData.length === 0 ? (
+        {loading ? (
+          <Skeleton className="h-[300px] w-full" />
+        ) : chartData.length === 0 ? (
           <p className="text-center text-on-surface-variant py-12">No revenue data yet</p>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
@@ -126,7 +142,16 @@ export default function AdminRevenuePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
           <h2 className="font-headline-md text-headline-md text-on-surface mb-4">By Source</h2>
-          {sourceBreakdown.length === 0 ? (
+          {loading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              ))}
+            </div>
+          ) : sourceBreakdown.length === 0 ? (
             <p className="text-on-surface-variant text-sm">No data</p>
           ) : (
             <div className="space-y-3">
@@ -142,7 +167,16 @@ export default function AdminRevenuePage() {
 
         <div className="bg-surface rounded-xl border border-outline-variant/30 p-6">
           <h2 className="font-headline-md text-headline-md text-on-surface mb-4">Unpaid Invoices</h2>
-          {invoices.filter((i) => i.status === "unpaid").length === 0 ? (
+          {loading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-4 w-16" />
+                </div>
+              ))}
+            </div>
+          ) : invoices.filter((i) => i.status === "unpaid").length === 0 ? (
             <p className="text-on-surface-variant text-sm">All invoices paid</p>
           ) : (
             <div className="space-y-3">
@@ -176,7 +210,9 @@ export default function AdminRevenuePage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {revenue.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={6} />
+            ) : revenue.length === 0 ? (
               <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No revenue entries yet</td></tr>
             ) : paged.map((r: any, i: number) => (
               <tr key={r.id} className="hover:bg-surface-container-low">

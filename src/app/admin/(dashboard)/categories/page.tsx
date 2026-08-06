@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ name: "", slug: "", sort_order: "0", is_active: true })
@@ -21,6 +23,7 @@ export default function AdminCategoriesPage() {
     if (!sb) return
     const { data } = await sb.from("product_categories").select("*").order("sort_order")
     setCategories((data || []) as any[])
+    setLoading(false)
   }
 
   function openNew() {
@@ -83,7 +86,9 @@ export default function AdminCategoriesPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {categories.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={6} />
+            ) : categories.length === 0 ? (
               <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No categories yet</td></tr>
             ) : paged.map((c: any, i: number) => (
               <tr key={c.id} className="hover:bg-surface-container-low">

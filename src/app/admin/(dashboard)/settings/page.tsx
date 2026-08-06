@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/Card"
+import { Skeleton } from "@/components/ui/Skeleton"
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [deliveryRate, setDeliveryRate] = useState("150")
   const [taxRate, setTaxRate] = useState("0")
   const [saving, setSaving] = useState(false)
@@ -22,6 +24,7 @@ export default function AdminSettingsPage() {
         if (dr) setDeliveryRate(dr.value)
         const tr = list.find((s: any) => s.key === "tax_rate")
         if (tr) setTaxRate(tr.value)
+        setLoading(false)
       })
       .catch(console.error)
   }, [])
@@ -113,7 +116,13 @@ export default function AdminSettingsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {settings.map((s: any) => (
+                {loading ? (
+                  <tr>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-40" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-24" /></td>
+                    <td className="px-6 py-4"><Skeleton className="h-4 w-12 ml-auto" /></td>
+                  </tr>
+                ) : settings.map((s: any) => (
                   <tr key={s.id} className="hover:bg-surface-container-low">
                     <td className="px-6 py-4 font-medium text-on-surface whitespace-nowrap">{s.key}</td>
                     <td className="px-6 py-4">

@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminMessagesPage() {
   const [messages, setMessages] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [filterRead, setFilterRead] = useState("")
   const [page, setPage] = useState(1)
   const PAGE_SIZE = 20
@@ -17,6 +19,7 @@ export default function AdminMessagesPage() {
     if (!sb) return
     const { data } = await sb.from("contacts").select("*").order("created_at", { ascending: false })
     setMessages((data || []) as any[])
+    setLoading(false)
   }
 
   const filtered = useMemo(() => {
@@ -72,7 +75,9 @@ export default function AdminMessagesPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={7} />
+            ) : filtered.length === 0 ? (
               <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No messages match filters</td></tr>
             ) : paged.map((m: any, i: number) => (
               <tr key={m.id} className="hover:bg-surface-container-low">

@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminTestimonialsPage() {
   const [testimonials, setTestimonials] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ patient_name: "", patient_title: "", patient_image: "", content: "", rating: "5", is_featured: false, is_approved: true })
@@ -21,6 +23,7 @@ export default function AdminTestimonialsPage() {
     if (!sb) return
     const { data } = await sb.from("testimonials").select("*").order("created_at", { ascending: false })
     setTestimonials((data || []) as any[])
+    setLoading(false)
   }
 
   function openNew() {
@@ -94,7 +97,9 @@ export default function AdminTestimonialsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {testimonials.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={7} />
+            ) : testimonials.length === 0 ? (
               <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No testimonials yet</td></tr>
             ) : paged.map((t: any, i: number) => (
               <tr key={t.id} className="hover:bg-surface-container-low">

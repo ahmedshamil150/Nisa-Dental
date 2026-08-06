@@ -3,11 +3,13 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 const STATUSES = ["", "pending", "confirmed", "completed", "cancelled"]
 
 export default function AdminAppointmentsPage() {
   const [appointments, setAppointments] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState("")
   const [page, setPage] = useState(1)
   const PAGE_SIZE = 20
@@ -19,6 +21,7 @@ export default function AdminAppointmentsPage() {
     if (!sb) return
     const { data } = await sb.from("appointments").select("*, service:services(*)").order("appointment_date", { ascending: false })
     setAppointments((data || []) as any[])
+    setLoading(false)
   }
 
   const filtered = useMemo(() => {
@@ -75,7 +78,9 @@ export default function AdminAppointmentsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={8} />
+            ) : filtered.length === 0 ? (
               <tr><td colSpan={8} className="px-6 py-12 text-center text-on-surface-variant">No appointments match filters</td></tr>
             ) : paged.map((a: any, i: number) => (
               <tr key={a.id} className="hover:bg-surface-container-low">

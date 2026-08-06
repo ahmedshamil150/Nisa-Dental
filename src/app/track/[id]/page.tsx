@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
+import { Skeleton } from "@/components/ui/Skeleton"
 
 const STATUS_STEPS = [
   { key: "pending", label: "Order Placed", icon: "receipt_long", desc: "Your order has been received" },
@@ -67,8 +68,18 @@ export default function TrackOrderPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap text-center">
-        <p className="font-body-lg text-on-surface-variant">Loading...</p>
+      <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+        <Skeleton className="h-9 w-64 max-w-full" />
+        <div className="grid gap-8 md:grid-cols-3 mt-10">
+          <Skeleton className="h-24 rounded-xl md:col-span-2" />
+          <Skeleton className="h-24 rounded-xl" />
+        </div>
+        <Skeleton className="h-8 w-40 mt-12" />
+        <div className="space-y-4 mt-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full rounded-xl" />
+          ))}
+        </div>
       </div>
     )
   }

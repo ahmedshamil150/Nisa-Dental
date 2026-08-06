@@ -4,9 +4,11 @@ import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminInvoicesPage() {
   const [invoices, setInvoices] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState("")
   const [page, setPage] = useState(1)
   const PAGE_SIZE = 20
@@ -18,6 +20,7 @@ export default function AdminInvoicesPage() {
     if (!sb) return
     const { data } = await sb.from("invoices").select("*, order:orders(*)").order("created_at", { ascending: false })
     setInvoices((data || []) as any[])
+    setLoading(false)
   }
 
   const filtered = useMemo(() => {
@@ -65,7 +68,9 @@ export default function AdminInvoicesPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={7} />
+            ) : filtered.length === 0 ? (
               <tr><td colSpan={7} className="px-6 py-12 text-center text-on-surface-variant">No invoices match filters</td></tr>
             ) : paged.map((inv: any, i: number) => (
               <tr key={inv.id} className="hover:bg-surface-container-low">

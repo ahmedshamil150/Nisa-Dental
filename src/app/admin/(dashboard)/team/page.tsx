@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminTeamPage() {
   const [members, setMembers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<any | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [page, setPage] = useState(1)
@@ -23,6 +25,7 @@ export default function AdminTeamPage() {
     if (!sb) return
     const { data } = await sb.from("team_members").select("*").order("sort_order")
     setMembers((data || []) as any[])
+    setLoading(false)
   }
 
   function openNew() {
@@ -93,7 +96,9 @@ export default function AdminTeamPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {members.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={6} />
+            ) : members.length === 0 ? (
               <tr><td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant">No team members yet</td></tr>
             ) : paged.map((m: any, i: number) => (
               <tr key={m.id} className="hover:bg-surface-container-low">

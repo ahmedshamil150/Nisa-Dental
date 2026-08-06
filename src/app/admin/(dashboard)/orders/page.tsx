@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -138,7 +139,7 @@ export default function AdminOrdersPage() {
           </thead>
           <tbody className="divide-y">
             {loading ? (
-              <tr><td colSpan={10} className="px-6 py-12 text-center text-on-surface-variant">Loading...</td></tr>
+              <SkeletonTable rows={6} columns={10} />
             ) : filtered.length === 0 ? (
               <tr><td colSpan={10} className="px-6 py-12 text-center text-on-surface-variant">No orders match filters</td></tr>
             ) : paged.map((o: any, i: number) => (

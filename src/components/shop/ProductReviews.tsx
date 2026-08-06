@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Skeleton } from "@/components/ui/Skeleton"
 
 export function ProductReviews({ productId }: { productId: string }) {
   const [reviews, setReviews] = useState<any[]>([])
@@ -34,7 +35,15 @@ export function ProductReviews({ productId }: { productId: string }) {
       <h2 className="font-headline-lg text-headline-lg text-on-surface mb-8">Customer Reviews</h2>
 
       {loading ? (
-        <p className="text-on-surface-variant">Loading reviews...</p>
+        <div className="space-y-6 mb-10">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/30">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-4 w-full mt-3" />
+              <Skeleton className="h-4 w-2/3 mt-2" />
+            </div>
+          ))}
+        </div>
       ) : reviews.length === 0 ? (
         <p className="text-on-surface-variant mb-8">No reviews yet. Be the first to review this product.</p>
       ) : (

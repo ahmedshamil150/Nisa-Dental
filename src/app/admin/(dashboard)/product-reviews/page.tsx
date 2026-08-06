@@ -3,9 +3,11 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 export default function AdminProductReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("")
   const [page, setPage] = useState(1)
   const PAGE_SIZE = 20
@@ -17,6 +19,7 @@ export default function AdminProductReviewsPage() {
     if (!sb) return
     const { data } = await sb.from("product_reviews").select("*, product:products(name)").order("created_at", { ascending: false })
     setReviews((data || []) as any[])
+    setLoading(false)
   }
 
   async function toggleApproved(r: any) {
@@ -65,7 +68,9 @@ export default function AdminProductReviewsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={8} />
+            ) : filtered.length === 0 ? (
               <tr><td colSpan={8} className="px-6 py-12 text-center text-on-surface-variant">No reviews found</td></tr>
             ) : paged.map((r: any, i: number) => (
               <tr key={r.id} className="hover:bg-surface-container-low">

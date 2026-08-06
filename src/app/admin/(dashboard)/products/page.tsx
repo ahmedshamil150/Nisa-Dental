@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react"
 import { getSupabase } from "@/lib/supabase"
 import { Pagination } from "@/components/ui/Pagination"
+import { SkeletonTable } from "@/components/ui/Skeleton"
 
 interface Product {
   id: string
@@ -25,6 +26,7 @@ interface Product {
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<Product | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -75,6 +77,7 @@ export default function AdminProductsPage() {
     ])
     setProducts((p.data || []) as any)
     setCategories((c.data || []) as any)
+    setLoading(false)
   }
 
   const filtered = useMemo(() => {
@@ -238,7 +241,9 @@ export default function AdminProductsPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filtered.length === 0 ? (
+            {loading ? (
+              <SkeletonTable rows={6} columns={9} />
+            ) : filtered.length === 0 ? (
               <tr><td colSpan={9} className="px-6 py-12 text-center text-on-surface-variant">No products match filters</td></tr>
             ) : paged.map((p: any, i: number) => (
               <tr key={p.id} className="hover:bg-surface-container-low">
