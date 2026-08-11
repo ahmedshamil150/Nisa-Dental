@@ -45,6 +45,7 @@ const sections: { key: SectionKey; label: string }[] = [
 ]
 
 function sectionForPath(pathname: string): SectionKey {
+  if (pathname === "/admin") return "clinic"
   if (shopLinks.some((l) => l.href !== "/admin" && pathname.startsWith(l.href))) return "shop"
   if (clinicLinks.some((l) => pathname.startsWith(l.href))) return "clinic"
   if (miscLinks.some((l) => pathname.startsWith(l.href))) return "all"

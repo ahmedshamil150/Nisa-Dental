@@ -5,7 +5,6 @@ import { getSupabase } from "@/lib/supabase"
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
 
 const TestimonialsCarousel = dynamic(() => import("@/components/ui/TestimonialsCarousel").then(m => ({ default: m.TestimonialsCarousel })))
-const FeaturedProducts = dynamic(() => import("@/components/ui/FeaturedProducts").then(m => ({ default: m.FeaturedProducts })))
 
 async function getServices() {
   const sb = getSupabase()
@@ -21,15 +20,8 @@ async function getTestimonials() {
   return (data || []) as any[]
 }
 
-async function getFeaturedProducts() {
-  const sb = getSupabase()
-  if (!sb) return []
-  const { data } = await sb.from("products").select("*").eq("is_active", true).eq("is_featured", true).order("created_at", { ascending: false })
-  return (data || []) as any[]
-}
-
 export default async function HomePage() {
-  const [services, testimonials, featuredProducts] = await Promise.all([getServices(), getTestimonials(), getFeaturedProducts()])
+  const [services, testimonials] = await Promise.all([getServices(), getTestimonials()])
 
   return (
     <>
@@ -62,12 +54,6 @@ export default async function HomePage() {
               className="border border-primary text-primary px-6 md:px-8 py-3 md:py-4 rounded-lg font-label-md text-[13px] md:text-label-md hover:bg-primary/5 transition-all active:scale-95 text-center"
             >
               View Our Services
-            </Link>
-            <Link
-              href="/shop"
-              className="bg-secondary-container text-on-secondary-container px-6 md:px-8 py-3 md:py-4 rounded-lg font-label-md text-[13px] md:text-label-md hover:shadow-md transition-all active:scale-95 text-center"
-            >
-              Shop Now
             </Link>
           </div>
         </div>
@@ -192,8 +178,6 @@ export default async function HomePage() {
           )}
         </div>
       </section>
-
-      <FeaturedProducts products={featuredProducts} />
 
       {/* Why Choose Us */}
       <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-section-gap border-y border-outline-variant/20">

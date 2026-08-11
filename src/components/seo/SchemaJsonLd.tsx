@@ -36,7 +36,7 @@ export function SchemaJsonLd() {
         inLanguage: "en-US",
         potentialAction: {
           "@type": "SearchAction",
-          target: { "@type": "EntryPoint", urlTemplate: "https://nisa-dental.vercel.app/shop?search={search_term_string}" },
+          target: { "@type": "EntryPoint", urlTemplate: "https://nisa-dental.vercel.app/about#services" },
           "query-input": "required name=search_term_string",
         },
       },
@@ -54,10 +54,9 @@ export function SchemaJsonLd() {
         "@id": "https://nisa-dental.vercel.app/#breadcrumb",
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: "https://nisa-dental.vercel.app/" },
-          { "@type": "ListItem", position: 2, name: "Shop", item: "https://nisa-dental.vercel.app/shop" },
-          { "@type": "ListItem", position: 3, name: "Appointment", item: "https://nisa-dental.vercel.app/appointment" },
-          { "@type": "ListItem", position: 4, name: "About", item: "https://nisa-dental.vercel.app/about" },
-          { "@type": "ListItem", position: 5, name: "Contact", item: "https://nisa-dental.vercel.app/contact" },
+          { "@type": "ListItem", position: 2, name: "Appointment", item: "https://nisa-dental.vercel.app/appointment" },
+          { "@type": "ListItem", position: 3, name: "About", item: "https://nisa-dental.vercel.app/about" },
+          { "@type": "ListItem", position: 4, name: "Contact", item: "https://nisa-dental.vercel.app/contact" },
         ],
       },
       {
@@ -78,14 +77,6 @@ export function SchemaJsonLd() {
             acceptedAnswer: {
               "@type": "Answer",
               text: "You can book an appointment through our website's appointment form or by calling us at +92-334-1710086.",
-            },
-          },
-          {
-            "@type": "Question",
-            name: "Do you sell dental products online?",
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: "Yes, we offer a range of premium dental care and surgical products through our online shop with delivery in Sialkot.",
             },
           },
         ],

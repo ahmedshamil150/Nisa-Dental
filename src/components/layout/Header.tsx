@@ -4,28 +4,15 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
-import { useCart } from "@/lib/cart-context"
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/shop", label: "Shop" },
-  { href: "/track", label: "Track Order" },
   { href: "/about", label: "About", dropdown: [
     { href: "/about#services", label: "Services" },
     { href: "/about#team", label: "Team" },
   ]},
   { href: "/contact", label: "Contact" },
 ]
-
-function CartBadge() {
-  const { itemCount } = useCart()
-  if (itemCount === 0) return null
-  return (
-    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-error text-on-error text-[10px] font-bold flex items-center justify-center">
-      {itemCount > 9 ? "9+" : itemCount}
-    </span>
-  )
-}
 
 export function Header() {
   const pathname = usePathname()
@@ -183,10 +170,6 @@ export function Header() {
             }`}>
               Appointment
             </Link>
-            <Link href="/cart" className={`relative hover:scale-110 transition-transform ${scrolled ? "text-white" : "text-primary"}`}>
-              <span className="material-symbols-outlined">shopping_cart</span>
-              <CartBadge />
-            </Link>
           </div>
         </div>
       </header>
@@ -209,18 +192,9 @@ export function Header() {
         {/* Icon capsule with 3 icons */}
         <div className="pointer-events-auto relative shrink-0">
           <div className={`bg-primary/90 backdrop-blur-md border border-primary-border/40 shadow-sm flex flex-col items-stretch transition-all duration-300 ease-out rounded-3xl ${iconsOpen ? "px-4 py-4 gap-3" : "px-3 pt-3 pb-2.5 gap-2.5"}`}>
-            <Link href="/cart" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5 relative" aria-label="Shopping cart">
-              <span className="material-symbols-outlined text-[22px] shrink-0">shopping_cart</span>
-              <CartBadge />
-              <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Cart</span>
-            </Link>
             <Link href="/appointment" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5" aria-label="Book appointment">
               <span className="material-symbols-outlined text-[22px] shrink-0">calendar_month</span>
               <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Appointment</span>
-            </Link>
-            <Link href="/track" className="flex items-center gap-3 text-on-primary hover:opacity-80 transition-opacity px-0.5" aria-label="Track order">
-              <span className="material-symbols-outlined text-[22px] shrink-0">local_shipping</span>
-              <span className={`font-label-md text-[13px] whitespace-nowrap transition-all duration-300 ease-out ${iconsOpen ? "opacity-100 max-w-[120px] ml-0" : "opacity-0 max-w-0 overflow-hidden -ml-3"}`}>Track</span>
             </Link>
             <button onClick={() => setIconsOpen(!iconsOpen)}
               className="flex items-center justify-center text-on-primary/70 hover:text-on-primary transition-colors pt-0.5"
@@ -256,10 +230,6 @@ export function Header() {
               <Link href="/about" onClick={() => setMenuOpen(false)}
                 className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname === "/about" ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>
                 About
-              </Link>
-              <Link href="/shop" onClick={() => setMenuOpen(false)}
-                className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname.startsWith("/shop") ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>
-                Shop
               </Link>
               <Link href="/contact" onClick={() => setMenuOpen(false)}
                 className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname === "/contact" ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>
