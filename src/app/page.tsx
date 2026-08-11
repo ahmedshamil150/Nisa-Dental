@@ -50,7 +50,7 @@ export default async function HomePage() {
               Book Appointment
             </Link>
             <Link
-              href="/about#services"
+              href="/services"
               className="border border-primary text-primary px-6 md:px-8 py-3 md:py-4 rounded-lg font-label-md text-[13px] md:text-label-md hover:bg-primary/5 transition-all active:scale-95 text-center"
             >
               View Our Services
@@ -95,7 +95,7 @@ export default async function HomePage() {
                       </li>
                     </ul>
                   </div>
-                  <Link href="/about#services" className="mt-8 inline-flex items-center gap-2 font-label-md text-label-md font-bold text-primary transition-all group-hover:gap-3.5">
+                  <Link href="/services" className="mt-8 inline-flex items-center gap-2 font-label-md text-label-md font-bold text-primary transition-all group-hover:gap-3.5">
                     Learn More <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </Link>
                 </div>
@@ -146,7 +146,7 @@ export default async function HomePage() {
                 <div className="p-7">
                   <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">{services[2]?.name || "Teeth Whitening"}</h3>
                   <p className="text-on-surface-variant">{services[2]?.short_description || "Professional grade brightening treatments that deliver immediate, safe, and stunning results."}</p>
-                  <Link href="/about#services" className="mt-5 inline-flex items-center gap-2 font-label-md text-label-md font-bold text-primary transition-all group-hover:gap-3.5">
+                  <Link href="/services" className="mt-5 inline-flex items-center gap-2 font-label-md text-label-md font-bold text-primary transition-all group-hover:gap-3.5">
                     Learn More <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </Link>
                 </div>
@@ -165,7 +165,7 @@ export default async function HomePage() {
                     <p className="max-w-xs opacity-85">{services[3]?.short_description || "Gentle, fun, and educational dental visits designed specifically for our youngest patients."}</p>
                   </div>
                   <Link
-                    href="/about#services"
+                    href="/services"
                     className="mt-8 inline-flex items-center gap-2 self-start rounded-xl bg-white px-6 py-3 font-label-md text-label-md font-bold text-on-tertiary-container transition-all hover:gap-3.5 hover:bg-surface-dim"
                   >
                     Explore <span className="material-symbols-outlined text-[18px]">arrow_forward</span>

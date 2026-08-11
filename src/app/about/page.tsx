@@ -1,12 +1,6 @@
 import { getSupabase } from "@/lib/supabase"
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
-
-async function getServices() {
-  const sb = getSupabase()
-  if (!sb) return []
-  const { data } = await sb.from("services").select("*").eq("is_active", true).order("sort_order")
-  return (data || []) as any[]
-}
+import Link from "next/link"
 
 async function getTeam() {
   const sb = getSupabase()
@@ -16,7 +10,7 @@ async function getTeam() {
 }
 
 export default async function AboutPage() {
-  const [services, team] = await Promise.all([getServices(), getTeam()])
+  const team = await getTeam()
 
   return (
     <div className="container mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
@@ -25,8 +19,11 @@ export default async function AboutPage() {
         <h1 className="font-headline-lg text-headline-lg text-on-surface mb-4">About NISA Dental</h1>
         <div className="w-16 h-1 bg-primary mx-auto rounded-full mb-6" />
         <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-          At NISA Dental Clinic, we are committed to providing exceptional dental care combined with premium surgical products. Our state-of-the-art facility and experienced team ensure every patient receives personalized, comfortable treatment.
+          At NISA Dental Clinic, we are committed to providing exceptional dental care. Our state-of-the-art facility and experienced team ensure every patient receives personalized, comfortable treatment.
         </p>
+        <Link href="/services" className="mt-8 inline-flex items-center gap-2 bg-primary text-on-primary px-8 py-4 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-all active:scale-95">
+          View Our Services <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </Link>
       </div>
       </AnimateOnScroll>
 
@@ -49,28 +46,6 @@ export default async function AboutPage() {
         </div>
       </div>
       </AnimateOnScroll>
-      {services.length > 0 && (
-        <AnimateOnScroll>
-        <section id="services" className="mb-20 scroll-mt-20">
-          <h2 className="font-headline-lg text-headline-lg text-on-surface text-center mb-12">Our Services</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((s: any) => (
-              <div key={s.id} className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 transition-all">
-                <span className="material-symbols-outlined text-primary text-4xl mb-4">clinical_notes</span>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{s.name}</h3>
-                {s.short_description && <p className="text-on-surface-variant mb-4">{s.short_description}</p>}
-                {s.description && <p className="text-caption text-on-surface-variant mb-4 line-clamp-2">{s.description}</p>}
-                <div className="flex items-center justify-between mt-6 pt-4 border-t border-outline-variant/20">
-                  {s.price && <span className="font-headline-md text-headline-md text-primary">PKR {s.price}</span>}
-                  {s.duration_minutes && <span className="text-caption text-on-surface-variant">~{s.duration_minutes} min</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-        </AnimateOnScroll>
-      )}
-
       {team.length > 0 && (
         <AnimateOnScroll>
         <section id="team" className="scroll-mt-20">

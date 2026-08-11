@@ -7,10 +7,10 @@ import { useEffect, useRef, useState } from "react"
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About", dropdown: [
-    { href: "/about#services", label: "Services" },
-    { href: "/about#team", label: "Team" },
-  ]},
+  { href: "/services", label: "Services" },
+  { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
+  { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Contact" },
 ]
 
@@ -84,7 +84,7 @@ export function Header() {
     activeTweenRefs.current[i] = tl.tweenTo(0, { duration: 0.2, ease: "power3.easeOut", overwrite: "auto" })
   }
 
-  function NavPill({ link, index, scrolledState }: { link: typeof navLinks[0], index: number, scrolledState: boolean }) {
+  function NavPill({ link, index, scrolledState }: { link: { href: string; label: string; dropdown?: { href: string; label: string }[] }, index: number, scrolledState: boolean }) {
     const isActive = pathname === link.href
     const textClasses = scrolledState
       ? (isActive ? "text-white" : "text-white/80 hover:text-white")
@@ -230,6 +230,18 @@ export function Header() {
               <Link href="/about" onClick={() => setMenuOpen(false)}
                 className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname === "/about" ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>
                 About
+              </Link>
+              <Link href="/services" onClick={() => setMenuOpen(false)}
+                className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname === "/services" ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>
+                Services
+              </Link>
+              <Link href="/blog" onClick={() => setMenuOpen(false)}
+                className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname === "/blog" ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>
+                Blog
+              </Link>
+              <Link href="/faq" onClick={() => setMenuOpen(false)}
+                className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname === "/faq" ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>
+                FAQ
               </Link>
               <Link href="/contact" onClick={() => setMenuOpen(false)}
                 className={`block px-4 py-3 rounded-xl font-label-md text-label-md ${pathname === "/contact" ? "bg-primary-fixed/30 text-primary font-bold" : "text-on-surface hover:bg-surface-container"}`}>

@@ -20,34 +20,58 @@ const notoSerif = Noto_Serif({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://nisa-dental.vercel.app"),
   title: {
-    default: "Nisa Dental & Surgical - Advanced Dental Care & Surgical Supplies in Sialkot",
+    default: "Nisa Dental & Surgical - Advanced Dental Care in Sialkot",
     template: "%s | Nisa Dental & Surgical",
   },
-  description: "Nisa Dental & Surgical provides professional dental care services and premium surgical products in Sialkot. Book your appointment today for expert dental treatment.",
+  description: "Nisa Dental & Surgical in Sialkot offers expert dental care — scaling, root canal, fillings, braces, implants and more. Book your appointment today at 0334-1710086.",
+  keywords: [
+    "dentist in Sialkot", "dental clinic Sialkot", "root canal treatment Sialkot",
+    "braces Sialkot", "dental implants", "teeth cleaning", "dental filling",
+    "Nisa Dental", "dental care Pakistan", "orthodontics Sialkot",
+  ],
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
   },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Nisa Dental & Surgical - Advanced Dental Care & Surgical Supplies",
-    description: "Professional dental services and premium surgical products in Sialkot. Book your appointment today.",
+    title: "Nisa Dental & Surgical - Advanced Dental Care in Sialkot",
+    description: "Expert dental care in Sialkot — scaling, root canal, fillings, braces, implants and more. Book your appointment at 0334-1710086.",
     url: "https://nisa-dental.vercel.app",
     siteName: "Nisa Dental & Surgical",
     locale: "en_US",
     type: "website",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "Nisa Dental & Surgical" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nisa Dental & Surgical",
-    description: "Professional dental services and premium surgical products in Sialkot.",
+    title: "Nisa Dental & Surgical - Advanced Dental Care in Sialkot",
+    description: "Expert dental care in Sialkot — scaling, root canal, fillings, braces, implants and more.",
+    images: ["/logo.png"],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "",
   },
   other: {
     "theme-color": "#3f625f",
+    "geo.region": "PK-PB",
+    "geo.placename": "Sialkot",
+    "geo.position": "32.4927;74.5317",
+    "ICBM": "32.4927, 74.5317",
   },
 }
 

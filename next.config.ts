@@ -1,14 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  compress: true,
   images: {
-    formats: ["image/webp"],
-    deviceSizes: [480, 768, 1024, 1280, 1536],
+    formats: ["image/webp", "image/avif"],
+    deviceSizes: [480, 768, 1024, 1280, 1536, 1920],
+    imageSizes: [64, 96, 128, 256, 384],
+    minimumCacheTTL: 86400,
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "gbrlphzesfndamkixjdt.supabase.co" },
       { protocol: "https", hostname: "**.supabase.co" },
     ],
+  },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "recharts", "jspdf", "html2canvas"],
   },
   headers: async () => [
     {

@@ -12,22 +12,28 @@ export function Footer() {
             <p className="text-on-surface-variant font-body-md">
               Leading the way in premium, technology-driven oral healthcare with a focus on human comfort.
             </p>
+            <div className="mt-6 space-y-3">
+              <p className="text-on-surface-variant font-body-md">Nisa Dental Clinic<br />Aimnabad Road, Sialkot</p>
+              <p className="text-on-surface-variant font-body-md">Nisa Surgical<br />Kareempura Road, Sialkot</p>
+              <p className="font-body-md"><a href="tel:03341710086" className="text-primary hover:opacity-80 transition-opacity">0334-1710086</a></p>
+            </div>
           </div>
           <div>
             <h3 className="font-label-md text-label-md text-primary mb-6">SERVICES</h3>
             <ul className="space-y-4">
-              <li><Link href="/about#services" className="text-on-surface-variant hover:text-primary transition-colors">General Dentistry</Link></li>
-              <li><Link href="/about#services" className="text-on-surface-variant hover:text-primary transition-colors">Cosmetic Dental</Link></li>
-              <li><Link href="/about#services" className="text-on-surface-variant hover:text-primary transition-colors">Orthodontics</Link></li>
-              <li><Link href="/about#services" className="text-on-surface-variant hover:text-primary transition-colors">Pediatric Care</Link></li>
+              <li><Link href="/services" className="text-on-surface-variant hover:text-primary transition-colors">General Dentistry</Link></li>
+              <li><Link href="/services" className="text-on-surface-variant hover:text-primary transition-colors">Cosmetic Dental</Link></li>
+              <li><Link href="/services" className="text-on-surface-variant hover:text-primary transition-colors">Orthodontics</Link></li>
+              <li><Link href="/services" className="text-on-surface-variant hover:text-primary transition-colors">Dental Implants</Link></li>
             </ul>
           </div>
           <div>
-            <h3 className="font-label-md text-label-md text-primary mb-6">CLINIC</h3>
+            <h3 className="font-label-md text-label-md text-primary mb-6">EXPLORE</h3>
             <ul className="space-y-4">
-              <li className="text-on-surface-variant">Nisa Dental Clinic<br />Aimnabad Road, Sialkot</li>
-              <li className="text-on-surface-variant">Nisa Surgical<br />Kareempura Road, Sialkot</li>
-              <li className="text-on-surface-variant"><a href="tel:03341710086" className="hover:text-primary">0334-1710086</a></li>
+              <li><Link href="/about" className="text-on-surface-variant hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link href="/blog" className="text-on-surface-variant hover:text-primary transition-colors">Blog</Link></li>
+              <li><Link href="/faq" className="text-on-surface-variant hover:text-primary transition-colors">FAQ</Link></li>
+              <li><Link href="/appointment" className="text-on-surface-variant hover:text-primary transition-colors">Book Appointment</Link></li>
             </ul>
           </div>
           <div>
