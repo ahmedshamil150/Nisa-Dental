@@ -15,7 +15,7 @@ export const blogPosts: BlogPost[] = [
     title: "Root Canal Treatment in Sialkot: Cost, Steps and What to Expect",
     excerpt:
       "Everything you need to know about root canal treatment at Nisa Dental — pricing in Sialkot, how many visits it takes, and how we keep it comfortable.",
-    coverIcon: "dentist",
+    coverIcon: "dentistry",
     category: "Treatments",
     date: "2026-08-01",
     readMinutes: 5,

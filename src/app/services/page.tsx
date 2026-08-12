@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { getSupabase } from "@/lib/supabase"
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
+import { safeMaterialIcon } from "@/lib/material-icons"
 import Link from "next/link"
 
 export const metadata: Metadata = {
@@ -41,7 +42,7 @@ function ServiceCard({ s }: { s: Service }) {
   return (
     <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 hover:-translate-y-1 transition-all duration-300">
       <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-        <span className="material-symbols-outlined text-primary text-2xl">{s.icon || "clinical_notes"}</span>
+        <span className="material-symbols-outlined text-primary text-2xl">{safeMaterialIcon(s.icon)}</span>
       </div>
       <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{s.name}</h3>
       {s.short_description && <p className="text-on-surface-variant mb-3">{s.short_description}</p>}
@@ -56,6 +57,20 @@ function ServiceCard({ s }: { s: Service }) {
           <span className="font-headline-md text-headline-md text-primary">On Consultation</span>
         )}
         {s.duration_minutes && <span className="text-caption text-on-surface-variant">~{s.duration_minutes} min</span>}
+      </div>
+      <div className="mt-6 flex flex-col sm:flex-row gap-3">
+        <Link
+          href="/appointment"
+          className="flex-1 bg-primary text-on-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/90 active:scale-95 transition-all"
+        >
+          Book Appointment
+        </Link>
+        <Link
+          href="/contact"
+          className="flex-1 border border-primary text-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/5 active:scale-95 transition-all"
+        >
+          Contact
+        </Link>
       </div>
     </div>
   )

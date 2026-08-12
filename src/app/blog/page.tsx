@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { blogPosts } from "@/lib/blog-posts"
+import { safeMaterialIcon } from "@/lib/material-icons"
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
 
 export const metadata: Metadata = {
@@ -38,7 +39,7 @@ export default function BlogPage() {
               className="group flex flex-col bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 h-full"
             >
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                <span className="material-symbols-outlined text-primary text-2xl">{post.coverIcon}</span>
+                <span className="material-symbols-outlined text-primary text-2xl">{safeMaterialIcon(post.coverIcon)}</span>
               </div>
               <div className="flex items-center gap-3 text-caption text-on-surface-variant mb-2">
                 <span className="bg-primary/10 text-primary px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider text-[11px]">{post.category}</span>
