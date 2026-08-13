@@ -4,6 +4,7 @@ import "./globals.css"
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper"
 import { SchemaJsonLd } from "@/components/seo/SchemaJsonLd"
 import { MaterialSymbolsLoader } from "@/components/seo/MaterialSymbolsLoader"
+import { SITE_URL } from "@/lib/site-config"
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -20,38 +21,45 @@ const notoSerif = Noto_Serif({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nisa-dental.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Nisa Dental & Surgical - Advanced Dental Care in Sialkot",
+    default: "Best Dental Clinic in Sialkot | Nisa Dental & Surgical",
     template: "%s | Nisa Dental & Surgical",
   },
-  description: "Nisa Dental & Surgical in Sialkot offers expert dental care — scaling, root canal, fillings, braces, implants and more. Book your appointment today at 0334-1710086.",
+  description: "Nisa Dental & Surgical is a leading dental clinic in Sialkot offering root canal, scaling & polishing, braces, implants, fillings and extractions at transparent prices. Dentist near you in Sialkot Cantt. Call 0334-1710086.",
   keywords: [
+    "Best dental clinic in Sialkot", "Top 10 dentist in Sialkot", "Dental clinic Sialkot Cantt",
+    "Dentist Sialkot near me", "Lady dentist in Sialkot", "Smile dental clinic Sialkot",
+    "Makkah Dental clinic Sialkot", "Dental clinic near me", "dental clinic in Sialkot",
     "dentist in Sialkot", "dental clinic Sialkot", "root canal treatment Sialkot",
     "braces Sialkot", "dental implants", "teeth cleaning", "dental filling",
     "Nisa Dental", "dental care Pakistan", "orthodontics Sialkot",
+    "best dentist Sialkot", "teeth whitening Sialkot",
+    "dentist in Pakistan", "affordable dental care", "dental surgeon Sialkot",
+    "dentist Cantt Sialkot", "dental hospital Sialkot", "tooth extraction Sialkot",
+    "scaling polishing Sialkot", "dental braces cost Sialkot", "implant dentist Sialkot",
   ],
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",
   },
   alternates: {
-    canonical: "/",
+    canonical: SITE_URL,
   },
   openGraph: {
-    title: "Nisa Dental & Surgical - Advanced Dental Care in Sialkot",
-    description: "Expert dental care in Sialkot — scaling, root canal, fillings, braces, implants and more. Book your appointment at 0334-1710086.",
-    url: "https://nisa-dental.vercel.app",
+    title: "Best Dental Clinic in Sialkot | Nisa Dental & Surgical",
+    description: "Leading dental clinic in Sialkot — root canal, scaling & polishing, braces, implants, fillings and extractions at transparent prices. Book at 0334-1710086.",
+    url: SITE_URL,
     siteName: "Nisa Dental & Surgical",
     locale: "en_US",
     type: "website",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "Nisa Dental & Surgical" }],
+    images: [{ url: `${SITE_URL}/logo.png`, width: 512, height: 512, alt: "Nisa Dental & Surgical" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nisa Dental & Surgical - Advanced Dental Care in Sialkot",
-    description: "Expert dental care in Sialkot — scaling, root canal, fillings, braces, implants and more.",
-    images: ["/logo.png"],
+    title: "Best Dental Clinic in Sialkot | Nisa Dental & Surgical",
+    description: "Leading dental clinic in Sialkot — root canal, scaling & polishing, braces, implants and more.",
+    images: [`${SITE_URL}/logo.png`],
   },
   robots: {
     index: true,

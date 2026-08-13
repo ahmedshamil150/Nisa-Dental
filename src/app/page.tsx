@@ -1,9 +1,22 @@
 import Image from "next/image"
 import Link from "next/link"
 import dynamic from "next/dynamic"
+import type { Metadata } from "next"
 import { getSupabase } from "@/lib/supabase"
 import { safeMaterialIcon } from "@/lib/material-icons"
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
+
+export const metadata: Metadata = {
+  title: "Best Dental Clinic in Sialkot | Dentist Near You - Nisa Dental",
+  description: "Looking for the best dental clinic in Sialkot? Nisa Dental & Surgical offers root canal, scaling & polishing, braces, implants, fillings and extractions in Sialkot Cantt at transparent prices. Call 0334-1710086.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Best Dental Clinic in Sialkot | Nisa Dental & Surgical",
+    description: "Expert dental care in Sialkot — root canal, scaling, braces, implants and more. Dentist near you in Sialkot Cantt.",
+    type: "website",
+    url: "/",
+  },
+}
 
 const TestimonialsCarousel = dynamic(() => import("@/components/ui/TestimonialsCarousel").then(m => ({ default: m.TestimonialsCarousel })))
 
