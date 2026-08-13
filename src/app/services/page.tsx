@@ -40,37 +40,39 @@ async function getServices() {
 function ServiceCard({ s }: { s: Service }) {
   const fromPrice = /starting from/i.test(s.short_description || "") || /from 50/i.test(s.short_description || "") || /from 60/i.test(s.short_description || "")
   return (
-    <div className="bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 hover:-translate-y-1 transition-all duration-300">
+    <div className="flex h-full flex-col bg-surface-container-low p-8 rounded-xl border border-outline-variant/30 group hover:border-primary/30 hover:-translate-y-1 transition-all duration-300">
       <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
         <span className="material-symbols-outlined text-primary text-2xl">{safeMaterialIcon(s.icon)}</span>
       </div>
       <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{s.name}</h3>
-      {s.short_description && <p className="text-on-surface-variant mb-3">{s.short_description}</p>}
-      {s.description && <p className="text-caption text-on-surface-variant mb-4 line-clamp-3">{s.description}</p>}
-      <div className="flex items-center justify-between mt-6 pt-4 border-t border-outline-variant/20">
-        {s.price ? (
-          <div>
-            <span className="font-headline-md text-headline-md text-primary">PKR {s.price.toLocaleString()}</span>
-            {fromPrice && <span className="text-xs text-on-surface-variant block">starting from</span>}
-          </div>
-        ) : (
-          <span className="font-headline-md text-headline-md text-primary">On Consultation</span>
-        )}
-        {s.duration_minutes && <span className="text-caption text-on-surface-variant">~{s.duration_minutes} min</span>}
-      </div>
-      <div className="mt-6 flex flex-col sm:flex-row gap-3">
-        <Link
-          href="/appointment"
-          className="flex-1 bg-primary text-on-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/90 active:scale-95 transition-all"
-        >
-          Book Appointment
-        </Link>
-        <Link
-          href="/contact"
-          className="flex-1 border border-primary text-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/5 active:scale-95 transition-all"
-        >
-          Contact
-        </Link>
+      {s.short_description && <p className="text-on-surface-variant mb-3 line-clamp-1">{s.short_description}</p>}
+      {s.description && <p className="text-caption text-on-surface-variant line-clamp-2">{s.description}</p>}
+      <div className="mt-auto">
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-outline-variant/20">
+          {s.price ? (
+            <div>
+              <span className="font-headline-md text-headline-md text-primary">PKR {s.price.toLocaleString()}</span>
+              {fromPrice && <span className="text-xs text-on-surface-variant block">starting from</span>}
+            </div>
+          ) : (
+            <span className="font-headline-md text-headline-md text-primary">On Consultation</span>
+          )}
+          {s.duration_minutes && <span className="text-caption text-on-surface-variant">~{s.duration_minutes} min</span>}
+        </div>
+        <div className="mt-6 flex flex-col sm:flex-row gap-3">
+          <Link
+            href="/appointment"
+            className="flex-1 bg-primary text-on-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/90 active:scale-95 transition-all"
+          >
+            Book Appointment
+          </Link>
+          <Link
+            href="/contact"
+            className="flex-1 border border-primary text-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/5 active:scale-95 transition-all"
+          >
+            Contact
+          </Link>
+        </div>
       </div>
     </div>
   )
@@ -111,9 +113,9 @@ export default async function ServicesPage() {
       </div>
 
       {services.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {services.map((s: Service, i: number) => (
-            <AnimateOnScroll key={s.id} delay={Math.min(i * 0.05, 0.2)}>
+            <AnimateOnScroll key={s.id} delay={Math.min(i * 0.05, 0.2)} className="h-full">
               <ServiceCard s={s} />
             </AnimateOnScroll>
           ))}
