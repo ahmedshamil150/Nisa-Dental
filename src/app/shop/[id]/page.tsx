@@ -5,6 +5,7 @@ import { getSupabase } from "@/lib/supabase"
 import { AddToCartLargeButton } from "@/components/shop/AddToCartLargeButton"
 import { ProductImageCarousel } from "@/components/shop/ProductImageCarousel"
 import { ProductReviews } from "@/components/shop/ProductReviews"
+import { SITE_URL } from "@/lib/site-config"
 
 async function getProduct(slug: string) {
   const sb = getSupabase()
@@ -63,7 +64,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               price: salePrice || product.price,
               priceCurrency: "PKR",
               availability: product.stock_quantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-              url: `https://nisa-dental.vercel.app/shop/${product.slug}`,
+              url: `${SITE_URL}/shop/${product.slug}`,
             },
           })}} />
           <p className="text-caption font-caption text-on-surface-variant uppercase tracking-widest mb-2">{product.category?.name || "Product"}</p>

@@ -1,6 +1,19 @@
+import type { Metadata } from "next"
 import { getSupabase } from "@/lib/supabase"
 import { AnimateOnScroll } from "@/components/ui/AnimateOnScroll"
 import Link from "next/link"
+
+export const metadata: Metadata = {
+  title: "About Us - Our Dental Team & Clinic in Sialkot",
+  description: "Meet the experienced team at Nisa Dental & Surgical in Sialkot. Learn about our modern facility, our approach to gentle dental care, and why patients trust us.",
+  alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About Nisa Dental & Surgical, Sialkot",
+    description: "Our story, our dental team, and our commitment to comfortable, expert dental care in Sialkot.",
+    type: "website",
+    url: "/about",
+  },
+}
 
 async function getTeam() {
   const sb = getSupabase()
