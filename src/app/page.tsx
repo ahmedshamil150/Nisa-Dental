@@ -95,7 +95,7 @@ export default async function HomePage() {
                       </li>
                     </ul>
                   </div>
-                  <Link href="/services" className="mt-8 inline-flex items-center gap-2 font-label-md text-label-md font-bold text-primary transition-all group-hover:gap-3.5">
+                  <Link href="/services" className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-label-md text-label-md font-bold text-on-primary transition-all hover:bg-primary/90 active:scale-95">
                     Learn More <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </Link>
                 </div>
@@ -126,7 +126,7 @@ export default async function HomePage() {
                   </div>
                   <Link
                     href="/appointment"
-                    className="block w-full rounded-xl bg-surface py-3.5 text-center font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-dim"
+                    className="block w-full rounded-lg bg-surface py-3 text-center font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-dim"
                   >
                     Book Consultant
                   </Link>
@@ -146,7 +146,7 @@ export default async function HomePage() {
                 <div className="p-7">
                   <h3 className="font-headline-md text-headline-md mb-2 text-on-surface">{services[2]?.name || "Teeth Whitening"}</h3>
                   <p className="text-on-surface-variant">{services[2]?.short_description || "Professional grade brightening treatments that deliver immediate, safe, and stunning results."}</p>
-                  <Link href="/services" className="mt-5 inline-flex items-center gap-2 font-label-md text-label-md font-bold text-primary transition-all group-hover:gap-3.5">
+                  <Link href="/services" className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-label-md text-label-md font-bold text-on-primary transition-all hover:bg-primary/90 active:scale-95">
                     Learn More <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </Link>
                 </div>
@@ -166,9 +166,9 @@ export default async function HomePage() {
                   </div>
                   <Link
                     href="/services"
-                    className="mt-8 inline-flex items-center gap-2 self-start rounded-xl bg-white px-6 py-3 font-label-md text-label-md font-bold text-on-tertiary-container transition-all hover:gap-3.5 hover:bg-surface-dim"
+                    className="mt-8 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-label-md text-label-md font-bold text-on-tertiary-container transition-all hover:bg-surface-dim active:scale-95"
                   >
-                    Explore <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    Learn More <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </Link>
                 </div>
                 <span className="material-symbols-outlined absolute -bottom-6 -right-4 text-[140px] opacity-10 rotate-12">{services[3]?.icon || "child_care"}</span>
