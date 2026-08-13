@@ -96,6 +96,16 @@ export default async function HomePage() {
             </AnimateOnScroll>
           ))}
         </div>
+        <AnimateOnScroll>
+        <div className="mt-14 text-center">
+          <Link
+            href="/services"
+            className="inline-flex items-center gap-2 rounded-lg border-2 border-primary text-primary px-10 py-4 font-label-md text-label-md font-bold hover:bg-primary hover:text-on-primary active:scale-95 transition-all"
+          >
+            View All Services <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </Link>
+        </div>
+        </AnimateOnScroll>
       </section>
 
       {/* Why Choose Us */}
