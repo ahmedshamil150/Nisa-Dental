@@ -62,13 +62,13 @@ function ServiceCard({ s }: { s: Service }) {
         <div className="mt-6 flex flex-col sm:flex-row gap-3">
           <Link
             href="/appointment"
-            className="flex-1 bg-primary text-on-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/90 active:scale-95 transition-all"
+            className="flex flex-1 items-center justify-center bg-primary text-on-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/90 active:scale-95 transition-all"
           >
             Book Appointment
           </Link>
           <Link
             href="/contact"
-            className="flex-1 border border-primary text-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/5 active:scale-95 transition-all"
+            className="flex flex-1 items-center justify-center border border-primary text-primary px-5 py-3 rounded-lg font-label-md text-label-md text-center hover:bg-primary/5 active:scale-95 transition-all"
           >
             Contact
           </Link>
