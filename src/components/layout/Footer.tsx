@@ -44,9 +44,15 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-outline-variant/30 pt-8 text-center">
+        <div className="border-t border-outline-variant/30 pt-8 text-center space-y-2">
           <p className="font-body-md text-body-md text-on-surface-variant">
             &copy; {new Date().getFullYear()} Nisa Dental Clinic. Premium Oral Healthcare.
+          </p>
+          <p className="font-body-md text-body-md text-on-surface-variant">
+            Developed and maintained by{" "}
+            <a href="https://www.ahdigitalsolutions.dev" target="_blank" rel="noopener" className="font-bold text-primary hover:opacity-80 transition-opacity">
+              AH Digital Solutions
+            </a>
           </p>
         </div>
       </div>
