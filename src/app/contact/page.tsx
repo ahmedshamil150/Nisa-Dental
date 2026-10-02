@@ -84,7 +84,7 @@ export default function ContactPage() {
             <div>
               <h3 className="font-headline-md text-headline-md text-on-surface">Address</h3>
               <p className="text-on-surface-variant">Nisa Dental Clinic<br />Aimnabad Road, Sialkot</p>
-              <p className="text-on-surface-variant mt-2">Nisa Surgical<br />Kareempura Road, Sialkot</p>
+              <p className="text-on-surface-variant mt-2">Nisa Surgical<br />Karimpura Road, Sialkot</p>
             </div>
           </Card>
           <Card className="p-6 flex items-start gap-4">

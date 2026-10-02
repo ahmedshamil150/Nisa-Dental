@@ -14,7 +14,7 @@ export function Footer() {
             </p>
             <div className="mt-6 space-y-3">
               <p className="text-on-surface-variant font-body-md">Nisa Dental Clinic<br />Aimnabad Road, Sialkot</p>
-              <p className="text-on-surface-variant font-body-md">Nisa Surgical<br />Kareempura Road, Sialkot</p>
+              <p className="text-on-surface-variant font-body-md">Nisa Surgical<br />Karimpura Road, Sialkot</p>
               <p className="font-body-md"><a href="tel:03341710086" className="text-primary hover:opacity-80 transition-opacity">0334-1710086</a></p>
             </div>
           </div>

@@ -45,7 +45,7 @@ const faqs = [
   },
   {
     q: "Where is Nisa Dental located?",
-    a: "Our dental clinic is on Aimnabad Road, Sialkot, and our surgical facility is on Kareempura Road, Sialkot. Contact us for directions or guidance.",
+    a: "Our dental clinic is on Aimnabad Road, Sialkot, and our surgical facility is on Karimpura Road, Sialkot. Contact us for directions or guidance.",
   },
   {
     q: "Is the treatment painful?",
